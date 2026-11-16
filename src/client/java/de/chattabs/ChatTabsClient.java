@@ -40,6 +40,7 @@ public class ChatTabsClient implements ClientModInitializer {
 		ClientPlayConnectionEvents.JOIN.register((connection, sender, minecraft) -> {
 			ChatTabs.get().resetServerChannel();
 			ChatHistory.get().onJoin(connection, minecraft);
+			UpdateChecker.onJoin(minecraft);
 		});
 		ClientPlayConnectionEvents.DISCONNECT.register((connection, minecraft) -> ChatHistory.get().onDisconnect());
 

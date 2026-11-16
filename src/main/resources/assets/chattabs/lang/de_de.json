@@ -179,6 +179,13 @@
 	"chattabs.config.match.command": "Befehl-Ausgabe",
 	"chattabs.config.edit.value.command": "Befehl",
 	"chattabs.config.edit.value.command.hint": "z. B. /where",
-	"chattabs.config.edit.value.command.tooltip": "Alles, was in den 3 Sekunden nach diesem Befehl sonst im System-Tab landen würde, kommt in diesen Kanal – z. B. die komplette Ausgabe von /where. Mehrere Befehle = mehrere Regeln.",
-	"chattabs.config.extra.test.command": "Befehl-Ausgaben werden beim Ausführen erkannt."
+	"chattabs.config.edit.value.command.tooltip": "Alles, was nach diesem Befehl (Zeit rechts einstellbar) sonst im System-Tab landen würde, kommt in diesen Kanal – z. B. die komplette Ausgabe von /where. Mehrere Befehle = mehrere Regeln.",
+	"chattabs.config.extra.test.command": "Befehl-Ausgaben werden beim Ausführen erkannt.",
+	"chattabs.config.update_check": "Nach Updates suchen",
+	"chattabs.config.update_check.tooltip": "Prüft beim Betreten einer Welt bzw. eines Servers (einmal pro Spielstart), ob auf GitHub eine neuere Version liegt, und meldet sich dann im Chat.",
+	"chattabs.update.available": "Neue Version %s verfügbar (du hast %s).",
+	"chattabs.update.download": "[Herunterladen]",
+	"chattabs.config.extra.seconds": "%s s",
+	"chattabs.config.extra.seconds.name": "Zeit",
+	"chattabs.config.extra.seconds.tooltip": "So viele Sekunden nach dem Befehl landet alles, was sonst im System-Tab landen würde, in diesem Kanal. Bei langsamer Antwort des Servers höher stellen."
 }

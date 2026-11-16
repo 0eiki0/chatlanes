@@ -95,7 +95,10 @@ class ExtraRulesScreen extends BaseSettingsScreen {
 					this.rebuildWidgets();
 				}));
 
-			EditBox value = new EditBox(this.font, this.left + matchWidth + 3, rowY + 1, this.contentWidth - matchWidth - deleteWidth - 6, 18, t("match"));
+			boolean command = rule.match == TabConfig.Match.COMMAND;
+			int secondsWidth = command ? 56 : 0;
+			EditBox value = new EditBox(this.font, this.left + matchWidth + 3, rowY + 1,
+				this.contentWidth - matchWidth - deleteWidth - 6 - (command ? secondsWidth + 3 : 0), 18, t("match"));
 			value.setMaxLength(1024);
 			value.setValue(rule.pattern);
 			value.moveCursorToStart(false);
@@ -107,6 +110,17 @@ class ExtraRulesScreen extends BaseSettingsScreen {
 				value.setTextColor(isValid(rule) ? 0xFFE0E0E0 : ERROR_COLOR);
 			});
 			this.addRenderableWidget(value);
+
+			if (command) {
+				// Wie lange nach dem Befehl die Ausgabe eingefangen wird
+				CycleButton<Integer> seconds = CycleButton.<Integer>builder(v -> t("extra.seconds", v), rule.secondsOrDefault())
+					.withValues(secondValues(rule.secondsOrDefault()))
+					.displayOnlyValue()
+					.create(this.left + this.contentWidth - deleteWidth - 3 - secondsWidth, rowY, secondsWidth, 20, t("extra.seconds.name"),
+						(b, v) -> rule.seconds = v);
+				seconds.setTooltip(Tooltip.create(t("extra.seconds.tooltip")));
+				this.addRenderableWidget(seconds);
+			}
 
 			Button delete = Button.builder(Component.literal("✕"), b -> {
 				rules.remove(index);
@@ -143,6 +157,13 @@ class ExtraRulesScreen extends BaseSettingsScreen {
 		}
 		this.addRenderableWidget(Button.builder(t("done"), b -> this.onClose())
 			.bounds(this.left + this.contentWidth - 90, bottomY, 90, 20).build());
+	}
+
+	/** Auswahl an Sekunden – enthält immer auch den aktuell gespeicherten Wert. */
+	private static List<Integer> secondValues(int current) {
+		java.util.TreeSet<Integer> values = new java.util.TreeSet<>(List.of(1, 2, 3, 4, 5, 6, 8, 10, 15, 20, 30, 45, 60));
+		values.add(current);
+		return List.copyOf(values);
 	}
 
 	private int pageCount() {

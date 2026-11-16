@@ -34,6 +34,9 @@ public class ChatTabsConfig {
 
 	public Language language = Language.AUTO;
 
+	/** Beim Betreten eines Servers prüfen, ob auf GitHub eine neuere Version liegt. */
+	public boolean updateCheck = true;
+
 	/** Pro Tab: Uhrzeit wie unter Allgemein eingestellt, immer an oder immer aus. */
 	public enum TimestampMode { DEFAULT, ON, OFF }
 
@@ -210,6 +213,12 @@ public class ChatTabsConfig {
 	public static class Rule {
 		public TabConfig.Match match = TabConfig.Match.CONTAINS;
 		public String pattern = "";
+		/** Nur bei Befehl-Ausgabe: wie viele Sekunden nach dem Befehl eingefangen wird (fehlt = 3). */
+		public Integer seconds;
+
+		public int secondsOrDefault() {
+			return this.seconds == null ? 3 : Math.max(1, Math.min(60, this.seconds));
+		}
 
 		public Rule() {
 		}
@@ -220,7 +229,9 @@ public class ChatTabsConfig {
 		}
 
 		public Rule copy() {
-			return new Rule(this.match, this.pattern);
+			Rule copy = new Rule(this.match, this.pattern);
+			copy.seconds = this.seconds;
+			return copy;
 		}
 	}
 

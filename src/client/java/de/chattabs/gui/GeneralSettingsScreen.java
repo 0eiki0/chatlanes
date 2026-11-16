@@ -86,6 +86,12 @@ class GeneralSettingsScreen extends BaseSettingsScreen {
 			.withValues(ChatTabsConfig.TimestampFormat.values())
 			.create(this.rightHalfX(), y, this.halfWidth(), 20, t("timestamp_format"), (b, v) -> this.working.timestampFormat = v));
 
+		y += ROW;
+		CycleButton<Boolean> updates = onOff(this.working.updateCheck)
+			.create(this.left, y, w, 20, t("update_check"), (b, v) -> this.working.updateCheck = v);
+		updates.setTooltip(Tooltip.create(t("update_check.tooltip")));
+		this.addRenderableWidget(updates);
+
 		this.addRenderableWidget(Button.builder(t("back"), b -> this.onClose())
 			.bounds(this.left, this.height - 26, w, 20).build());
 	}

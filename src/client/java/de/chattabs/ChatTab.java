@@ -16,7 +16,7 @@ public final class ChatTab {
 	/** Zusätzliche Regeln (nur für Nachrichten, die sonst im System-Tab landen würden). */
 	private final java.util.List<Pattern> extraPatterns = new java.util.ArrayList<>();
 	/** Befehle (klein, ohne "/"), deren Ausgabe in diesen Kanal kommt, z. B. "where". */
-	private final java.util.Set<String> extraCommands = new java.util.HashSet<>();
+	private final java.util.Map<String, Integer> extraCommands = new java.util.HashMap<>();
 	private int unread;
 
 	private ChatTab(Kind kind, @Nullable TabConfig config, @Nullable String player, @Nullable Pattern pattern) {
@@ -39,7 +39,7 @@ public final class ChatTab {
 				if (rule.match == TabConfig.Match.COMMAND) {
 					String command = commandName(rule.pattern);
 					if (!command.isEmpty()) {
-						tab.extraCommands.add(command);
+						tab.extraCommands.merge(command, rule.secondsOrDefault(), Math::max);
 					}
 					continue;
 				}
@@ -103,8 +103,9 @@ public final class ChatTab {
 		return (space >= 0 ? command.substring(0, space) : command).toLowerCase(java.util.Locale.ROOT);
 	}
 
-	boolean capturesCommand(String command) {
-		return this.extraCommands.contains(command);
+	/** Sekunden, die die Ausgabe dieses Befehls eingefangen wird, oder 0, wenn der Tab den Befehl nicht einfängt. */
+	int captureSeconds(String command) {
+		return this.extraCommands.getOrDefault(command, 0);
 	}
 
 	/** Passt eine der zusätzlichen Regeln? */

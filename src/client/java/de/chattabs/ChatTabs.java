@@ -37,7 +37,6 @@ public final class ChatTabs {
 	}
 
 	/** Ausgabe eines Befehls einfangen: bis zu diesem Zeitpunkt landet "System"-Ausgabe im Tab captureTab. */
-	private static final long COMMAND_OUTPUT_WINDOW = 3000L;
 	private @Nullable String captureTab;
 	private long captureUntil;
 	/** Per Befehl-Ausgabe zugeordnete Nachrichten → Tab-Name (bleibt auch nach "Speichern" der Einstellungen). */
@@ -195,9 +194,10 @@ public final class ChatTabs {
 		if (message.startsWith("/")) {
 			String command = ChatTab.commandName(message);
 			for (ChatTab tab : this.configTabs) {
-				if (tab.kind() == ChatTab.Kind.CHANNEL && tab.capturesCommand(command)) {
+				int seconds = tab.kind() == ChatTab.Kind.CHANNEL ? tab.captureSeconds(command) : 0;
+				if (seconds > 0) {
 					this.captureTab = tab.name();
-					this.captureUntil = System.currentTimeMillis() + COMMAND_OUTPUT_WINDOW;
+					this.captureUntil = System.currentTimeMillis() + seconds * 1000L;
 					break;
 				}
 			}
@@ -373,6 +373,10 @@ public final class ChatTabs {
 		Classification c = this.classify(message);
 		this.reopenIfNewer(c, ChatHistory.get().isRestoring() ? ChatHistory.get().restoreTime() : System.currentTimeMillis());
 		if (ChatHistory.get().isRestoring()) {
+			return;
+		}
+		if (c.everywhere()) {
+			// Hinweise der Mod (Update-Meldung, Trennlinie): in allen Tabs sichtbar, aber nicht ungelesen/gespeichert/Ton.
 			return;
 		}
 		ChatHistory.get().onMessage(message, this.captured.get(message));

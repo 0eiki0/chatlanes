@@ -179,6 +179,13 @@
 	"chattabs.config.match.command": "Command output",
 	"chattabs.config.edit.value.command": "Command",
 	"chattabs.config.edit.value.command.hint": "e.g. /where",
-	"chattabs.config.edit.value.command.tooltip": "Everything that would land in the System tab within 3 seconds after this command goes to this channel – e.g. the full output of /where. Several commands = several rules.",
-	"chattabs.config.extra.test.command": "Command output is detected when you run the command."
+	"chattabs.config.edit.value.command.tooltip": "Everything that would land in the System tab after this command (time adjustable on the right) goes to this channel – e.g. the full output of /where. Several commands = several rules.",
+	"chattabs.config.extra.test.command": "Command output is detected when you run the command.",
+	"chattabs.config.update_check": "Check for updates",
+	"chattabs.config.update_check.tooltip": "When joining a world or server (once per game start), checks whether a newer version is on GitHub and tells you in the chat.",
+	"chattabs.update.available": "New version %s available (you have %s).",
+	"chattabs.update.download": "[Download]",
+	"chattabs.config.extra.seconds": "%s s",
+	"chattabs.config.extra.seconds.name": "Time",
+	"chattabs.config.extra.seconds.tooltip": "For this many seconds after the command, everything that would land in the System tab goes to this channel. Increase if the server responds slowly."
 }
