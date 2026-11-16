@@ -3,6 +3,7 @@
 	"package": "de.chattabs.mixin",
 	"compatibilityLevel": "JAVA_25",
 	"client": [
+		"ChatComponentAccessor",
 		"ChatComponentMixin",
 		"ChatScreenMixin"
 	],

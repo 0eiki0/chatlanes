@@ -1,6 +1,7 @@
 package de.chattabs;
 
 import de.chattabs.config.ChatTabsConfig.TabConfig;
+import de.chattabs.config.TabColor;
 import java.util.regex.Pattern;
 import org.jspecify.annotations.Nullable;
 
@@ -27,8 +28,28 @@ public final class ChatTab {
 			case ALL -> Kind.ALL;
 			case CHANNEL -> Kind.CHANNEL;
 		};
-		Pattern pattern = kind == Kind.CHANNEL ? ChatTabs.compile(config.pattern) : null;
+		Pattern pattern = kind == Kind.CHANNEL ? buildPattern(config.match, config.pattern) : null;
 		return new ChatTab(kind, config, null, pattern);
+	}
+
+	/** Baut aus Erkennungsart und Wert den regulären Ausdruck. Wird auch vom Live-Test im Menü benutzt. */
+	public static @Nullable Pattern buildPattern(TabConfig.Match match, String value) {
+		if (value == null || value.isEmpty()) {
+			return null;
+		}
+		return switch (match == null ? TabConfig.Match.REGEX : match) {
+			// Beliebig viele "[Irgendwas] "-Präfixe (z. B. "[Freebuild] ") überspringen, dann muss die Kennung kommen.
+			case TAG -> Pattern.compile("^(?:\\[[^\\]]*\\]\\s*)*?" + Pattern.quote(value.trim()));
+			case CONTAINS -> Pattern.compile(Pattern.quote(value), Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
+			case REGEX -> ChatTabs.compile(value);
+		};
+	}
+
+	public int color() {
+		if (this.isPrivate()) {
+			return 0xFFFF55FF;
+		}
+		return this.config.color == null ? TabColor.DEFAULT.argb() : this.config.color.argb();
 	}
 
 	static ChatTab privateTab(String player) {
@@ -65,6 +86,10 @@ public final class ChatTab {
 
 	void addUnread() {
 		this.unread++;
+	}
+
+	void setUnread(int unread) {
+		this.unread = unread;
 	}
 
 	void clearUnread() {

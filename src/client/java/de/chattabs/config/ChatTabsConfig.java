@@ -23,6 +23,10 @@ public class ChatTabsConfig {
 	private static final Logger LOGGER = LoggerFactory.getLogger("chattabs");
 	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
+	/** Erkennt die Standard-Regex aus Version 1.0.x, z. B. ^(?:\[[^\]]+\] )?\[G\] */
+	private static final java.util.regex.Pattern LEGACY_DEFAULT =
+		java.util.regex.Pattern.compile(java.util.regex.Pattern.quote("^(?:\\[[^\\]]+\\] )?\\[") + "([A-Za-z0-9]+)" + java.util.regex.Pattern.quote("\\] "));
+
 	public enum Position { TOP, BOTTOM }
 
 	public enum ClosedChatMode { NEVER, UNREAD, ALWAYS }
@@ -33,6 +37,8 @@ public class ChatTabsConfig {
 	public ClosedChatMode showWhenClosed = ClosedChatMode.UNREAD;
 	/** Wie viele Nachrichten insgesamt gespeichert werden (Vanilla: 100). */
 	public int maxHistory = 1000;
+	/** Anzahl ungelesener Nachrichten hinter dem Tab-Namen anzeigen, z. B. "Global (3)". */
+	public boolean showUnreadCount = true;
 
 	/** Automatisch einen Tab pro Spieler für private Nachrichten anlegen. */
 	public boolean pmTabs = true;
@@ -47,6 +53,8 @@ public class ChatTabsConfig {
 	public String pmSendCommand = "/msg {player} {message}";
 	/** Msg-Tabs mit ungelesenen Nachrichten blinken. */
 	public boolean pmBlink = true;
+	/** Ton abspielen, wenn eine private Nachricht in einem nicht geöffneten Tab ankommt. */
+	public boolean pmSound = false;
 	/** Msg-Tabs nach einem Server-Wechsel automatisch schließen. */
 	public boolean pmCloseOnDisconnect = true;
 
@@ -55,10 +63,22 @@ public class ChatTabsConfig {
 	public static class TabConfig {
 		public enum Type { SYSTEM, CHANNEL, ALL }
 
+		/**
+		 * Wie {@link #pattern} gelesen wird:
+		 * TAG = Kennung wie "[G]" am Anfang (davor stehende Server-Präfixe wie "[Freebuild]" werden übersprungen),
+		 * CONTAINS = Nachricht enthält den Text (Groß-/Kleinschreibung egal),
+		 * REGEX = regulärer Ausdruck für Profis.
+		 */
+		public enum Match { TAG, CONTAINS, REGEX }
+
 		public String name = "Tab";
 		public Type type = Type.CHANNEL;
-		/** Regulärer Ausdruck, der auf den Text der Nachricht (ohne Farben) angewendet wird. */
+		// Absichtlich ohne Startwert: fehlt das Feld in einer alten Config, wird es zu REGEX (siehe sanitize).
+		public Match match;
+		/** Kennung, Text oder regulärer Ausdruck – je nach {@link #match}. */
 		public String pattern = "";
+		/** Textfarbe des Tabs (siehe {@link TabColor}). */
+		public TabColor color = TabColor.DEFAULT;
 		/** Wird beim Senden aus diesem Tab vor die Nachricht gesetzt, z. B. "/g " (leer = normal senden). */
 		public String sendPrefix = "";
 		/** Tab blinkt bei ungelesenen Nachrichten. */
@@ -67,24 +87,26 @@ public class ChatTabsConfig {
 		public TabConfig() {
 		}
 
-		public TabConfig(String name, Type type, String pattern, String sendPrefix, boolean blink) {
+		public TabConfig(String name, Type type, Match match, String pattern, String sendPrefix, boolean blink, TabColor color) {
 			this.name = name;
 			this.type = type;
+			this.match = match;
 			this.pattern = pattern;
 			this.sendPrefix = sendPrefix;
 			this.blink = blink;
+			this.color = color;
 		}
 
 		public TabConfig copy() {
-			return new TabConfig(this.name, this.type, this.pattern, this.sendPrefix, this.blink);
+			return new TabConfig(this.name, this.type, this.match, this.pattern, this.sendPrefix, this.blink, this.color);
 		}
 	}
 
 	public static ChatTabsConfig createDefault() {
 		ChatTabsConfig config = new ChatTabsConfig();
-		config.tabs.add(new TabConfig("System", TabConfig.Type.SYSTEM, "", "", false));
-		config.tabs.add(new TabConfig("Global", TabConfig.Type.CHANNEL, "^(?:\\[[^\\]]+\\] )?\\[G\\] ", "", false));
-		config.tabs.add(new TabConfig("Handel", TabConfig.Type.CHANNEL, "^(?:\\[[^\\]]+\\] )?\\[H\\] ", "", false));
+		config.tabs.add(new TabConfig("System", TabConfig.Type.SYSTEM, TabConfig.Match.TAG, "", "", false, TabColor.DEFAULT));
+		config.tabs.add(new TabConfig("Global", TabConfig.Type.CHANNEL, TabConfig.Match.TAG, "[G]", "", false, TabColor.GREEN));
+		config.tabs.add(new TabConfig("Handel", TabConfig.Type.CHANNEL, TabConfig.Match.TAG, "[H]", "", false, TabColor.GOLD));
 		return config;
 	}
 
@@ -105,6 +127,18 @@ public class ChatTabsConfig {
 		for (TabConfig tab : this.tabs) {
 			if (tab.name == null || tab.name.isBlank()) tab.name = "Tab";
 			if (tab.type == null) tab.type = TabConfig.Type.CHANNEL;
+			// Ältere Configs (Version 1.0.x) kannten nur reguläre Ausdrücke.
+			if (tab.match == null) {
+				// Die Standard-Regex von 1.0.x ("^(?:\\[[^\\]]+\\] )?\\[G\\] ") wird zur einfachen Kennung "[G]".
+				java.util.regex.Matcher legacy = LEGACY_DEFAULT.matcher(tab.pattern);
+				if (legacy.matches()) {
+					tab.match = TabConfig.Match.TAG;
+					tab.pattern = "[" + legacy.group(1) + "]";
+				} else {
+					tab.match = TabConfig.Match.REGEX;
+				}
+			}
+			if (tab.color == null) tab.color = TabColor.DEFAULT;
 			if (tab.pattern == null) tab.pattern = "";
 			if (tab.sendPrefix == null) tab.sendPrefix = "";
 		}

@@ -65,10 +65,17 @@ public final class ChatTabs {
 	/** Übernimmt eine (neue) Konfiguration und baut die Tabs neu auf. */
 	public void apply(ChatTabsConfig newConfig) {
 		String activeName = this.active == null ? null : this.active.name();
+		Map<String, Integer> unread = new java.util.HashMap<>();
+		for (ChatTab tab : this.configTabs) {
+			unread.merge(tab.name(), tab.unread(), Integer::sum);
+		}
 		this.config = newConfig;
 		this.configTabs.clear();
 		for (TabConfig tab : newConfig.tabs) {
-			this.configTabs.add(ChatTab.fromConfig(tab));
+			ChatTab created = ChatTab.fromConfig(tab);
+			// Ungelesen-Zähler bleiben nach dem Speichern der Einstellungen erhalten.
+			created.setUnread(unread.getOrDefault(created.name(), 0));
+			this.configTabs.add(created);
 		}
 
 		this.pmPattern = newConfig.pmTabs ? compile(newConfig.pmPattern) : null;
@@ -215,11 +222,37 @@ public final class ChatTabs {
 	/** Wird für jede neu empfangene Nachricht aufgerufen und zählt ungelesene Nachrichten. */
 	public void onNewMessage(GuiMessage message) {
 		Classification c = this.classify(message);
+		boolean playSound = false;
 		for (ChatTab tab : this.tabs()) {
 			if (tab != this.active && belongsTo(c, tab)) {
 				tab.addUnread();
+				playSound |= tab.isPrivate();
 			}
 		}
+		if (playSound && this.config.pmSound) {
+			Minecraft.getInstance().getSoundManager().play(
+				net.minecraft.client.resources.sounds.SimpleSoundInstance.forUI(net.minecraft.sounds.SoundEvents.NOTE_BLOCK_PLING, 1.5F)
+			);
+		}
+	}
+
+	/** Erkennt den Spielernamen einer privaten Nachricht – für den Live-Test im Menü. */
+	public static @Nullable String testPrivateMessage(String regex, String text) {
+		Pattern pattern = compile(regex);
+		if (pattern == null) {
+			return null;
+		}
+		Matcher matcher = pattern.matcher(text);
+		if (!matcher.find()) {
+			return null;
+		}
+		return pattern.namedGroups().entrySet().stream()
+			.filter(e -> e.getKey().startsWith("player"))
+			.sorted(Map.Entry.comparingByValue())
+			.map(e -> matcher.group(e.getKey()))
+			.filter(name -> name != null && !name.isEmpty())
+			.findFirst()
+			.orElse(null);
 	}
 
 	/** Gelöschte Nachrichten (Moderation) bleiben im selben Tab. */

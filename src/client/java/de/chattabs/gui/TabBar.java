@@ -1,8 +1,11 @@
 package de.chattabs.gui;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import de.chattabs.ChatTab;
 import de.chattabs.ChatTabs;
 import de.chattabs.config.ChatTabsConfig;
+import de.chattabs.config.TabColor;
+import de.chattabs.mixin.ChatComponentAccessor;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.client.Minecraft;
@@ -16,7 +19,7 @@ public final class TabBar {
 	private static final int HEIGHT = 12;
 	private static final int PADDING = 4;
 	private static final int GAP = 2;
-	private static final String SETTINGS_LABEL = "⚙";
+	
 
 	private static final int BG_ACTIVE = 0xE0000000;
 	private static final int BG_INACTIVE = 0x90000000;
@@ -46,9 +49,12 @@ public final class TabBar {
 
 		double scale = minecraft.options.chatScale().get();
 		int lineHeight = (int) (9.0 * (minecraft.options.chatLineSpacing().get() + 1.0));
-		int lines = minecraft.gui.hud.getChat().getLinesPerPage();
+		var chat = minecraft.gui.hud.getChat();
+		// Direkt über der obersten sichtbaren Zeile – mindestens eine Zeile Platz, höchstens die volle Chathöhe.
+		int visibleLines = Math.min(((ChatComponentAccessor) chat).chattabs$getTrimmedMessages().size(), chat.getLinesPerPage());
+		visibleLines = Math.max(1, visibleLines);
 		int chatBottom = (int) Math.floor((screenHeight - 40) / scale);
-		int chatTop = (int) Math.floor((chatBottom - lines * lineHeight) * scale);
+		int chatTop = (int) Math.floor((chatBottom - visibleLines * lineHeight) * scale);
 		return Math.max(0, chatTop - HEIGHT - 1);
 	}
 
@@ -59,7 +65,7 @@ public final class TabBar {
 		int x = 2;
 		for (ChatTab tab : tabs.tabs()) {
 			String label = tab.name();
-			if (tab != tabs.active() && tab.unread() > 0) {
+			if (tabs.config().showUnreadCount && tab != tabs.active() && tab.unread() > 0) {
 				label += " (" + (tab.unread() > 99 ? "99+" : tab.unread()) + ")";
 			}
 			int width = font.width(label) + PADDING * 2;
@@ -67,7 +73,8 @@ public final class TabBar {
 			x += width + GAP;
 		}
 		if (focused) {
-			entries.add(new Entry(null, SETTINGS_LABEL, x, y, font.width(SETTINGS_LABEL) + PADDING * 2));
+			String settings = net.minecraft.client.resources.language.I18n.get("chattabs.tabbar.settings");
+			entries.add(new Entry(null, settings, x, y, font.width(settings) + PADDING * 2));
 		}
 		return entries;
 	}
@@ -102,10 +109,14 @@ public final class TabBar {
 			int textColor;
 			if (blinking) {
 				textColor = TEXT_BLINK;
-			} else if (isActive || hovered) {
+			} else if (isActive) {
+				textColor = tab.color() == TabColor.DEFAULT.argb() ? TEXT_ACTIVE : tab.color();
+			} else if (hovered) {
 				textColor = TEXT_ACTIVE;
 			} else if (tab != null && tab.unread() > 0) {
 				textColor = TEXT_UNREAD;
+			} else if (tab != null) {
+				textColor = tab.color();
 			} else {
 				textColor = TEXT_INACTIVE;
 			}
@@ -134,14 +145,15 @@ public final class TabBar {
 			}
 			ChatTab tab = entry.tab();
 			if (tab == null) {
-				if (button == 0) {
+				if (button == InputConstants.MOUSE_BUTTON_LEFT) {
 					minecraft.gui.setScreen(new ChatTabsConfigScreen(screen));
 				}
 				return true;
 			}
-			if (button == 0) {
+			// Achtung: Seit 26.x nutzt Minecraft SDL-Nummern (links = 1, Mitte = 2, rechts = 3).
+			if (button == InputConstants.MOUSE_BUTTON_LEFT) {
 				tabs.setActive(tab);
-			} else if ((button == 1 || button == 2) && tab.isPrivate()) {
+			} else if ((button == InputConstants.MOUSE_BUTTON_RIGHT || button == InputConstants.MOUSE_BUTTON_MIDDLE) && tab.isPrivate()) {
 				tabs.closePrivateTab(tab);
 			}
 			return true;

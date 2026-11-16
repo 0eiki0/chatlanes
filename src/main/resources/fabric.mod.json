@@ -12,6 +12,9 @@
 	"entrypoints": {
 		"client": [
 			"de.chattabs.ChatTabsClient"
+		],
+		"modmenu": [
+			"de.chattabs.compat.ModMenuIntegration"
 		]
 	},
 	"mixins": [
@@ -23,10 +26,14 @@
 	"depends": {
 		"fabricloader": ">=0.20.0",
 		"minecraft": "~26.3",
-		"java": ">=25"
+		"java": ">=25",
+		"fabric-api": "*"
 	},
 	"contact": {
 		"sources": "https://github.com/0eiki0/chattabs",
 		"issues": "https://github.com/0eiki0/chattabs/issues"
+	},
+	"suggests": {
+		"modmenu": "*"
 	}
 }
