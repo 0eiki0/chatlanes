@@ -175,5 +175,10 @@
 	"chattabs.config.extra.test.tooltip": "Tippe eine Chatzeile ein, die bisher im System-Tab landet, um die Regeln zu prüfen.",
 	"chattabs.config.extra.test.match": "✔ Kommt in den Tab „%s“",
 	"chattabs.config.extra.test.no_match": "✘ Keine Regel passt",
-	"chattabs.config.extra.test.empty": "Füge eine Regel hinzu, um zu testen."
+	"chattabs.config.extra.test.empty": "Füge eine Regel hinzu, um zu testen.",
+	"chattabs.config.match.command": "Befehl-Ausgabe",
+	"chattabs.config.edit.value.command": "Befehl",
+	"chattabs.config.edit.value.command.hint": "z. B. /where",
+	"chattabs.config.edit.value.command.tooltip": "Alles, was in den 3 Sekunden nach diesem Befehl sonst im System-Tab landen würde, kommt in diesen Kanal – z. B. die komplette Ausgabe von /where. Mehrere Befehle = mehrere Regeln.",
+	"chattabs.config.extra.test.command": "Befehl-Ausgaben werden beim Ausführen erkannt."
 }

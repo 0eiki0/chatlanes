@@ -34,7 +34,7 @@ class ExtraRulesScreen extends BaseSettingsScreen {
 	/** Passt die Nachricht auf eine der zusätzlichen Regeln? (für den Live-Test) */
 	static boolean matchesAny(TabConfig tab, String text) {
 		for (Rule rule : tab.extraRulesOrEmpty()) {
-			if (isValid(rule)) {
+			if (rule.match != TabConfig.Match.COMMAND && isValid(rule)) {
 				Pattern pattern = ChatTab.buildPattern(rule.match, rule.pattern);
 				if (pattern != null && pattern.matcher(text).find()) {
 					return true;
@@ -161,10 +161,17 @@ class ExtraRulesScreen extends BaseSettingsScreen {
 		}
 
 		boolean matches = matchesAny(this.tab, lastTestMessage);
-		Component result = this.tab.extraRulesOrEmpty().isEmpty()
+		Component result;
+		result = this.tab.extraRulesOrEmpty().isEmpty()
 			? t("extra.test.empty")
 			: t(matches ? "extra.test.match" : "extra.test.no_match", this.tab.name);
 		int color = this.tab.extraRulesOrEmpty().isEmpty() ? LABEL_COLOR : matches ? OK_COLOR : ERROR_COLOR;
+		boolean hasCommand = this.tab.extraRulesOrEmpty().stream().anyMatch(r -> r.match == TabConfig.Match.COMMAND);
+		if (!matches && hasCommand) {
+			// Befehl-Ausgaben lassen sich nicht am Text testen – sie werden beim Ausführen des Befehls erkannt.
+			result = t("extra.test.command");
+			color = LABEL_COLOR;
+		}
 		graphics.text(this.font, result, this.left + this.labelWidth, this.testY + ROW, color);
 	}
 }

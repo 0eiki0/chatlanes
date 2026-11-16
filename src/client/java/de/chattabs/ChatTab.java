@@ -15,6 +15,8 @@ public final class ChatTab {
 	private final @Nullable Pattern pattern;
 	/** Zusätzliche Regeln (nur für Nachrichten, die sonst im System-Tab landen würden). */
 	private final java.util.List<Pattern> extraPatterns = new java.util.ArrayList<>();
+	/** Befehle (klein, ohne "/"), deren Ausgabe in diesen Kanal kommt, z. B. "where". */
+	private final java.util.Set<String> extraCommands = new java.util.HashSet<>();
 	private int unread;
 
 	private ChatTab(Kind kind, @Nullable TabConfig config, @Nullable String player, @Nullable Pattern pattern) {
@@ -34,6 +36,13 @@ public final class ChatTab {
 		ChatTab tab = new ChatTab(kind, config, null, pattern);
 		if (kind == Kind.CHANNEL) {
 			for (de.chattabs.config.ChatTabsConfig.Rule rule : config.extraRulesOrEmpty()) {
+				if (rule.match == TabConfig.Match.COMMAND) {
+					String command = commandName(rule.pattern);
+					if (!command.isEmpty()) {
+						tab.extraCommands.add(command);
+					}
+					continue;
+				}
 				Pattern extra = buildPattern(rule.match, rule.pattern);
 				if (extra != null) {
 					tab.extraPatterns.add(extra);
@@ -53,6 +62,7 @@ public final class ChatTab {
 			case TAG -> Pattern.compile("^(?:\\[[^\\]]*\\]\\s*)*?" + Pattern.quote(value.trim()));
 			case CONTAINS -> Pattern.compile(Pattern.quote(value), Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
 			case REGEX -> ChatTabs.compile(value);
+			case COMMAND -> null; // wird über den gesendeten Befehl erkannt, nicht über den Text
 		};
 	}
 
@@ -81,6 +91,20 @@ public final class ChatTab {
 
 	public @Nullable String player() {
 		return this.player;
+	}
+
+	/** "/Where Spieler" → "where" */
+	public static String commandName(String input) {
+		String command = input == null ? "" : input.trim();
+		if (command.startsWith("/")) {
+			command = command.substring(1);
+		}
+		int space = command.indexOf(' ');
+		return (space >= 0 ? command.substring(0, space) : command).toLowerCase(java.util.Locale.ROOT);
+	}
+
+	boolean capturesCommand(String command) {
+		return this.extraCommands.contains(command);
 	}
 
 	/** Passt eine der zusätzlichen Regeln? */

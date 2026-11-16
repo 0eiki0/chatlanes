@@ -60,7 +60,7 @@ class TabEditScreen extends BaseSettingsScreen {
 		this.addRenderableWidget(type);
 
 		CycleButton<TabConfig.Match> match = CycleButton.<TabConfig.Match>builder(v -> t("match." + v.name().toLowerCase()), this.edited.match)
-			.withValues(TabConfig.Match.values())
+			.withValues(TabConfig.Match.MAIN)
 			.create(this.rightHalfX(), y, half, 20, t("match"), (b, v) -> {
 				this.edited.match = v;
 				this.rebuildWidgets();

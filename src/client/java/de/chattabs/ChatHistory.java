@@ -189,6 +189,7 @@ public final class ChatHistory {
 					Component message = ComponentSerialization.CODEC.parse(this.ops, json.get("c")).getOrThrow();
 					lastTime = json.has("t") ? json.get("t").getAsLong() : lastTime;
 					this.restoreTime = lastTime;
+					ChatTabs.get().setRestoreCapturedTab(json.has("x") ? json.get("x").getAsString() : null);
 					chat.chattabs$addMessage(message, null, GuiMessageSource.SYSTEM_CLIENT, null);
 				} catch (RuntimeException e) {
 					LOGGER.debug("Überspringe beschädigte Zeile im Chatverlauf", e);
@@ -200,12 +201,13 @@ public final class ChatHistory {
 			ChatTabs.get().markEverywhere(separator);
 			chat.chattabs$addMessage(separator, null, GuiMessageSource.SYSTEM_CLIENT, null);
 		} finally {
+			ChatTabs.get().setRestoreCapturedTab(null);
 			this.restoring = false;
 		}
 	}
 
 	/** Neue Nachricht empfangen → im Hintergrund anhängen. */
-	void onMessage(GuiMessage message) {
+	void onMessage(GuiMessage message, @Nullable String capturedTab) {
 		Path path = this.file;
 		RegistryOps<JsonElement> registryOps = this.ops;
 		if (path == null || registryOps == null || this.restoring || !ChatTabs.get().config().saveHistory) {
@@ -221,6 +223,9 @@ public final class ChatHistory {
 		}
 		JsonObject json = new JsonObject();
 		json.addProperty("t", System.currentTimeMillis());
+		if (capturedTab != null) {
+			json.addProperty("x", capturedTab); // per Befehl-Ausgabe einem Kanal zugeordnet
+		}
 		json.add("c", content);
 		String line = json.toString() + "\n";
 		int limit = ChatTabs.get().config().maxHistory;

@@ -110,7 +110,13 @@ public class ChatTabsConfig {
 		 * CONTAINS = Nachricht enthält den Text (Groß-/Kleinschreibung egal),
 		 * REGEX = regulärer Ausdruck für Profis.
 		 */
-		public enum Match { TAG, CONTAINS, REGEX }
+		/** COMMAND gibt es nur bei zusätzlichen Regeln: Ausgabe eines Befehls (z. B. /where) diesem Kanal zuordnen. */
+		public enum Match {
+			TAG, CONTAINS, REGEX, COMMAND;
+
+			/** Erkennungsarten für die Haupt-Erkennung eines Kanals (ohne COMMAND). */
+			public static final java.util.List<Match> MAIN = java.util.List.of(TAG, CONTAINS, REGEX);
+		}
 
 		public String name = "Tab";
 		public Type type = Type.CHANNEL;

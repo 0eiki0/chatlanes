@@ -175,5 +175,10 @@
 	"chattabs.config.extra.test.tooltip": "Type a chat line that currently lands in the System tab to check the rules.",
 	"chattabs.config.extra.test.match": "✔ Goes to tab “%s”",
 	"chattabs.config.extra.test.no_match": "✘ No rule matches",
-	"chattabs.config.extra.test.empty": "Add a rule to test."
+	"chattabs.config.extra.test.empty": "Add a rule to test.",
+	"chattabs.config.match.command": "Command output",
+	"chattabs.config.edit.value.command": "Command",
+	"chattabs.config.edit.value.command.hint": "e.g. /where",
+	"chattabs.config.edit.value.command.tooltip": "Everything that would land in the System tab within 3 seconds after this command goes to this channel – e.g. the full output of /where. Several commands = several rules.",
+	"chattabs.config.extra.test.command": "Command output is detected when you run the command."
 }

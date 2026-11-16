@@ -36,6 +36,15 @@ public final class ChatTabs {
 		}
 	}
 
+	/** Ausgabe eines Befehls einfangen: bis zu diesem Zeitpunkt landet "System"-Ausgabe im Tab captureTab. */
+	private static final long COMMAND_OUTPUT_WINDOW = 3000L;
+	private @Nullable String captureTab;
+	private long captureUntil;
+	/** Per Befehl-Ausgabe zugeordnete Nachrichten → Tab-Name (bleibt auch nach "Speichern" der Einstellungen). */
+	private final ConcurrentMap<GuiMessage, String> captured = new MapMaker().weakKeys().makeMap();
+	/** Beim Wiederherstellen: Tab-Name der gerade geladenen Nachricht (aus dem gespeicherten Verlauf). */
+	private @Nullable String restoreCapturedTab;
+
 	/** Zuletzt (automatisch oder von Hand) gesendeter Kanalwechsel, z. B. "/ch global". */
 	private @Nullable String lastSwitchCommand;
 	private long lastSwitchTime;
@@ -184,6 +193,16 @@ public final class ChatTabs {
 	public void onCommandSent(String message) {
 		this.lastOwnInput = System.currentTimeMillis();
 		if (message.startsWith("/")) {
+			String command = ChatTab.commandName(message);
+			for (ChatTab tab : this.configTabs) {
+				if (tab.kind() == ChatTab.Kind.CHANNEL && tab.capturesCommand(command)) {
+					this.captureTab = tab.name();
+					this.captureUntil = System.currentTimeMillis() + COMMAND_OUTPUT_WINDOW;
+					break;
+				}
+			}
+		}
+		if (message.startsWith("/")) {
 			for (ChatTab tab : this.configTabs) {
 				TabConfig tabConfig = tab.config();
 				String prefix = tabConfig == null || tabConfig.switchCommand == null ? "" : tabConfig.switchCommand.trim();
@@ -211,6 +230,11 @@ public final class ChatTabs {
 		Pattern pattern = compile(regex);
 		String text = ChatFormatting.stripFormatting(message.getString());
 		return pattern != null && text != null && pattern.matcher(text).find();
+	}
+
+	/** Vom gespeicherten Verlauf gesetzt: zu welchem Tab die gerade geladene Befehl-Ausgabe gehört. */
+	void setRestoreCapturedTab(@Nullable String tabName) {
+		this.restoreCapturedTab = tabName;
 	}
 
 	/** Inhalte (z. B. die Trennlinie des wiederhergestellten Verlaufs), die in allen Tabs erscheinen. */
@@ -299,6 +323,26 @@ public final class ChatTabs {
 			}
 		}
 
+		// Befehl-Ausgabe (z. B. /where): erst gemerkte Zuordnung, sonst ein gerade offenes Zeitfenster.
+		if (result == Classification.SYSTEM) {
+			String tabName = this.captured.get(message);
+			if (tabName == null && ChatHistory.get().isRestoring()) {
+				tabName = this.restoreCapturedTab;
+			} else if (tabName == null && !ChatHistory.get().isRestoring()
+					&& this.captureTab != null && System.currentTimeMillis() <= this.captureUntil) {
+				tabName = this.captureTab;
+			}
+			if (tabName != null) {
+				for (ChatTab tab : this.configTabs) {
+					if (tab.kind() == ChatTab.Kind.CHANNEL && tab.name().equals(tabName)) {
+						this.captured.put(message, tabName);
+						result = new Classification(tab, null, false, tab.config().extraAlsoInSystem);
+						break;
+					}
+				}
+			}
+		}
+
 		this.cache.put(message, result);
 		return result;
 	}
@@ -331,7 +375,7 @@ public final class ChatTabs {
 		if (ChatHistory.get().isRestoring()) {
 			return;
 		}
-		ChatHistory.get().onMessage(message);
+		ChatHistory.get().onMessage(message, this.captured.get(message));
 		for (ChatTab tab : this.tabs()) {
 			if (tab != this.active && belongsTo(c, tab)) {
 				tab.addUnread();
@@ -419,6 +463,10 @@ public final class ChatTabs {
 		Classification c = this.cache.get(from);
 		if (c != null) {
 			this.cache.put(to, c);
+		}
+		String capturedTab = this.captured.get(from);
+		if (capturedTab != null) {
+			this.captured.put(to, capturedTab);
 		}
 		Long time = this.receivedAt.get(from);
 		if (time != null) {
