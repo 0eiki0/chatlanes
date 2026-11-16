@@ -36,9 +36,13 @@ class PrivateMessagesScreen extends BaseSettingsScreen {
 		y += ROW;
 
 		CycleButton<Boolean> close = onOff(this.working.pmCloseOnDisconnect)
-			.create(this.left, y, this.contentWidth, 20, t("pm_close"), (b, v) -> this.working.pmCloseOnDisconnect = v);
+			.create(this.left, y, half, 20, t("pm_close"), (b, v) -> this.working.pmCloseOnDisconnect = v);
 		close.setTooltip(Tooltip.create(t("pm_close.tooltip")));
 		this.addRenderableWidget(close);
+		var timestamps = timestampMode(this.working.pmTimestamps)
+			.create(this.rightHalfX(), y, half, 20, t("timestamps_short"), (b, v) -> this.working.pmTimestamps = v);
+		timestamps.setTooltip(Tooltip.create(t("timestamp_mode.tooltip")));
+		this.addRenderableWidget(timestamps);
 		y += ROW;
 
 		this.soundRow(y, this.working.pmSoundType, this.working.pmVolume, v -> this.working.pmSoundType = v, v -> this.working.pmVolume = v);

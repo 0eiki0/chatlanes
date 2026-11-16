@@ -72,6 +72,14 @@ abstract class BaseSettingsScreen extends Screen {
 		this.addRenderableWidget(play);
 	}
 
+	/** Auswahl "Uhrzeit: Standard / An / Aus" (Standard = wie unter Allgemein). */
+	static net.minecraft.client.gui.components.CycleButton.Builder<de.chattabs.config.ChatTabsConfig.TimestampMode> timestampMode(
+			de.chattabs.config.ChatTabsConfig.TimestampMode value) {
+		return net.minecraft.client.gui.components.CycleButton.<de.chattabs.config.ChatTabsConfig.TimestampMode>builder(
+				m -> t("timestamp_mode." + m.name().toLowerCase(java.util.Locale.ROOT)), value)
+			.withValues(de.chattabs.config.ChatTabsConfig.TimestampMode.values());
+	}
+
 	/** Muss am Anfang jedes init() aufgerufen werden. */
 	protected void beginLayout(int maxWidth) {
 		this.labels.clear();

@@ -74,6 +74,17 @@ class GeneralSettingsScreen extends BaseSettingsScreen {
 			.create(this.left, y, w, 20, t("history"), (b, v) -> this.working.maxHistory = v);
 		history.setTooltip(Tooltip.create(t("history.tooltip")));
 		this.addRenderableWidget(history);
+		y += ROW;
+
+		// Uhrzeit vor Nachrichten: an/aus + Format
+		CycleButton<Boolean> timestamps = onOff(this.working.timestamps)
+			.create(this.left, y, this.halfWidth(), 20, t("timestamps"), (b, v) -> this.working.timestamps = v);
+		timestamps.setTooltip(Tooltip.create(t("timestamps.tooltip")));
+		this.addRenderableWidget(timestamps);
+		this.addRenderableWidget(CycleButton.<ChatTabsConfig.TimestampFormat>builder(
+				f -> Component.literal(java.time.format.DateTimeFormatter.ofPattern(f.pattern).format(java.time.LocalTime.now())), this.working.timestampFormat)
+			.withValues(ChatTabsConfig.TimestampFormat.values())
+			.create(this.rightHalfX(), y, this.halfWidth(), 20, t("timestamp_format"), (b, v) -> this.working.timestampFormat = v));
 
 		this.addRenderableWidget(Button.builder(t("back"), b -> this.onClose())
 			.bounds(this.left, this.height - 26, w, 20).build());

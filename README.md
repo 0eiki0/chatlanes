@@ -26,13 +26,13 @@ Die `chattabs-<version>.jar` in den `mods`-Ordner legen. Benötigt **Fabric Load
 
 Im Menü:
 - **Tabs**: hinzufügen, bearbeiten, verschieben (↑/↓), löschen
-- **Tab bearbeiten**: Name, Typ (System / Kanal / Alle), Erkennung, Wechsel-Befehl, Sende-Präfix, Blinken, Zähler „(3)“ an/aus, Farbe, **Ton mit Lautstärke** (rund 20 Töne, ▶ zum Probehören) und ein **Live-Test** („✔ Landet im Tab …“)
+- **Tab bearbeiten**: Name, Uhrzeit (Standard/An/Aus), Typ (System / Kanal / Alle), Erkennung, Wechsel-Befehl, Sende-Präfix, Blinken, Zähler „(3)“ an/aus, Farbe, **Ton mit Lautstärke** (rund 20 Töne, ▶ zum Probehören) und ein **Live-Test** („✔ Landet im Tab …“)
   - *Kennung*: einfach z. B. `[G]` eintragen – Server-Präfixe wie `[Freebuild]` davor werden übersprungen
   - *Enthält Text*: alle Nachrichten mit diesem Text
   - *Regex*: regulärer Ausdruck für Profis
-- **Allgemein**: Sprache der Mod (Automatisch wie Minecraft / Deutsch / English), Tab-Leiste oben/unten, feste Chatgröße, Anzeige bei geschlossenem Chat, Ungelesen-Zähler, Verlaufsgröße
+- **Allgemein**: Sprache der Mod (Automatisch wie Minecraft / Deutsch / English), Tab-Leiste oben/unten, feste Chatgröße, Anzeige bei geschlossenem Chat, Ungelesen-Zähler, Verlaufsgröße, **Uhrzeit vor Nachrichten** (an/aus, Format `[14:05]`, `[14:05:33]`, `14:05`, `14:05:33`)
 - **Kanäle & Verlauf**: Kanal beim Tab-Klick wechseln, Server-Bestätigung ausblenden, Nachrichten speichern, gespeicherten Verlauf löschen (gespeichert in `config/chattabs/history/`)
-- **Private Nachrichten**: Msg-Tabs an/aus, Blinken, Ton mit Lautstärke, beim Trennen schließen, Senden-Befehl, Erkennung mit Live-Test
+- **Private Nachrichten**: Msg-Tabs an/aus, Blinken, Uhrzeit, Ton mit Lautstärke, beim Trennen schließen, Senden-Befehl, Erkennung mit Live-Test
 
 Alles wird in `config/chattabs.json` gespeichert.
 

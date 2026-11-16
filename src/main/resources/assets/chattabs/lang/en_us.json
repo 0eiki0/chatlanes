@@ -154,5 +154,13 @@
 	"chattabs.sound.arrow_hit": "Arrow hit",
 	"chattabs.sound.anvil": "Anvil",
 	"chattabs.config.edit.test.short_ok": "Test: ✔ match",
-	"chattabs.config.edit.test.short_fail": "Test: ✘ no match"
+	"chattabs.config.edit.test.short_fail": "Test: ✘ no match",
+	"chattabs.config.timestamps": "Time before messages",
+	"chattabs.config.timestamps.tooltip": "Shows the time received before every message, e.g. “[14:05] [G] Eiki: Hi”. Applies to all tabs set to “Time: Default” – change per channel under Edit.",
+	"chattabs.config.timestamp_format": "Format",
+	"chattabs.config.timestamps_short": "Time",
+	"chattabs.config.timestamp_mode.default": "Default",
+	"chattabs.config.timestamp_mode.on": "ON",
+	"chattabs.config.timestamp_mode.off": "OFF",
+	"chattabs.config.timestamp_mode.tooltip": "Time before the messages of this tab.\nDefault: as under General → “Time before messages”.\nON/OFF: always on or off for this tab."
 }

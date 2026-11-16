@@ -154,5 +154,13 @@
 	"chattabs.sound.arrow_hit": "Pfeiltreffer",
 	"chattabs.sound.anvil": "Amboss",
 	"chattabs.config.edit.test.short_ok": "Test: ✔ passt",
-	"chattabs.config.edit.test.short_fail": "Test: ✘ passt nicht"
+	"chattabs.config.edit.test.short_fail": "Test: ✘ passt nicht",
+	"chattabs.config.timestamps": "Uhrzeit vor Nachrichten",
+	"chattabs.config.timestamps.tooltip": "Zeigt die Empfangszeit vor jeder Nachricht, z. B. „[14:05] [G] Eiki: Hi“. Gilt für alle Tabs, die auf „Uhrzeit: Standard“ stehen – pro Kanal unter Bearbeiten änderbar.",
+	"chattabs.config.timestamp_format": "Format",
+	"chattabs.config.timestamps_short": "Uhrzeit",
+	"chattabs.config.timestamp_mode.default": "Standard",
+	"chattabs.config.timestamp_mode.on": "An",
+	"chattabs.config.timestamp_mode.off": "Aus",
+	"chattabs.config.timestamp_mode.tooltip": "Uhrzeit vor den Nachrichten dieses Tabs.\nStandard: wie unter Allgemein → „Uhrzeit vor Nachrichten“.\nAn/Aus: für diesen Tab immer an bzw. immer aus."
 }

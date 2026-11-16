@@ -34,6 +34,26 @@ public class ChatTabsConfig {
 
 	public Language language = Language.AUTO;
 
+	/** Pro Tab: Uhrzeit wie unter Allgemein eingestellt, immer an oder immer aus. */
+	public enum TimestampMode { DEFAULT, ON, OFF }
+
+	/** Format der Uhrzeit vor den Nachrichten. */
+	public enum TimestampFormat {
+		BRACKET_HM("'['HH:mm']'"), BRACKET_HMS("'['HH:mm:ss']'"), HM("HH:mm"), HMS("HH:mm:ss");
+
+		public final String pattern;
+
+		TimestampFormat(String pattern) {
+			this.pattern = pattern;
+		}
+	}
+
+	/** Uhrzeit vor jeder Nachricht anzeigen (Standard für alle Tabs, pro Tab übersteuerbar). */
+	public boolean timestamps = false;
+	public TimestampFormat timestampFormat = TimestampFormat.BRACKET_HM;
+	/** Uhrzeit bei privaten Nachrichten. */
+	public TimestampMode pmTimestamps = TimestampMode.DEFAULT;
+
 	public enum ClosedChatMode { NEVER, UNREAD, ALWAYS }
 
 	/** Tabs oberhalb oder unterhalb des Chats. */
@@ -100,6 +120,13 @@ public class ChatTabsConfig {
 		public String pattern = "";
 		/** Textfarbe des Tabs (siehe {@link TabColor}). */
 		public TabColor color = TabColor.DEFAULT;
+		/** Uhrzeit vor Nachrichten dieses Tabs (fehlt = wie unter Allgemein). */
+		public TimestampMode timestamps;
+
+		public TimestampMode timestampsOrDefault() {
+			return this.timestamps == null ? TimestampMode.DEFAULT : this.timestamps;
+		}
+
 		/** Ton bei neuen Nachrichten in diesem Tab (fehlt = kein Ton). */
 		public TabSound sound;
 		/** Lautstärke des Tons in Prozent (0–100, fehlt = 100). */
@@ -147,6 +174,7 @@ public class ChatTabsConfig {
 			TabConfig copy = new TabConfig(this.name, this.type, this.match, this.pattern, this.switchCommand, this.sendPrefix, this.blink, this.color);
 			copy.showUnread = this.showUnread;
 			copy.sound = this.sound;
+			copy.timestamps = this.timestamps;
 			copy.volume = this.volume;
 			return copy;
 		}
@@ -169,6 +197,8 @@ public class ChatTabsConfig {
 		ChatTabsConfig defaults = new ChatTabsConfig();
 		if (this.position == null) this.position = defaults.position;
 		if (this.language == null) this.language = Language.AUTO;
+		if (this.timestampFormat == null) this.timestampFormat = TimestampFormat.BRACKET_HM;
+		if (this.pmTimestamps == null) this.pmTimestamps = TimestampMode.DEFAULT;
 		if (this.pmSoundType == null) {
 			this.pmSoundType = Boolean.TRUE.equals(this.pmSound) ? TabSound.PLING : TabSound.NONE;
 		}

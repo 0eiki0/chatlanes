@@ -409,6 +409,56 @@ public final class ChatTabs {
 		if (c != null) {
 			this.cache.put(to, c);
 		}
+		Long time = this.receivedAt.get(from);
+		if (time != null) {
+			this.receivedAt.put(to, time);
+		}
+	}
+
+	/**
+	 * Empfangszeit jeder Nachricht (Wanduhr). Wird nie gelöscht, solange die Nachricht existiert –
+	 * auch nicht beim Speichern der Einstellungen. Wiederhergestellte Nachrichten bekommen ihre echte Zeit.
+	 */
+	private final ConcurrentMap<GuiMessage, Long> receivedAt = new MapMaker().weakKeys().makeMap();
+
+	public void recordTime(GuiMessage message) {
+		if (!this.receivedAt.containsKey(message)) {
+			this.receivedAt.put(message, ChatHistory.get().isRestoring() ? ChatHistory.get().restoreTime() : System.currentTimeMillis());
+		}
+	}
+
+	/** Uhrzeit-Präfix für diese Nachricht oder null, wenn für ihren Tab keine Uhrzeit angezeigt wird. */
+	public net.minecraft.network.chat.@Nullable Component timestampFor(GuiMessage message) {
+		Classification c = this.classify(message);
+		if (c.everywhere()) {
+			return null;
+		}
+		ChatTabsConfig.TimestampMode mode;
+		if (c.player() != null) {
+			mode = this.config.pmTimestamps;
+		} else if (c.channel() != null && c.channel().config() != null) {
+			mode = c.channel().config().timestampsOrDefault();
+		} else {
+			mode = ChatTabsConfig.TimestampMode.DEFAULT;
+			for (ChatTab tab : this.configTabs) {
+				if (tab.kind() == ChatTab.Kind.SYSTEM && tab.config() != null) {
+					mode = tab.config().timestampsOrDefault();
+					break;
+				}
+			}
+		}
+		boolean show = switch (mode == null ? ChatTabsConfig.TimestampMode.DEFAULT : mode) {
+			case ON -> true;
+			case OFF -> false;
+			case DEFAULT -> this.config.timestamps;
+		};
+		if (!show) {
+			return null;
+		}
+		long time = this.receivedAt.getOrDefault(message, System.currentTimeMillis());
+		String text = java.time.format.DateTimeFormatter.ofPattern(this.config.timestampFormat.pattern)
+			.format(java.time.Instant.ofEpochMilli(time).atZone(java.time.ZoneId.systemDefault()));
+		return net.minecraft.network.chat.Component.literal(text + " ").withStyle(ChatFormatting.GRAY);
 	}
 
 	public void onClear(boolean disconnect) {

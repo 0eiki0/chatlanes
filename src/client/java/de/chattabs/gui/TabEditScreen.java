@@ -40,6 +40,14 @@ class TabEditScreen extends BaseSettingsScreen {
 
 		EditBox name = this.textRow(y, t("edit.name"), this.edited.name, null, null, v -> this.edited.name = v);
 		name.setMaxLength(24);
+		// Name-Feld halbieren, rechts daneben die Uhrzeit-Einstellung des Tabs.
+		int fieldWidth = this.contentWidth - this.labelWidth;
+		name.setWidth(fieldWidth / 2 - 2);
+		var timestamps = timestampMode(this.edited.timestampsOrDefault())
+			.create(this.left + this.labelWidth + fieldWidth / 2 + 2, y, fieldWidth - fieldWidth / 2 - 2, 20, t("timestamps_short"),
+				(b, v) -> this.edited.timestamps = v);
+		timestamps.setTooltip(Tooltip.create(t("timestamp_mode.tooltip")));
+		this.addRenderableWidget(timestamps);
 		y += ROW;
 
 		CycleButton<TabConfig.Type> type = CycleButton.<TabConfig.Type>builder(v -> t("type." + v.name().toLowerCase()), this.edited.type)
@@ -144,6 +152,7 @@ class TabEditScreen extends BaseSettingsScreen {
 			this.original.blink = this.edited.blink;
 			this.original.showUnread = this.edited.showUnread;
 			this.original.sound = this.edited.sound;
+			this.original.timestamps = this.edited.timestamps;
 			this.original.volume = this.edited.volume;
 			this.original.color = this.edited.color;
 		}

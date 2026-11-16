@@ -22,9 +22,25 @@ public abstract class ChatComponentMixin {
 	/** Nur Nachrichten des aktiven Tabs in die sichtbaren Zeilen übernehmen. */
 	@Inject(method = "addMessageToDisplayQueue", at = @At("HEAD"), cancellable = true)
 	private void chattabs$filterDisplayed(GuiMessage message, CallbackInfo ci) {
+		ChatTabs.get().recordTime(message);
 		if (!ChatTabs.get().isVisible(message)) {
 			ci.cancel();
 		}
+	}
+
+	/** Uhrzeit vor die Nachricht setzen – nur für die Anzeige, der gespeicherte Inhalt bleibt unverändert. */
+	@WrapOperation(
+		method = "addMessageToDisplayQueue",
+		at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/chat/GuiMessage;splitLines(Lnet/minecraft/client/gui/Font;I)Ljava/util/List;")
+	)
+	private List<net.minecraft.util.FormattedCharSequence> chattabs$addTimestamp(GuiMessage message, Font font, int width,
+			Operation<List<net.minecraft.util.FormattedCharSequence>> original) {
+		net.minecraft.network.chat.Component prefix = ChatTabs.get().timestampFor(message);
+		if (prefix == null) {
+			return original.call(message, font, width);
+		}
+		GuiMessage withTime = new GuiMessage(message.addedTime(), prefix.copy().append(message.content()), message.signature(), message.source(), message.tag());
+		return original.call(withTime, font, width);
 	}
 
 	/** Neue Nachricht: ungelesene Zähler der anderen Tabs erhöhen. */
