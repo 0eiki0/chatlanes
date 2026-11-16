@@ -6,7 +6,8 @@
 		"ChatComponentAccessor",
 		"ChatComponentMixin",
 		"ChatScreenMixin",
-		"ClientLanguageMixin"
+		"ClientLanguageMixin",
+		"ConnectionMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

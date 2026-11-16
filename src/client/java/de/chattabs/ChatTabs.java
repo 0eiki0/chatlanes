@@ -194,10 +194,10 @@ public final class ChatTabs {
 		if (message.startsWith("/")) {
 			String command = ChatTab.commandName(message);
 			for (ChatTab tab : this.configTabs) {
-				int seconds = tab.kind() == ChatTab.Kind.CHANNEL ? tab.captureSeconds(command) : 0;
+				double seconds = tab.kind() == ChatTab.Kind.CHANNEL ? tab.captureSeconds(command) : 0;
 				if (seconds > 0) {
 					this.captureTab = tab.name();
-					this.captureUntil = System.currentTimeMillis() + seconds * 1000L;
+					this.captureUntil = System.currentTimeMillis() + Math.round(seconds * 1000.0);
 					break;
 				}
 			}

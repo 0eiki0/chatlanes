@@ -213,11 +213,11 @@ public class ChatTabsConfig {
 	public static class Rule {
 		public TabConfig.Match match = TabConfig.Match.CONTAINS;
 		public String pattern = "";
-		/** Nur bei Befehl-Ausgabe: wie viele Sekunden nach dem Befehl eingefangen wird (fehlt = 3). */
-		public Integer seconds;
+		/** Nur bei Befehl-Ausgabe: wie viele Sekunden nach dem Befehl eingefangen wird (fehlt = 3, auch 0,25 usw.). */
+		public Double seconds;
 
-		public int secondsOrDefault() {
-			return this.seconds == null ? 3 : Math.max(1, Math.min(60, this.seconds));
+		public double secondsOrDefault() {
+			return this.seconds == null ? 3.0 : Math.max(0.1, Math.min(60.0, this.seconds));
 		}
 
 		public Rule() {

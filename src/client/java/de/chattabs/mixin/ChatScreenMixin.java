@@ -22,12 +22,6 @@ public abstract class ChatScreenMixin {
 		}
 	}
 
-	/** Von Hand getippte Kanalwechsel (z. B. "/ch handel") merken. */
-	@Inject(method = "handleChatInput", at = @At("HEAD"))
-	private void chattabs$rememberCommand(String message, boolean addToRecent, org.spongepowered.asm.mixin.injection.callback.CallbackInfo ci) {
-		ChatTabs.get().onCommandSent(message.trim());
-	}
-
 	/** Im Msg-Tab wird automatisch "/msg <Spieler> ..." gesendet, in Kanal-Tabs ggf. ein Präfix vorangestellt. */
 	@WrapOperation(
 		method = "handleChatInput",

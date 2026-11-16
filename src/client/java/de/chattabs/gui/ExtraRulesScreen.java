@@ -113,7 +113,7 @@ class ExtraRulesScreen extends BaseSettingsScreen {
 
 			if (command) {
 				// Wie lange nach dem Befehl die Ausgabe eingefangen wird
-				CycleButton<Integer> seconds = CycleButton.<Integer>builder(v -> t("extra.seconds", v), rule.secondsOrDefault())
+				CycleButton<Double> seconds = CycleButton.<Double>builder(v -> t("extra.seconds", formatSeconds(v)), rule.secondsOrDefault())
 					.withValues(secondValues(rule.secondsOrDefault()))
 					.displayOnlyValue()
 					.create(this.left + this.contentWidth - deleteWidth - 3 - secondsWidth, rowY, secondsWidth, 20, t("extra.seconds.name"),
@@ -160,10 +160,18 @@ class ExtraRulesScreen extends BaseSettingsScreen {
 	}
 
 	/** Auswahl an Sekunden – enthält immer auch den aktuell gespeicherten Wert. */
-	private static List<Integer> secondValues(int current) {
-		java.util.TreeSet<Integer> values = new java.util.TreeSet<>(List.of(1, 2, 3, 4, 5, 6, 8, 10, 15, 20, 30, 45, 60));
+	private static List<Double> secondValues(double current) {
+		java.util.TreeSet<Double> values = new java.util.TreeSet<>(List.of(
+			0.1, 0.25, 0.5, 0.75, 1.0, 1.5, 2.0, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0, 15.0, 20.0, 30.0, 45.0, 60.0));
 		values.add(current);
 		return List.copyOf(values);
+	}
+
+	/** 0.5 → "0,5" (Deutsch) bzw. "0.5" (Englisch), 3.0 → "3" */
+	private static String formatSeconds(double value) {
+		java.text.DecimalFormatSymbols symbols = new java.text.DecimalFormatSymbols(java.util.Locale.ROOT);
+		symbols.setDecimalSeparator(net.minecraft.client.resources.language.I18n.get("chattabs.config.decimal_separator").charAt(0));
+		return new java.text.DecimalFormat("0.##", symbols).format(value);
 	}
 
 	private int pageCount() {

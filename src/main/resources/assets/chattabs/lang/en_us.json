@@ -187,5 +187,6 @@
 	"chattabs.update.download": "[Download]",
 	"chattabs.config.extra.seconds": "%s s",
 	"chattabs.config.extra.seconds.name": "Time",
-	"chattabs.config.extra.seconds.tooltip": "For this many seconds after the command, everything that would land in the System tab goes to this channel. Increase if the server responds slowly."
+	"chattabs.config.extra.seconds.tooltip": "For this long after the command, everything that would land in the System tab goes to this channel (0.1 to 60 seconds). Shorter = fewer unrelated messages caught, longer = safer with a slow server.",
+	"chattabs.config.decimal_separator": "."
 }

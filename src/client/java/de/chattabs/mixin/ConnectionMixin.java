@@ -1,0 +1,31 @@
+package de.chattabs.mixin;
+
+import de.chattabs.ChatTabs;
+import io.netty.channel.ChannelFutureListener;
+import net.minecraft.network.Connection;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ServerboundChatCommandPacket;
+import net.minecraft.network.protocol.game.ServerboundChatCommandSignedPacket;
+import net.minecraft.network.protocol.game.ServerboundChatPacket;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+/**
+ * Bemerkt JEDEN gesendeten Befehl und jede Chatnachricht – egal ob getippt, per Makro-Mod
+ * oder von einer anderen Mod geschickt. Wichtig für "Befehl-Ausgabe" und Kanalwechsel.
+ */
+@Mixin(Connection.class)
+public abstract class ConnectionMixin {
+	@Inject(method = "send(Lnet/minecraft/network/protocol/Packet;Lio/netty/channel/ChannelFutureListener;Z)V", at = @At("HEAD"))
+	private void chattabs$onSend(Packet<?> packet, ChannelFutureListener listener, boolean flush, CallbackInfo ci) {
+		if (packet instanceof ServerboundChatCommandPacket command) {
+			ChatTabs.get().onCommandSent("/" + command.command());
+		} else if (packet instanceof ServerboundChatCommandSignedPacket command) {
+			ChatTabs.get().onCommandSent("/" + command.command());
+		} else if (packet instanceof ServerboundChatPacket chat) {
+			ChatTabs.get().onCommandSent(chat.message());
+		}
+	}
+}

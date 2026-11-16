@@ -187,5 +187,6 @@
 	"chattabs.update.download": "[Herunterladen]",
 	"chattabs.config.extra.seconds": "%s s",
 	"chattabs.config.extra.seconds.name": "Zeit",
-	"chattabs.config.extra.seconds.tooltip": "So viele Sekunden nach dem Befehl landet alles, was sonst im System-Tab landen würde, in diesem Kanal. Bei langsamer Antwort des Servers höher stellen."
+	"chattabs.config.extra.seconds.tooltip": "So lange nach dem Befehl landet alles, was sonst im System-Tab landen würde, in diesem Kanal (0,1 bis 60 Sekunden). Kürzer = weniger fremde Nachrichten erwischt, länger = sicherer bei langsamem Server.",
+	"chattabs.config.decimal_separator": ","
 }
