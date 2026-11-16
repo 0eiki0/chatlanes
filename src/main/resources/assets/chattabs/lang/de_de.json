@@ -162,5 +162,18 @@
 	"chattabs.config.timestamp_mode.default": "Standard",
 	"chattabs.config.timestamp_mode.on": "An",
 	"chattabs.config.timestamp_mode.off": "Aus",
-	"chattabs.config.timestamp_mode.tooltip": "Uhrzeit vor den Nachrichten dieses Tabs.\nStandard: wie unter Allgemein → „Uhrzeit vor Nachrichten“.\nAn/Aus: für diesen Tab immer an bzw. immer aus."
+	"chattabs.config.timestamp_mode.tooltip": "Uhrzeit vor den Nachrichten dieses Tabs.\nStandard: wie unter Allgemein → „Uhrzeit vor Nachrichten“.\nAn/Aus: für diesen Tab immer an bzw. immer aus.",
+	"chattabs.config.extra.button": "Zusätzliche Nachrichten (%s) …",
+	"chattabs.config.extra.tooltip": "Nachrichten, die sonst im System-Tab landen würden, zusätzlich in diesen Kanal holen – z. B. alles mit „Aktueller Chat“.",
+	"chattabs.config.extra.title": "Zusätzliche Nachrichten für „%s“",
+	"chattabs.config.extra.info": "Passt eine Regel, landet die Nachricht hier statt in System:",
+	"chattabs.config.extra.also_system": "Trotzdem auch im System-Tab anzeigen",
+	"chattabs.config.extra.also_system.tooltip": "An: Die Nachricht erscheint in diesem Kanal UND im System-Tab.\nAus: Sie wird aus dem System-Tab hierher verschoben.",
+	"chattabs.config.extra.add": "+ Regel",
+	"chattabs.config.extra.delete": "Regel löschen",
+	"chattabs.config.extra.empty": "Noch keine Regeln – füge mit „+ Regel“ eine hinzu.",
+	"chattabs.config.extra.test.tooltip": "Tippe eine Chatzeile ein, die bisher im System-Tab landet, um die Regeln zu prüfen.",
+	"chattabs.config.extra.test.match": "✔ Kommt in den Tab „%s“",
+	"chattabs.config.extra.test.no_match": "✘ Keine Regel passt",
+	"chattabs.config.extra.test.empty": "Füge eine Regel hinzu, um zu testen."
 }

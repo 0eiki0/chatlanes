@@ -26,12 +26,13 @@ public final class ChatTabs {
 	private static final ChatTabs INSTANCE = new ChatTabs();
 
 	/** Ergebnis der Zuordnung einer Nachricht. channel == null und player == null bedeutet "System". */
-	private record Classification(@Nullable ChatTab channel, @Nullable String player, boolean everywhere) {
-		static final Classification SYSTEM = new Classification(null, null, false);
-		static final Classification EVERYWHERE = new Classification(null, null, true);
+	/** alsoSystem = per Zusatzregel einem Kanal zugeordnet, soll aber auch im System-Tab erscheinen. */
+	private record Classification(@Nullable ChatTab channel, @Nullable String player, boolean everywhere, boolean alsoSystem) {
+		static final Classification SYSTEM = new Classification(null, null, false, false);
+		static final Classification EVERYWHERE = new Classification(null, null, true, false);
 
 		Classification(@Nullable ChatTab channel, @Nullable String player) {
-			this(channel, player, false);
+			this(channel, player, false, false);
 		}
 	}
 
@@ -288,6 +289,16 @@ public final class ChatTabs {
 			}
 		}
 
+		// Zusätzliche Regeln der Kanäle – nur für Nachrichten, die sonst im System-Tab landen würden.
+		if (result == Classification.SYSTEM) {
+			for (ChatTab tab : this.configTabs) {
+				if (tab.kind() == ChatTab.Kind.CHANNEL && tab.matchesExtra(text)) {
+					result = new Classification(tab, null, false, tab.config().extraAlsoInSystem);
+					break;
+				}
+			}
+		}
+
 		this.cache.put(message, result);
 		return result;
 	}
@@ -298,7 +309,7 @@ public final class ChatTabs {
 		}
 		return switch (tab.kind()) {
 			case ALL -> true;
-			case SYSTEM -> c.channel() == null && c.player() == null;
+			case SYSTEM -> (c.channel() == null && c.player() == null) || c.alsoSystem();
 			case CHANNEL -> c.channel() == tab;
 			case PRIVATE -> c.player() != null && c.player().equalsIgnoreCase(tab.player());
 		};

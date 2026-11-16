@@ -13,6 +13,8 @@ public final class ChatTab {
 	private final @Nullable TabConfig config;
 	private final @Nullable String player;
 	private final @Nullable Pattern pattern;
+	/** Zusätzliche Regeln (nur für Nachrichten, die sonst im System-Tab landen würden). */
+	private final java.util.List<Pattern> extraPatterns = new java.util.ArrayList<>();
 	private int unread;
 
 	private ChatTab(Kind kind, @Nullable TabConfig config, @Nullable String player, @Nullable Pattern pattern) {
@@ -29,7 +31,16 @@ public final class ChatTab {
 			case CHANNEL -> Kind.CHANNEL;
 		};
 		Pattern pattern = kind == Kind.CHANNEL ? buildPattern(config.match, config.pattern) : null;
-		return new ChatTab(kind, config, null, pattern);
+		ChatTab tab = new ChatTab(kind, config, null, pattern);
+		if (kind == Kind.CHANNEL) {
+			for (de.chattabs.config.ChatTabsConfig.Rule rule : config.extraRulesOrEmpty()) {
+				Pattern extra = buildPattern(rule.match, rule.pattern);
+				if (extra != null) {
+					tab.extraPatterns.add(extra);
+				}
+			}
+		}
+		return tab;
 	}
 
 	/** Baut aus Erkennungsart und Wert den regulären Ausdruck. Wird auch vom Live-Test im Menü benutzt. */
@@ -70,6 +81,16 @@ public final class ChatTab {
 
 	public @Nullable String player() {
 		return this.player;
+	}
+
+	/** Passt eine der zusätzlichen Regeln? */
+	boolean matchesExtra(String text) {
+		for (Pattern extra : this.extraPatterns) {
+			if (extra.matcher(text).find()) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	@Nullable Pattern pattern() {

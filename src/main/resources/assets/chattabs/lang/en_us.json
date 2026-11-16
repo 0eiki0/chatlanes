@@ -162,5 +162,18 @@
 	"chattabs.config.timestamp_mode.default": "Default",
 	"chattabs.config.timestamp_mode.on": "ON",
 	"chattabs.config.timestamp_mode.off": "OFF",
-	"chattabs.config.timestamp_mode.tooltip": "Time before the messages of this tab.\nDefault: as under General → “Time before messages”.\nON/OFF: always on or off for this tab."
+	"chattabs.config.timestamp_mode.tooltip": "Time before the messages of this tab.\nDefault: as under General → “Time before messages”.\nON/OFF: always on or off for this tab.",
+	"chattabs.config.extra.button": "Additional messages (%s) …",
+	"chattabs.config.extra.tooltip": "Pull messages that would otherwise land in the System tab into this channel – e.g. everything containing “Current chat”.",
+	"chattabs.config.extra.title": "Additional messages for “%s”",
+	"chattabs.config.extra.info": "If a rule matches, the message goes here instead of System:",
+	"chattabs.config.extra.also_system": "Also show in System tab",
+	"chattabs.config.extra.also_system.tooltip": "ON: the message appears in this channel AND in the System tab.\nOFF: it is moved from the System tab to here.",
+	"chattabs.config.extra.add": "+ Rule",
+	"chattabs.config.extra.delete": "Delete rule",
+	"chattabs.config.extra.empty": "No rules yet – add one with “+ Rule”.",
+	"chattabs.config.extra.test.tooltip": "Type a chat line that currently lands in the System tab to check the rules.",
+	"chattabs.config.extra.test.match": "✔ Goes to tab “%s”",
+	"chattabs.config.extra.test.no_match": "✘ No rule matches",
+	"chattabs.config.extra.test.empty": "Add a rule to test."
 }

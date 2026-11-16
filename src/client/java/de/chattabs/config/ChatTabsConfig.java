@@ -120,6 +120,21 @@ public class ChatTabsConfig {
 		public String pattern = "";
 		/** Textfarbe des Tabs (siehe {@link TabColor}). */
 		public TabColor color = TabColor.DEFAULT;
+		/**
+		 * Zusätzliche Regeln: Nachrichten, die sonst im System-Tab landen würden,
+		 * kommen in diesen Kanal, wenn eine dieser Regeln passt.
+		 */
+		public List<Rule> extraRules;
+		/** Per Zusatzregel zugeordnete Nachrichten trotzdem auch im System-Tab zeigen. */
+		public boolean extraAlsoInSystem = false;
+
+		public List<Rule> extraRulesOrEmpty() {
+			if (this.extraRules == null) {
+				this.extraRules = new ArrayList<>();
+			}
+			return this.extraRules;
+		}
+
 		/** Uhrzeit vor Nachrichten dieses Tabs (fehlt = wie unter Allgemein). */
 		public TimestampMode timestamps;
 
@@ -175,8 +190,31 @@ public class ChatTabsConfig {
 			copy.showUnread = this.showUnread;
 			copy.sound = this.sound;
 			copy.timestamps = this.timestamps;
+			copy.extraAlsoInSystem = this.extraAlsoInSystem;
+			copy.extraRules = new ArrayList<>();
+			for (Rule rule : this.extraRulesOrEmpty()) {
+				copy.extraRules.add(rule.copy());
+			}
 			copy.volume = this.volume;
 			return copy;
+		}
+	}
+
+	/** Eine zusätzliche Erkennungsregel eines Kanals. */
+	public static class Rule {
+		public TabConfig.Match match = TabConfig.Match.CONTAINS;
+		public String pattern = "";
+
+		public Rule() {
+		}
+
+		public Rule(TabConfig.Match match, String pattern) {
+			this.match = match;
+			this.pattern = pattern;
+		}
+
+		public Rule copy() {
+			return new Rule(this.match, this.pattern);
 		}
 	}
 
@@ -225,6 +263,11 @@ public class ChatTabsConfig {
 				tab.match = TabConfig.Match.REGEX;
 			}
 			if (tab.color == null) tab.color = TabColor.DEFAULT;
+			tab.extraRulesOrEmpty().removeIf(rule -> rule == null);
+			for (Rule rule : tab.extraRules) {
+				if (rule.match == null) rule.match = TabConfig.Match.CONTAINS;
+				if (rule.pattern == null) rule.pattern = "";
+			}
 			if (tab.switchCommand == null) {
 				// Configs vor 1.3.0: für die Standard-Kanäle den passenden Cubeside-Befehl eintragen.
 				String tag = tab.match == TabConfig.Match.TAG ? tab.pattern.trim() : "";

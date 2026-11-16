@@ -106,9 +106,21 @@ class TabEditScreen extends BaseSettingsScreen {
 		y += ROW;
 
 		this.soundRow(y, this.edited.soundOrNone(), this.edited.volumeOrDefault(), v -> this.edited.sound = v, v -> this.edited.volume = v);
-		y += ROW + 4;
+		y += ROW;
 
 		if (channel) {
+			// Weitere Nachrichten (die sonst im System-Tab landen würden) diesem Kanal zuordnen
+			Button extra = Button.builder(t("extra.button", this.edited.extraRulesOrEmpty().size()),
+					b -> this.minecraft.gui.setScreen(new ExtraRulesScreen(this, this.edited)))
+				.bounds(this.left, y, this.contentWidth, 20).build();
+			extra.setTooltip(Tooltip.create(t("extra.tooltip")));
+			this.addRenderableWidget(extra);
+			y += ROW;
+		}
+		y += 4;
+
+		// Live-Test nur, wenn noch Platz über den unteren Knöpfen ist (sehr kleine Fenster: weglassen).
+		if (channel && y + 20 <= this.height - 30) {
 			// Beschriftung zeichnet extractRenderState selbst (bei wenig Platz direkt mit Ergebnis).
 			this.textRow(y, null, lastTestMessage, null, t("edit.test.tooltip"), v -> lastTestMessage = v);
 			this.testY = y;
@@ -155,6 +167,8 @@ class TabEditScreen extends BaseSettingsScreen {
 			this.original.timestamps = this.edited.timestamps;
 			this.original.volume = this.edited.volume;
 			this.original.color = this.edited.color;
+			this.original.extraRules = this.edited.extraRules;
+			this.original.extraAlsoInSystem = this.edited.extraAlsoInSystem;
 		}
 		this.onClose();
 	}
@@ -172,12 +186,12 @@ class TabEditScreen extends BaseSettingsScreen {
 		if (!this.isValueValid()) {
 			result = t("edit.test.invalid");
 			color = ERROR_COLOR;
-		} else if (this.edited.pattern.isEmpty()) {
+		} else if (this.edited.pattern.isEmpty() && this.edited.extraRulesOrEmpty().isEmpty()) {
 			result = t("edit.test.empty");
 			color = LABEL_COLOR;
 		} else {
 			Pattern pattern = ChatTab.buildPattern(this.edited.match, this.edited.pattern);
-			matches = pattern != null && pattern.matcher(lastTestMessage).find();
+			matches = (pattern != null && pattern.matcher(lastTestMessage).find()) || ExtraRulesScreen.matchesAny(this.edited, lastTestMessage);
 			result = t(matches ? "edit.test.match" : "edit.test.no_match", this.edited.name);
 			color = matches ? OK_COLOR : ERROR_COLOR;
 		}

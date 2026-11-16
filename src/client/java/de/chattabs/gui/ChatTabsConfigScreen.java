@@ -190,6 +190,7 @@ public class ChatTabsConfigScreen extends BaseSettingsScreen {
 			case CHANNEL -> tab.pattern.isEmpty()
 				? t("describe.channel_empty")
 				: t("describe.channel", tab.match == TabConfig.Match.REGEX ? t("describe.regex") : Component.literal(tab.pattern))
+					.append(tab.extraRulesOrEmpty().isEmpty() ? Component.empty() : Component.literal(" +" + tab.extraRulesOrEmpty().size()))
 					.append(tab.switchCommand == null || tab.switchCommand.isBlank() ? Component.empty() : Component.literal(" → " + tab.switchCommand));
 		};
 	}
