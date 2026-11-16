@@ -13,7 +13,7 @@ import net.minecraft.network.chat.Component;
 
 /** Einstellungen für Msg-Tabs (private Nachrichten), inklusive Live-Test der Erkennung. */
 class PrivateMessagesScreen extends BaseSettingsScreen {
-	private static String lastTestMessage = "[Freebuild] From Levlox: Du riechst hervorragend !";
+	private static String lastTestMessage = "[Freebuild] From Eiki: Du riechst hervorragend !";
 
 	private final ChatTabsConfig working;
 	private int resultY;
