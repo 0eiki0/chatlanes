@@ -1,0 +1,32 @@
+{
+	"schemaVersion": 1,
+	"id": "chattabs",
+	"version": "${version}",
+	"name": "Chat Tabs",
+	"description": "Teilt den Chat in anpassbare Tabs auf: System, Kanäle (z. B. [G] Global) und eigene Tabs für private Nachrichten.",
+	"authors": [
+		"0eiki0"
+	],
+	"icon": "assets/chattabs/icon.png",
+	"environment": "client",
+	"entrypoints": {
+		"client": [
+			"de.chattabs.ChatTabsClient"
+		]
+	},
+	"mixins": [
+		{
+			"config": "chattabs.client.mixins.json",
+			"environment": "client"
+		}
+	],
+	"depends": {
+		"fabricloader": ">=0.20.0",
+		"minecraft": "~26.3",
+		"java": ">=25"
+	},
+	"contact": {
+		"sources": "https://github.com/0eiki0/chattabs",
+		"issues": "https://github.com/0eiki0/chattabs/issues"
+	}
+}
