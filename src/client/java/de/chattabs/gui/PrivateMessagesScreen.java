@@ -29,17 +29,17 @@ class PrivateMessagesScreen extends BaseSettingsScreen {
 		int y = TOP;
 		int half = this.halfWidth();
 
-		this.addRenderableWidget(CycleButton.onOffBuilder(this.working.pmTabs)
+		this.addRenderableWidget(onOff(this.working.pmTabs)
 			.create(this.left, y, half, 20, t("pm_tabs"), (b, v) -> this.working.pmTabs = v));
-		this.addRenderableWidget(CycleButton.onOffBuilder(this.working.pmBlink)
+		this.addRenderableWidget(onOff(this.working.pmBlink)
 			.create(this.rightHalfX(), y, half, 20, t("pm_blink"), (b, v) -> this.working.pmBlink = v));
 		y += ROW;
 
-		CycleButton<Boolean> sound = CycleButton.onOffBuilder(this.working.pmSound)
+		CycleButton<Boolean> sound = onOff(this.working.pmSound)
 			.create(this.left, y, half, 20, t("pm_sound"), (b, v) -> this.working.pmSound = v);
 		sound.setTooltip(Tooltip.create(t("pm_sound.tooltip")));
 		this.addRenderableWidget(sound);
-		CycleButton<Boolean> close = CycleButton.onOffBuilder(this.working.pmCloseOnDisconnect)
+		CycleButton<Boolean> close = onOff(this.working.pmCloseOnDisconnect)
 			.create(this.rightHalfX(), y, half, 20, t("pm_close"), (b, v) -> this.working.pmCloseOnDisconnect = v);
 		close.setTooltip(Tooltip.create(t("pm_close.tooltip")));
 		this.addRenderableWidget(close);

@@ -29,7 +29,7 @@ class ChannelHistoryScreen extends BaseSettingsScreen {
 
 		this.label(t("channels.switch_header"), this.left, y + 2);
 		y += 12;
-		CycleButton<Boolean> switchOnTab = CycleButton.onOffBuilder(this.working.switchChannelOnTab)
+		CycleButton<Boolean> switchOnTab = onOff(this.working.switchChannelOnTab)
 			.create(this.left, y, w, 20, t("switch_on_tab"), (b, v) -> this.working.switchChannelOnTab = v);
 		switchOnTab.setTooltip(Tooltip.create(t("switch_on_tab.tooltip")));
 		this.addRenderableWidget(switchOnTab);
@@ -42,7 +42,7 @@ class ChannelHistoryScreen extends BaseSettingsScreen {
 
 		this.label(t("channels.history_header"), this.left, y + 2);
 		y += 12;
-		CycleButton<Boolean> save = CycleButton.onOffBuilder(this.working.saveHistory)
+		CycleButton<Boolean> save = onOff(this.working.saveHistory)
 			.create(this.left, y, w, 20, t("save_history"), (b, v) -> this.working.saveHistory = v);
 		save.setTooltip(Tooltip.create(t("save_history.tooltip")));
 		this.addRenderableWidget(save);

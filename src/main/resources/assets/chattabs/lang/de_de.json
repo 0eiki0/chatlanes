@@ -123,5 +123,11 @@
 	"chattabs.config.edit.switch.tooltip": "Wird beim Auswählen des Tabs an den Server gesendet, damit du direkt in diesem Kanal schreibst. Auf Cubeside: /ch global, /ch handel, /ch games, /ch local … Leer = nichts senden.",
 	"chattabs.history.separator": "──── Gespeicherter Verlauf (bis %s) ────",
 	"chattabs.config.counter": "Zähler",
-	"chattabs.config.counter.tooltip": "Zeigt die Anzahl ungelesener Nachrichten in Klammern hinter dem Namen, z. B. „Global (3)“. Aus = nur der Name wird gelb."
+	"chattabs.config.counter.tooltip": "Zeigt die Anzahl ungelesener Nachrichten in Klammern hinter dem Namen, z. B. „Global (3)“. Aus = nur der Name wird gelb.",
+	"chattabs.config.on": "An",
+	"chattabs.config.off": "Aus",
+	"chattabs.config.language.auto": "Automatisch (wie Minecraft)",
+	"chattabs.config.language.german": "Deutsch",
+	"chattabs.config.language.english": "English",
+	"chattabs.config.language.tooltip": "In welcher Sprache die Mod ihre Texte anzeigt. „Automatisch“ folgt der Spracheinstellung von Minecraft."
 }

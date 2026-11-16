@@ -37,6 +37,11 @@ abstract class BaseSettingsScreen extends Screen {
 		return Component.translatable("chattabs.config." + key, args);
 	}
 
+	/** An/Aus-Schalter mit Texten der Mod (folgen der Sprachwahl der Mod, nicht nur der von Minecraft). */
+	static net.minecraft.client.gui.components.CycleButton.Builder<Boolean> onOff(boolean value) {
+		return net.minecraft.client.gui.components.CycleButton.booleanBuilder(t("on"), t("off"), value);
+	}
+
 	/** Muss am Anfang jedes init() aufgerufen werden. */
 	protected void beginLayout(int maxWidth) {
 		this.labels.clear();
@@ -82,7 +87,12 @@ abstract class BaseSettingsScreen extends Screen {
 	@Override
 	public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
 		super.extractRenderState(graphics, mouseX, mouseY, a);
-		graphics.centeredText(this.font, this.title, this.width / 2, 12, TITLE_COLOR);
+		// Titel jedes Mal neu übersetzen, damit ein Sprachwechsel im Menü sofort sichtbar ist
+		// (Minecraft speichert übersetzte Texte sonst zwischen).
+		Component title = this.title.getContents() instanceof net.minecraft.network.chat.contents.TranslatableContents tc
+			? Component.translatable(tc.getKey(), tc.getArgs())
+			: this.title;
+		graphics.centeredText(this.font, title, this.width / 2, 12, TITLE_COLOR);
 		for (Label label : this.labels) {
 			graphics.text(this.font, label.text(), label.x(), label.y(), label.color());
 		}

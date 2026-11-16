@@ -130,6 +130,13 @@ public class ChatTabsConfigScreen extends BaseSettingsScreen {
 		this.page = Integer.MAX_VALUE;
 	}
 
+	@Override
+	public void onClose() {
+		// Sprach-Vorschau beenden – ab jetzt gilt wieder die gespeicherte Einstellung.
+		de.chattabs.ModLanguage.setPreview(null);
+		super.onClose();
+	}
+
 	private void saveAndClose() {
 		ChatTabs.get().apply(this.working.copy());
 		ChatTabs.get().config().save();

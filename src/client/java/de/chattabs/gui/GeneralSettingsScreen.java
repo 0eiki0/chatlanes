@@ -1,5 +1,6 @@
 package de.chattabs.gui;
 
+import de.chattabs.ModLanguage;
 import de.chattabs.config.ChatTabsConfig;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,13 +24,27 @@ class GeneralSettingsScreen extends BaseSettingsScreen {
 		int y = TOP;
 		int w = this.contentWidth;
 
+		// Sprache – Beschriftung absichtlich zweisprachig, damit man sie in jeder Sprache findet.
+		CycleButton<ChatTabsConfig.Language> language = CycleButton.<ChatTabsConfig.Language>builder(
+				l -> t("language." + l.name().toLowerCase()), this.working.language)
+			.withValues(ChatTabsConfig.Language.values())
+			.create(this.left, y, w, 20, Component.literal("Sprache / Language"), (b, v) -> {
+				this.working.language = v;
+				// Sofort anzeigen; wirksam gespeichert wird erst mit "Speichern".
+				ModLanguage.setPreview(v);
+				this.rebuildWidgets();
+			});
+		language.setTooltip(Tooltip.create(t("language.tooltip")));
+		this.addRenderableWidget(language);
+		y += ROW;
+
 		this.addRenderableWidget(CycleButton.<ChatTabsConfig.Position>builder(
 				p -> t(p == ChatTabsConfig.Position.TOP ? "position.top" : "position.bottom"), this.working.position)
 			.withValues(ChatTabsConfig.Position.values())
 			.create(this.left, y, w, 20, t("position"), (b, v) -> this.working.position = v));
 		y += ROW;
 
-		CycleButton<Boolean> fixed = CycleButton.onOffBuilder(this.working.fixedChatSize)
+		CycleButton<Boolean> fixed = onOff(this.working.fixedChatSize)
 			.create(this.left, y, w, 20, t("fixed_size"), (b, v) -> this.working.fixedChatSize = v);
 		fixed.setTooltip(Tooltip.create(t("fixed_size.tooltip")));
 		this.addRenderableWidget(fixed);
@@ -43,7 +58,7 @@ class GeneralSettingsScreen extends BaseSettingsScreen {
 		this.addRenderableWidget(closed);
 		y += ROW;
 
-		CycleButton<Boolean> unread = CycleButton.onOffBuilder(this.working.showUnreadCount)
+		CycleButton<Boolean> unread = onOff(this.working.showUnreadCount)
 			.create(this.left, y, w, 20, t("unread_count"), (b, v) -> this.working.showUnreadCount = v);
 		unread.setTooltip(Tooltip.create(t("unread_count.tooltip")));
 		this.addRenderableWidget(unread);

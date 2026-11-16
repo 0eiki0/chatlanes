@@ -29,6 +29,11 @@ public class ChatTabsConfig {
 
 	public enum Position { TOP, BOTTOM }
 
+	/** Sprache der Mod: wie Minecraft, oder fest Deutsch/Englisch. */
+	public enum Language { AUTO, GERMAN, ENGLISH }
+
+	public Language language = Language.AUTO;
+
 	public enum ClosedChatMode { NEVER, UNREAD, ALWAYS }
 
 	/** Tabs oberhalb oder unterhalb des Chats. */
@@ -144,6 +149,7 @@ public class ChatTabsConfig {
 	private ChatTabsConfig sanitize() {
 		ChatTabsConfig defaults = new ChatTabsConfig();
 		if (this.position == null) this.position = defaults.position;
+		if (this.language == null) this.language = Language.AUTO;
 		if (this.showWhenClosed == null) this.showWhenClosed = defaults.showWhenClosed;
 		if (this.pmPattern == null) this.pmPattern = defaults.pmPattern;
 		if (this.pmSendCommand == null) this.pmSendCommand = defaults.pmSendCommand;

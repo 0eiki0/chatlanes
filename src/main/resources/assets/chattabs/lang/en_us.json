@@ -123,5 +123,11 @@
 	"chattabs.config.edit.switch.tooltip": "Sent to the server when you select this tab so you write in that channel. Empty = send nothing.",
 	"chattabs.history.separator": "──── Saved history (until %s) ────",
 	"chattabs.config.counter": "Counter",
-	"chattabs.config.counter.tooltip": "Shows the number of unread messages in brackets after the name, e.g. “Global (3)”. Off = the name just turns yellow."
+	"chattabs.config.counter.tooltip": "Shows the number of unread messages in brackets after the name, e.g. “Global (3)”. Off = the name just turns yellow.",
+	"chattabs.config.on": "ON",
+	"chattabs.config.off": "OFF",
+	"chattabs.config.language.auto": "Automatic (like Minecraft)",
+	"chattabs.config.language.german": "Deutsch",
+	"chattabs.config.language.english": "English",
+	"chattabs.config.language.tooltip": "Which language the mod uses for its texts. “Automatic” follows Minecraft's language setting."
 }

@@ -83,11 +83,11 @@ class TabEditScreen extends BaseSettingsScreen {
 
 		// Drei Schalter nebeneinander: Blinken | Zähler | Farbe
 		int third = (this.contentWidth - 8) / 3;
-		CycleButton<Boolean> blink = CycleButton.onOffBuilder(this.edited.blink)
+		CycleButton<Boolean> blink = onOff(this.edited.blink)
 			.create(this.left, y, third, 20, t("blink"), (b, v) -> this.edited.blink = v);
 		blink.setTooltip(Tooltip.create(t("blink.tooltip")));
 		this.addRenderableWidget(blink);
-		CycleButton<Boolean> counter = CycleButton.onOffBuilder(this.edited.showsUnread())
+		CycleButton<Boolean> counter = onOff(this.edited.showsUnread())
 			.create(this.left + third + 4, y, third, 20, t("counter"), (b, v) -> this.edited.showUnread = v);
 		counter.setTooltip(Tooltip.create(t("counter.tooltip")));
 		this.addRenderableWidget(counter);
