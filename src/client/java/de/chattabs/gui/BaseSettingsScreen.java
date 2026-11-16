@@ -42,6 +42,36 @@ abstract class BaseSettingsScreen extends Screen {
 		return net.minecraft.client.gui.components.CycleButton.booleanBuilder(t("on"), t("off"), value);
 	}
 
+	/**
+	 * Zeile "Ton | Lautstärke | ▶": Ton auswählen, Lautstärke einstellen, Probe hören.
+	 */
+	protected void soundRow(int y, de.chattabs.config.TabSound sound, int volume,
+			java.util.function.Consumer<de.chattabs.config.TabSound> onSound, java.util.function.IntConsumer onVolume) {
+		int[] currentVolume = {volume};
+		de.chattabs.config.TabSound[] currentSound = {sound};
+		int playWidth = 20;
+		int soundWidth = (this.contentWidth - playWidth - 8) / 2;
+		var soundButton = net.minecraft.client.gui.components.CycleButton.<de.chattabs.config.TabSound>builder(
+				v -> Component.translatable(v.translationKey()), sound)
+			.withValues(de.chattabs.config.TabSound.values())
+			.create(this.left, y, soundWidth, 20, t("sound"), (b, v) -> {
+				currentSound[0] = v;
+				onSound.accept(v);
+				de.chattabs.ChatSounds.play(v, currentVolume[0]);
+			});
+		soundButton.setTooltip(Tooltip.create(t("sound.tooltip")));
+		this.addRenderableWidget(soundButton);
+		this.addRenderableWidget(new VolumeSlider(this.left + soundWidth + 4, y, this.contentWidth - soundWidth - playWidth - 8, 20, volume, v -> {
+			currentVolume[0] = v;
+			onVolume.accept(v);
+		}));
+		var play = net.minecraft.client.gui.components.Button.builder(Component.literal("▶"),
+				b -> de.chattabs.ChatSounds.play(currentSound[0], currentVolume[0]))
+			.bounds(this.left + this.contentWidth - playWidth, y, playWidth, 20).build();
+		play.setTooltip(Tooltip.create(t("sound.play")));
+		this.addRenderableWidget(play);
+	}
+
 	/** Muss am Anfang jedes init() aufgerufen werden. */
 	protected void beginLayout(int maxWidth) {
 		this.labels.clear();
@@ -55,9 +85,12 @@ abstract class BaseSettingsScreen extends Screen {
 	}
 
 	/** Zeile mit Beschriftung links und Textfeld rechts. */
-	protected EditBox textRow(int y, Component label, String value, @Nullable Component hint, @Nullable Component tooltip, Consumer<String> onChange) {
-		this.label(label, this.left, y + 6);
-		EditBox box = new EditBox(this.font, this.left + this.labelWidth, y + 1, this.contentWidth - this.labelWidth, 18, label);
+	protected EditBox textRow(int y, @Nullable Component label, String value, @Nullable Component hint, @Nullable Component tooltip, Consumer<String> onChange) {
+		if (label != null) {
+			this.label(label, this.left, y + 6);
+		}
+		EditBox box = new EditBox(this.font, this.left + this.labelWidth, y + 1, this.contentWidth - this.labelWidth, 18,
+			label != null ? label : Component.empty());
 		box.setMaxLength(1024);
 		box.setValue(value);
 		box.moveCursorToStart(false);

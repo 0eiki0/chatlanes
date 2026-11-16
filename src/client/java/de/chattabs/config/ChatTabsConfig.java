@@ -70,8 +70,12 @@ public class ChatTabsConfig {
 	public String pmSendCommand = "/msg {player} {message}";
 	/** Msg-Tabs mit ungelesenen Nachrichten blinken. */
 	public boolean pmBlink = true;
-	/** Ton abspielen, wenn eine private Nachricht in einem nicht geöffneten Tab ankommt. */
-	public boolean pmSound = false;
+	/** Veraltet (bis 1.4.0): Ton an/aus. Wird beim Laden in {@link #pmSoundType} übernommen. */
+	public @org.jspecify.annotations.Nullable Boolean pmSound;
+	/** Ton bei einer neuen privaten Nachricht. */
+	public TabSound pmSoundType;
+	/** Lautstärke für Msg-Töne in Prozent (0–100). */
+	public int pmVolume = 100;
 	/** Msg-Tabs nach einem Server-Wechsel automatisch schließen. */
 	public boolean pmCloseOnDisconnect = true;
 
@@ -96,6 +100,18 @@ public class ChatTabsConfig {
 		public String pattern = "";
 		/** Textfarbe des Tabs (siehe {@link TabColor}). */
 		public TabColor color = TabColor.DEFAULT;
+		/** Ton bei neuen Nachrichten in diesem Tab (fehlt = kein Ton). */
+		public TabSound sound;
+		/** Lautstärke des Tons in Prozent (0–100, fehlt = 100). */
+		public Integer volume;
+
+		public TabSound soundOrNone() {
+			return this.sound == null ? TabSound.NONE : this.sound;
+		}
+
+		public int volumeOrDefault() {
+			return this.volume == null ? 100 : Math.max(0, Math.min(100, this.volume));
+		}
 		/** Wird beim Auswählen des Tabs an den Server gesendet, z. B. "/ch global" (leer = nichts senden). */
 		public String switchCommand;
 		/** Wird beim Senden aus diesem Tab vor die Nachricht gesetzt, z. B. "/g " (leer = normal senden). */
@@ -130,12 +146,15 @@ public class ChatTabsConfig {
 		public TabConfig copy() {
 			TabConfig copy = new TabConfig(this.name, this.type, this.match, this.pattern, this.switchCommand, this.sendPrefix, this.blink, this.color);
 			copy.showUnread = this.showUnread;
+			copy.sound = this.sound;
+			copy.volume = this.volume;
 			return copy;
 		}
 	}
 
 	public static ChatTabsConfig createDefault() {
 		ChatTabsConfig config = new ChatTabsConfig();
+		config.pmSoundType = TabSound.NONE;
 		config.tabs.add(new TabConfig("System", TabConfig.Type.SYSTEM, TabConfig.Match.TAG, "", "", false, TabColor.DEFAULT));
 		config.tabs.add(new TabConfig("Global", TabConfig.Type.CHANNEL, TabConfig.Match.TAG, "[G]", "/ch global", "", false, TabColor.GREEN));
 		config.tabs.add(new TabConfig("Handel", TabConfig.Type.CHANNEL, TabConfig.Match.TAG, "[H]", "/ch handel", "", false, TabColor.GOLD));
@@ -150,6 +169,11 @@ public class ChatTabsConfig {
 		ChatTabsConfig defaults = new ChatTabsConfig();
 		if (this.position == null) this.position = defaults.position;
 		if (this.language == null) this.language = Language.AUTO;
+		if (this.pmSoundType == null) {
+			this.pmSoundType = Boolean.TRUE.equals(this.pmSound) ? TabSound.PLING : TabSound.NONE;
+		}
+		this.pmSound = null;
+		this.pmVolume = Math.max(0, Math.min(100, this.pmVolume));
 		if (this.showWhenClosed == null) this.showWhenClosed = defaults.showWhenClosed;
 		if (this.pmPattern == null) this.pmPattern = defaults.pmPattern;
 		if (this.pmSendCommand == null) this.pmSendCommand = defaults.pmSendCommand;

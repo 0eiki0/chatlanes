@@ -21,6 +21,7 @@ class TabEditScreen extends BaseSettingsScreen {
 	private final TabConfig edited;
 	private final boolean isNew;
 	private int resultY;
+	private int testY;
 
 	TabEditScreen(ChatTabsConfigScreen main, TabConfig tab, boolean isNew) {
 		super(Component.translatable(isNew ? "chattabs.config.edit.title_new" : "chattabs.config.edit.title"), main);
@@ -94,10 +95,15 @@ class TabEditScreen extends BaseSettingsScreen {
 		this.addRenderableWidget(CycleButton.<TabColor>builder(c -> Component.translatable(c.translationKey()).withColor(c.argb()), this.edited.color)
 			.withValues(TabColor.values())
 			.create(this.left + (third + 4) * 2, y, this.contentWidth - (third + 4) * 2, 20, t("color"), (b, v) -> this.edited.color = v));
+		y += ROW;
+
+		this.soundRow(y, this.edited.soundOrNone(), this.edited.volumeOrDefault(), v -> this.edited.sound = v, v -> this.edited.volume = v);
 		y += ROW + 4;
 
 		if (channel) {
-			this.textRow(y, t("edit.test"), lastTestMessage, null, t("edit.test.tooltip"), v -> lastTestMessage = v);
+			// Beschriftung zeichnet extractRenderState selbst (bei wenig Platz direkt mit Ergebnis).
+			this.textRow(y, null, lastTestMessage, null, t("edit.test.tooltip"), v -> lastTestMessage = v);
+			this.testY = y;
 			this.resultY = y + ROW;
 		} else {
 			this.resultY = -1;
@@ -137,6 +143,8 @@ class TabEditScreen extends BaseSettingsScreen {
 			this.original.switchCommand = this.edited.switchCommand;
 			this.original.blink = this.edited.blink;
 			this.original.showUnread = this.edited.showUnread;
+			this.original.sound = this.edited.sound;
+			this.original.volume = this.edited.volume;
 			this.original.color = this.edited.color;
 		}
 		this.onClose();
@@ -145,12 +153,13 @@ class TabEditScreen extends BaseSettingsScreen {
 	@Override
 	public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
 		super.extractRenderState(graphics, mouseX, mouseY, a);
-		if (this.resultY < 0 || this.resultY > this.height - 38) {
+		if (this.resultY < 0) {
 			return;
 		}
 
 		Component result;
 		int color;
+		boolean matches = false;
 		if (!this.isValueValid()) {
 			result = t("edit.test.invalid");
 			color = ERROR_COLOR;
@@ -159,10 +168,17 @@ class TabEditScreen extends BaseSettingsScreen {
 			color = LABEL_COLOR;
 		} else {
 			Pattern pattern = ChatTab.buildPattern(this.edited.match, this.edited.pattern);
-			boolean matches = pattern != null && pattern.matcher(lastTestMessage).find();
+			matches = pattern != null && pattern.matcher(lastTestMessage).find();
 			result = t(matches ? "edit.test.match" : "edit.test.no_match", this.edited.name);
 			color = matches ? OK_COLOR : ERROR_COLOR;
 		}
-		graphics.text(this.font, result, this.left + this.labelWidth, this.resultY, color);
+		if (this.resultY <= this.height - 38) {
+			// Genug Platz: Beschriftung links, ausführliches Ergebnis darunter.
+			graphics.text(this.font, t("edit.test"), this.left, this.testY + 6, LABEL_COLOR);
+			graphics.text(this.font, result, this.left + this.labelWidth, this.resultY, color);
+		} else {
+			// Wenig Platz (kleines Fenster/große GUI): Ergebnis kurz in der Beschriftung, z. B. "Test: ✔".
+			graphics.text(this.font, t(matches ? "edit.test.short_ok" : "edit.test.short_fail"), this.left, this.testY + 6, color);
+		}
 	}
 }

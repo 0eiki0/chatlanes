@@ -181,6 +181,7 @@ public final class ChatTabs {
 
 	/** Merkt sich von Hand eingegebene Kanalwechsel, damit der nächste Tab-Klick wieder korrekt wechselt. */
 	public void onCommandSent(String message) {
+		this.lastOwnInput = System.currentTimeMillis();
 		if (message.startsWith("/")) {
 			for (ChatTab tab : this.configTabs) {
 				TabConfig tabConfig = tab.config();
@@ -320,17 +321,39 @@ public final class ChatTabs {
 			return;
 		}
 		ChatHistory.get().onMessage(message);
-		boolean playSound = false;
 		for (ChatTab tab : this.tabs()) {
 			if (tab != this.active && belongsTo(c, tab)) {
 				tab.addUnread();
-				playSound |= tab.isPrivate();
 			}
 		}
-		if (playSound && this.config.pmSound) {
-			Minecraft.getInstance().getSoundManager().play(
-				net.minecraft.client.resources.sounds.SimpleSoundInstance.forUI(net.minecraft.sounds.SoundEvents.NOTE_BLOCK_PLING, 1.5F)
-			);
+		this.playSoundFor(c);
+	}
+
+	/** Zeitpunkt der letzten eigenen Eingabe – das Server-Echo der eigenen Nachricht soll keinen Ton auslösen. */
+	private long lastOwnInput;
+
+	/**
+	 * Spielt den Ton des passenden Tabs: Msg-Tab vor Kanal vor System vor Alle.
+	 * Kein Ton, wenn du den Tab gerade bei offenem Chat ansiehst, oder direkt nach deiner eigenen Nachricht.
+	 */
+	private void playSoundFor(Classification c) {
+		if (System.currentTimeMillis() - this.lastOwnInput < 1500L) {
+			return;
+		}
+		boolean chatOpen = Minecraft.getInstance().gui.screen() instanceof net.minecraft.client.gui.screens.ChatScreen;
+		for (ChatTab.Kind kind : new ChatTab.Kind[] {ChatTab.Kind.PRIVATE, ChatTab.Kind.CHANNEL, ChatTab.Kind.SYSTEM, ChatTab.Kind.ALL}) {
+			for (ChatTab tab : this.tabs()) {
+				if (tab.kind() != kind || !belongsTo(c, tab) || (tab == this.active && chatOpen)) {
+					continue;
+				}
+				TabConfig tabConfig = tab.config();
+				de.chattabs.config.TabSound sound = tabConfig == null ? this.config.pmSoundType : tabConfig.soundOrNone();
+				int volume = tabConfig == null ? this.config.pmVolume : tabConfig.volumeOrDefault();
+				if (sound != null && sound != de.chattabs.config.TabSound.NONE) {
+					ChatSounds.play(sound, volume);
+					return;
+				}
+			}
 		}
 	}
 
