@@ -70,6 +70,13 @@ public class ChatTabsConfig {
 	/** Anzahl ungelesener Nachrichten hinter dem Tab-Namen anzeigen, z. B. "Global (3)". */
 	public boolean showUnreadCount = true;
 
+	/** Name des Tabs, der bei jedem Spielstart ausgewählt ist (leer/unbekannt = erster Tab). */
+	public String defaultTab = "";
+	/** Automatisch in den Standard-Tab zurückwechseln, wenn man eine Weile im aktuellen Tab nichts geschrieben hat. */
+	public boolean autoReturn = false;
+	/** Nach so vielen Sekunden ohne eigene Nachricht zurückwechseln. */
+	public int autoReturnSeconds = 60;
+
 	/** Beim Auswählen eines Kanal-Tabs dessen Wechsel-Befehl (z. B. "/ch global") an den Server senden. */
 	public boolean switchChannelOnTab = true;
 	/**
@@ -263,6 +270,8 @@ public class ChatTabsConfig {
 		if (this.pmPattern == null) this.pmPattern = defaults.pmPattern;
 		if (this.pmSendCommand == null) this.pmSendCommand = defaults.pmSendCommand;
 		if (this.hideSwitchConfirmation == null) this.hideSwitchConfirmation = "";
+		if (this.defaultTab == null) this.defaultTab = "";
+		this.autoReturnSeconds = Math.max(5, Math.min(3600, this.autoReturnSeconds));
 		if (this.maxHistory < 100) this.maxHistory = 100;
 		if (this.maxHistory > 20000) this.maxHistory = 20000;
 		if (this.tabs == null) this.tabs = new ArrayList<>();

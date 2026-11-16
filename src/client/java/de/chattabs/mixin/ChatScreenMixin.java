@@ -28,6 +28,8 @@ public abstract class ChatScreenMixin {
 		at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/ClientPacketListener;sendChat(Ljava/lang/String;)V")
 	)
 	private void chattabs$sendToTab(ClientPacketListener connection, String message, Operation<Void> original) {
+		// Erst in den Kanal des aktiven Tabs wechseln, falls der Server (noch) woanders ist
+		ChatTabs.get().ensureServerChannel();
 		String transformed = ChatTabs.get().transformOutgoing(message);
 		if (transformed == null) {
 			original.call(connection, message);

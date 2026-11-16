@@ -124,9 +124,53 @@ public final class ChatTabs {
 			}
 		}
 		if (this.active == null) {
-			this.active = this.firstTab();
+			// Erster Aufruf (Spielstart) oder der aktive Tab existiert nicht mehr → Standard-Tab
+			this.active = this.defaultTabOrFirst();
 		}
 		this.refreshChat();
+	}
+
+	/** Der eingestellte Standard-Tab, sonst der erste Tab. */
+	public @Nullable ChatTab defaultTabOrFirst() {
+		String name = this.config.defaultTab;
+		if (name != null && !name.isBlank()) {
+			for (ChatTab tab : this.configTabs) {
+				if (tab.name().equals(name)) {
+					return tab;
+				}
+			}
+		}
+		return this.firstTab();
+	}
+
+	/** Zeitpunkt, zu dem du zuletzt einen Tab gewählt oder etwas geschrieben hast. */
+	private long lastActivity = System.currentTimeMillis();
+
+	/**
+	 * Wird jeden Tick aufgerufen: nach der eingestellten Zeit ohne eigene Nachricht zurück in den Standard-Tab.
+	 * Passiert nur bei geschlossenem Chat, damit dir beim Lesen nichts wegspringt.
+	 */
+	public void tick(Minecraft minecraft) {
+		if (!this.config.autoReturn || minecraft.player == null || this.active == null) {
+			return;
+		}
+		ChatTab target = this.defaultTabOrFirst();
+		if (target == null || target == this.active || minecraft.gui.screen() instanceof net.minecraft.client.gui.screens.ChatScreen) {
+			return;
+		}
+		if (System.currentTimeMillis() - this.lastActivity >= this.config.autoReturnSeconds * 1000L) {
+			this.setActive(target);
+		}
+	}
+
+	/**
+	 * Vor einer normalen Chatnachricht: sicherstellen, dass der Server im Kanal des aktiven Tabs ist
+	 * (z. B. direkt nach dem Login im Standard-Tab).
+	 */
+	public void ensureServerChannel() {
+		if (this.active != null) {
+			this.switchServerChannel(this.active);
+		}
 	}
 
 	public List<ChatTab> tabs() {
@@ -157,6 +201,7 @@ public final class ChatTabs {
 	}
 
 	public void setActive(ChatTab tab) {
+		this.lastActivity = System.currentTimeMillis();
 		tab.clearUnread();
 		if (this.active != tab) {
 			this.active = tab;
@@ -191,6 +236,7 @@ public final class ChatTabs {
 	/** Merkt sich von Hand eingegebene Kanalwechsel, damit der nächste Tab-Klick wieder korrekt wechselt. */
 	public void onCommandSent(String message) {
 		this.lastOwnInput = System.currentTimeMillis();
+		this.lastActivity = this.lastOwnInput;
 		if (message.startsWith("/")) {
 			String command = ChatTab.commandName(message);
 			for (ChatTab tab : this.configTabs) {

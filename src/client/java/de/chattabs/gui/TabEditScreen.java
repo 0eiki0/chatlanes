@@ -155,6 +155,9 @@ class TabEditScreen extends BaseSettingsScreen {
 		if (this.isNew) {
 			this.main.addTab(this.edited);
 		} else {
+			if (this.original.name.equals(this.main.working.defaultTab)) {
+				this.main.working.defaultTab = this.edited.name;
+			}
 			this.original.name = this.edited.name;
 			this.original.type = this.edited.type;
 			this.original.match = this.edited.match;

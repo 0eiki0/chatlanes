@@ -188,5 +188,10 @@
 	"chattabs.config.extra.seconds": "%s s",
 	"chattabs.config.extra.seconds.name": "Zeit",
 	"chattabs.config.extra.seconds.tooltip": "So lange nach dem Befehl landet alles, was sonst im System-Tab landen würde, in diesem Kanal (0,1 bis 60 Sekunden). Kürzer = weniger fremde Nachrichten erwischt, länger = sicherer bei langsamem Server.",
-	"chattabs.config.decimal_separator": ","
+	"chattabs.config.decimal_separator": ",",
+	"chattabs.config.default_tab": "Standard-Tab",
+	"chattabs.config.default_tab.tooltip": "Dieser Tab ist bei jedem Spielstart ausgewählt. Schreibst du nach dem Login dort, wechselt die Mod vorher automatisch in dessen Kanal (Wechsel-Befehl).",
+	"chattabs.config.auto_return": "Autom. zurück",
+	"chattabs.config.auto_return.time": "Nach",
+	"chattabs.config.auto_return.tooltip": "Wechselt automatisch zurück in den Standard-Tab, wenn du so lange im aktuellen Tab nichts geschrieben hast. Passiert erst, wenn der Chat geschlossen ist – beim Lesen springt nichts weg."
 }

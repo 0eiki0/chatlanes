@@ -188,5 +188,10 @@
 	"chattabs.config.extra.seconds": "%s s",
 	"chattabs.config.extra.seconds.name": "Time",
 	"chattabs.config.extra.seconds.tooltip": "For this long after the command, everything that would land in the System tab goes to this channel (0.1 to 60 seconds). Shorter = fewer unrelated messages caught, longer = safer with a slow server.",
-	"chattabs.config.decimal_separator": "."
+	"chattabs.config.decimal_separator": ".",
+	"chattabs.config.default_tab": "Default tab",
+	"chattabs.config.default_tab.tooltip": "This tab is selected every time the game starts. If you write there after logging in, the mod first switches to its channel (switch command).",
+	"chattabs.config.auto_return": "Auto return",
+	"chattabs.config.auto_return.time": "After",
+	"chattabs.config.auto_return.tooltip": "Automatically switches back to the default tab if you haven't written anything in the current tab for this long. Only happens while the chat is closed."
 }

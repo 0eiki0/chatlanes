@@ -48,6 +48,7 @@ public class ChatTabsClient implements ClientModInitializer {
 			while (openSettings.consumeClick()) {
 				openSettingsNextTick = true;
 			}
+			ChatTabs.get().tick(minecraft);
 			if (openSettingsNextTick && minecraft.gui.screen() == null) {
 				openSettingsNextTick = false;
 				openSettings(minecraft);

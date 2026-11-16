@@ -38,6 +38,38 @@ class ChannelHistoryScreen extends BaseSettingsScreen {
 		EditBox hide = this.textRow(y, t("hide_confirm"), this.working.hideSwitchConfirmation, t("hide_confirm.hint"), t("hide_confirm.tooltip"),
 			v -> this.working.hideSwitchConfirmation = v);
 		hide.setMaxLength(512);
+		y += ROW;
+
+		// Standard-Tab (bei jedem Spielstart ausgewählt)
+		java.util.List<String> names = new java.util.ArrayList<>();
+		for (var tab : this.working.tabs) {
+			if (!names.contains(tab.name)) {
+				names.add(tab.name);
+			}
+		}
+		if (!names.isEmpty()) {
+			String current = names.contains(this.working.defaultTab) ? this.working.defaultTab : names.getFirst();
+			CycleButton<String> defaultTab = CycleButton.<String>builder(Component::literal, current)
+				.withValues(names)
+				.create(this.left, y, w, 20, t("default_tab"), (b, v) -> this.working.defaultTab = v);
+			defaultTab.setTooltip(Tooltip.create(t("default_tab.tooltip")));
+			this.addRenderableWidget(defaultTab);
+			y += ROW;
+		}
+
+		// Automatisch zurück in den Standard-Tab nach einer Zeit ohne eigene Nachricht
+		int half = this.halfWidth();
+		CycleButton<Boolean> autoReturn = onOff(this.working.autoReturn)
+			.create(this.left, y, half, 20, t("auto_return"), (b, v) -> this.working.autoReturn = v);
+		autoReturn.setTooltip(Tooltip.create(t("auto_return.tooltip")));
+		this.addRenderableWidget(autoReturn);
+		java.util.TreeSet<Integer> times = new java.util.TreeSet<>(java.util.List.of(10, 15, 30, 45, 60, 90, 120, 180, 300, 600, 900, 1800, 3600));
+		times.add(this.working.autoReturnSeconds);
+		CycleButton<Integer> returnTime = CycleButton.<Integer>builder(ChannelHistoryScreen::formatDuration, this.working.autoReturnSeconds)
+			.withValues(java.util.List.copyOf(times))
+			.create(this.rightHalfX(), y, half, 20, t("auto_return.time"), (b, v) -> this.working.autoReturnSeconds = v);
+		returnTime.setTooltip(Tooltip.create(t("auto_return.tooltip")));
+		this.addRenderableWidget(returnTime);
 		y += ROW + 8;
 
 		this.label(t("channels.history_header"), this.left, y + 2);
@@ -65,6 +97,16 @@ class ChannelHistoryScreen extends BaseSettingsScreen {
 
 		this.addRenderableWidget(Button.builder(t("back"), b -> this.onClose())
 			.bounds(this.left, this.height - 26, w, 20).build());
+	}
+
+	/** 45 → "45 s", 120 → "2 min", 90 → "1:30 min" */
+	private static Component formatDuration(int seconds) {
+		if (seconds < 60) {
+			return Component.literal(seconds + " s");
+		}
+		int minutes = seconds / 60;
+		int rest = seconds % 60;
+		return Component.literal(rest == 0 ? minutes + " min" : minutes + ":" + String.format("%02d", rest) + " min");
 	}
 
 	@Override
