@@ -37,8 +37,10 @@ Im Menü:
 Alles wird in `config/chattabs.json` gespeichert.
 
 ## Download
-- **Neueste Testversion:** Reiter *Actions* → neuester „Build“-Lauf → unten bei *Artifacts* „chattabs“ herunterladen (ZIP mit der .jar).
-- **Releases:** Wird ein Tag `v…` gepusht (z. B. `git tag v1.0.1 && git push origin v1.0.1`), baut GitHub automatisch ein Release mit der .jar.
+- **Releases:** Nach jedem Push auf `main` erstellt GitHub automatisch ein Release mit der fertigen `.jar` – rechts auf der Repo-Seite unter *Releases*.
+  - Neue Version in `gradle.properties` → Release `v<Version>` (z. B. `v1.6.0`)
+  - Version unverändert → Release `v<Version>-build.<Nummer>`
+- **Testversionen anderer Branches:** Reiter *Actions* → Lauf auswählen → unten bei *Artifacts* „chattabs“.
 
 ## Selbst bauen
 Benötigt JDK 25:
