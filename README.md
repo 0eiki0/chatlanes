@@ -26,7 +26,7 @@ Die `chattabs-<version>.jar` in den `mods`-Ordner legen. Benötigt **Fabric Load
 
 Im Menü:
 - **Tabs**: hinzufügen, bearbeiten, verschieben (↑/↓), löschen
-- **Tab bearbeiten**: Name, Typ (System / Kanal / Alle), Erkennung, Wechsel-Befehl, Sende-Präfix, Blinken, Farbe und ein **Live-Test** („✔ Landet im Tab …“)
+- **Tab bearbeiten**: Name, Typ (System / Kanal / Alle), Erkennung, Wechsel-Befehl, Sende-Präfix, Blinken, Zähler „(3)“ an/aus, Farbe und ein **Live-Test** („✔ Landet im Tab …“)
   - *Kennung*: einfach z. B. `[G]` eintragen – Server-Präfixe wie `[Freebuild]` davor werden übersprungen
   - *Enthält Text*: alle Nachrichten mit diesem Text
   - *Regex*: regulärer Ausdruck für Profis

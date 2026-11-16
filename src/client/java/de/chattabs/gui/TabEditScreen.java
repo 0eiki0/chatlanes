@@ -81,13 +81,19 @@ class TabEditScreen extends BaseSettingsScreen {
 		this.textRow(y, t("edit.prefix"), this.edited.sendPrefix, t("edit.prefix.hint"), t("prefix.tooltip"), v -> this.edited.sendPrefix = v);
 		y += ROW;
 
+		// Drei Schalter nebeneinander: Blinken | Zähler | Farbe
+		int third = (this.contentWidth - 8) / 3;
 		CycleButton<Boolean> blink = CycleButton.onOffBuilder(this.edited.blink)
-			.create(this.left, y, half, 20, t("blink"), (b, v) -> this.edited.blink = v);
+			.create(this.left, y, third, 20, t("blink"), (b, v) -> this.edited.blink = v);
 		blink.setTooltip(Tooltip.create(t("blink.tooltip")));
 		this.addRenderableWidget(blink);
+		CycleButton<Boolean> counter = CycleButton.onOffBuilder(this.edited.showsUnread())
+			.create(this.left + third + 4, y, third, 20, t("counter"), (b, v) -> this.edited.showUnread = v);
+		counter.setTooltip(Tooltip.create(t("counter.tooltip")));
+		this.addRenderableWidget(counter);
 		this.addRenderableWidget(CycleButton.<TabColor>builder(c -> Component.translatable(c.translationKey()).withColor(c.argb()), this.edited.color)
 			.withValues(TabColor.values())
-			.create(this.rightHalfX(), y, half, 20, t("color"), (b, v) -> this.edited.color = v));
+			.create(this.left + (third + 4) * 2, y, this.contentWidth - (third + 4) * 2, 20, t("color"), (b, v) -> this.edited.color = v));
 		y += ROW + 4;
 
 		if (channel) {
@@ -130,6 +136,7 @@ class TabEditScreen extends BaseSettingsScreen {
 			this.original.sendPrefix = this.edited.sendPrefix;
 			this.original.switchCommand = this.edited.switchCommand;
 			this.original.blink = this.edited.blink;
+			this.original.showUnread = this.edited.showUnread;
 			this.original.color = this.edited.color;
 		}
 		this.onClose();

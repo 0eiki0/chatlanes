@@ -96,6 +96,11 @@ public final class ChatTab {
 		this.unread = 0;
 	}
 
+	/** Soll hinter dem Namen "(Anzahl)" stehen? Msg-Tabs folgen der globalen Einstellung. */
+	public boolean showsUnreadCount() {
+		return this.isPrivate() || this.config.showsUnread();
+	}
+
 	public boolean blinks() {
 		if (this.isPrivate()) {
 			return ChatTabs.get().config().pmBlink;

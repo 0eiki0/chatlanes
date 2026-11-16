@@ -107,7 +107,7 @@ public final class TabBar {
 		int x = 2;
 		for (ChatTab tab : tabs.tabs()) {
 			String label = tab.name();
-			if (tabs.config().showUnreadCount && tab != tabs.active() && tab.unread() > 0) {
+			if (tabs.config().showUnreadCount && tab.showsUnreadCount() && tab != tabs.active() && tab.unread() > 0) {
 				label += " (" + (tab.unread() > 99 ? "99+" : tab.unread()) + ")";
 			}
 			boolean closable = tab.isPrivate();

@@ -66,8 +66,8 @@
 	"chattabs.config.closed.unread": "Only when unread",
 	"chattabs.config.closed.always": "Always show",
 	"chattabs.config.closed.tooltip": "Whether the tabs are also shown while the chat is closed. “Only when unread” shows them while a blinking tab has unread messages.",
-	"chattabs.config.unread_count": "Unread counter",
-	"chattabs.config.unread_count.tooltip": "Shows the number of unread messages after the tab name, e.g. “Global (3)”.",
+	"chattabs.config.unread_count": "Unread counter (all)",
+	"chattabs.config.unread_count.tooltip": "Master switch for the unread count after tab names. Per channel under Edit → Counter.",
 	"chattabs.config.history": "Max history",
 	"chattabs.config.history.tooltip": "How many messages are kept in total (vanilla: 100). All tabs share this storage.",
 	"chattabs.config.pm_tabs": "PM tabs",
@@ -121,5 +121,7 @@
 	"chattabs.config.edit.switch": "Switch command",
 	"chattabs.config.edit.switch.hint": "e.g. /ch global",
 	"chattabs.config.edit.switch.tooltip": "Sent to the server when you select this tab so you write in that channel. Empty = send nothing.",
-	"chattabs.history.separator": "──── Saved history (until %s) ────"
+	"chattabs.history.separator": "──── Saved history (until %s) ────",
+	"chattabs.config.counter": "Counter",
+	"chattabs.config.counter.tooltip": "Shows the number of unread messages in brackets after the name, e.g. “Global (3)”. Off = the name just turns yellow."
 }

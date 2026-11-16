@@ -97,6 +97,12 @@ public class ChatTabsConfig {
 		public String sendPrefix = "";
 		/** Tab blinkt bei ungelesenen Nachrichten. */
 		public boolean blink = false;
+		/** Anzahl ungelesener Nachrichten in Klammern hinter dem Namen anzeigen, z. B. "Global (3)". Fehlt = an. */
+		public Boolean showUnread;
+
+		public boolean showsUnread() {
+			return this.showUnread == null || this.showUnread;
+		}
 
 		public TabConfig() {
 		}
@@ -117,7 +123,9 @@ public class ChatTabsConfig {
 		}
 
 		public TabConfig copy() {
-			return new TabConfig(this.name, this.type, this.match, this.pattern, this.switchCommand, this.sendPrefix, this.blink, this.color);
+			TabConfig copy = new TabConfig(this.name, this.type, this.match, this.pattern, this.switchCommand, this.sendPrefix, this.blink, this.color);
+			copy.showUnread = this.showUnread;
+			return copy;
 		}
 	}
 
