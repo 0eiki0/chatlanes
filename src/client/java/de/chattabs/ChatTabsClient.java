@@ -8,6 +8,7 @@ import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallba
 import net.fabricmc.fabric.api.client.command.v2.ClientCommands;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.Identifier;
@@ -34,6 +35,13 @@ public class ChatTabsClient implements ClientModInitializer {
 				return 1;
 			})
 		));
+
+		// Gespeicherten Verlauf beim Betreten eines Servers wiederherstellen
+		ClientPlayConnectionEvents.JOIN.register((connection, sender, minecraft) -> {
+			ChatTabs.get().resetServerChannel();
+			ChatHistory.get().onJoin(connection, minecraft);
+		});
+		ClientPlayConnectionEvents.DISCONNECT.register((connection, minecraft) -> ChatHistory.get().onDisconnect());
 
 		ClientTickEvents.END_CLIENT_TICK.register(minecraft -> {
 			while (openSettings.consumeClick()) {

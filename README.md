@@ -14,6 +14,8 @@ Die `chattabs-<version>.jar` in den `mods`-Ordner legen. Benötigt **Fabric Load
 - Msg-Tabs schließt du mit dem **×** am Tab (oder per Rechts-/Mittelklick).
 - Das Chatfeld hat bei offenem Chat immer die volle Höhe, damit die Tabs immer an derselben Stelle sitzen (abschaltbar unter *Allgemein → Feste Chatgröße*).
 - Schreibst du im Msg-Tab, wird automatisch `/msg <Spieler> <Text>` gesendet (Befehle mit `/` bleiben unverändert).
+- Wählst du einen Kanal-Tab aus, wechselt die Mod auch auf dem Server in diesen Kanal (Global → `/ch global`, Handel → `/ch handel`; pro Tab einstellbar).
+- Die Nachrichten aller Tabs werden pro Server gespeichert und beim nächsten Betreten wieder in die richtigen Tabs geladen (abschaltbar).
 
 ## Einstellungsmenü
 Öffnen über **eine** dieser Möglichkeiten:
@@ -24,11 +26,12 @@ Die `chattabs-<version>.jar` in den `mods`-Ordner legen. Benötigt **Fabric Load
 
 Im Menü:
 - **Tabs**: hinzufügen, bearbeiten, verschieben (↑/↓), löschen
-- **Tab bearbeiten**: Name, Typ (System / Kanal / Alle), Erkennung, Sende-Präfix, Blinken, Farbe und ein **Live-Test** („✔ Landet im Tab …“)
+- **Tab bearbeiten**: Name, Typ (System / Kanal / Alle), Erkennung, Wechsel-Befehl, Sende-Präfix, Blinken, Farbe und ein **Live-Test** („✔ Landet im Tab …“)
   - *Kennung*: einfach z. B. `[G]` eintragen – Server-Präfixe wie `[Freebuild]` davor werden übersprungen
   - *Enthält Text*: alle Nachrichten mit diesem Text
   - *Regex*: regulärer Ausdruck für Profis
 - **Allgemein**: Tab-Leiste oben/unten, feste Chatgröße, Anzeige bei geschlossenem Chat, Ungelesen-Zähler, Verlaufsgröße
+- **Kanäle & Verlauf**: Kanal beim Tab-Klick wechseln, Server-Bestätigung ausblenden, Nachrichten speichern, gespeicherten Verlauf löschen (gespeichert in `config/chattabs/history/`)
 - **Private Nachrichten**: Msg-Tabs an/aus, Blinken, Ton, beim Trennen schließen, Senden-Befehl, Erkennung mit Live-Test
 
 Alles wird in `config/chattabs.json` gespeichert.

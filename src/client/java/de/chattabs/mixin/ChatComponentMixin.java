@@ -55,6 +55,21 @@ public abstract class ChatComponentMixin {
 		return size > ChatTabs.get().config().maxHistory ? size : 0;
 	}
 
+	/** Server-Bestätigung eines automatischen Kanalwechsels ausblenden (falls eingestellt). */
+	@Inject(
+		method = "addMessage(Lnet/minecraft/network/chat/Component;Lnet/minecraft/network/chat/MessageSignature;Lnet/minecraft/client/multiplayer/chat/GuiMessageSource;Lnet/minecraft/client/multiplayer/chat/GuiMessageTag;)V",
+		at = @At("HEAD"),
+		cancellable = true
+	)
+	private void chattabs$hideSwitchConfirmation(
+		net.minecraft.network.chat.Component contents, net.minecraft.network.chat.MessageSignature signature,
+		net.minecraft.client.multiplayer.chat.GuiMessageSource source, net.minecraft.client.multiplayer.chat.GuiMessageTag tag, CallbackInfo ci
+	) {
+		if (ChatTabs.get().shouldHide(contents)) {
+			ci.cancel();
+		}
+	}
+
 	@Inject(method = "createDeletedMarker", at = @At("RETURN"))
 	private static void chattabs$keepTabOfDeleted(GuiMessage original, CallbackInfoReturnable<GuiMessage> cir) {
 		ChatTabs.get().copyClassification(original, cir.getReturnValue());

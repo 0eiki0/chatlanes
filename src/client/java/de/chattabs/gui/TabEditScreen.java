@@ -74,6 +74,10 @@ class TabEditScreen extends BaseSettingsScreen {
 		}
 		y += ROW;
 
+		EditBox switchCommand = this.textRow(y, t("edit.switch"), this.edited.switchCommand == null ? "" : this.edited.switchCommand,
+			t("edit.switch.hint"), t("edit.switch.tooltip"), v -> this.edited.switchCommand = v);
+		y += ROW;
+
 		this.textRow(y, t("edit.prefix"), this.edited.sendPrefix, t("edit.prefix.hint"), t("prefix.tooltip"), v -> this.edited.sendPrefix = v);
 		y += ROW;
 
@@ -84,7 +88,7 @@ class TabEditScreen extends BaseSettingsScreen {
 		this.addRenderableWidget(CycleButton.<TabColor>builder(c -> Component.translatable(c.translationKey()).withColor(c.argb()), this.edited.color)
 			.withValues(TabColor.values())
 			.create(this.rightHalfX(), y, half, 20, t("color"), (b, v) -> this.edited.color = v));
-		y += ROW + 6;
+		y += ROW + 4;
 
 		if (channel) {
 			this.textRow(y, t("edit.test"), lastTestMessage, null, t("edit.test.tooltip"), v -> lastTestMessage = v);
@@ -124,6 +128,7 @@ class TabEditScreen extends BaseSettingsScreen {
 			this.original.match = this.edited.match;
 			this.original.pattern = this.edited.pattern;
 			this.original.sendPrefix = this.edited.sendPrefix;
+			this.original.switchCommand = this.edited.switchCommand;
 			this.original.blink = this.edited.blink;
 			this.original.color = this.edited.color;
 		}

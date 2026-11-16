@@ -31,12 +31,13 @@ public class ChatTabsConfigScreen extends BaseSettingsScreen {
 	@Override
 	protected void init() {
 		this.beginLayout(380);
-		int half = this.halfWidth();
-
+		int third = (this.contentWidth - 8) / 3;
 		this.addRenderableWidget(Button.builder(t("general"), b -> this.minecraft.gui.setScreen(new GeneralSettingsScreen(this)))
-			.bounds(this.left, TOP, half, 20).build());
+			.bounds(this.left, TOP, third, 20).build());
+		this.addRenderableWidget(Button.builder(t("channels"), b -> this.minecraft.gui.setScreen(new ChannelHistoryScreen(this)))
+			.bounds(this.left + third + 4, TOP, third, 20).build());
 		this.addRenderableWidget(Button.builder(t("pm"), b -> this.minecraft.gui.setScreen(new PrivateMessagesScreen(this)))
-			.bounds(this.rightHalfX(), TOP, half, 20).build());
+			.bounds(this.left + (third + 4) * 2, TOP, this.contentWidth - (third + 4) * 2, 20).build());
 
 		this.label(t("tabs_header"), this.left, LIST_TOP - 11);
 
@@ -181,7 +182,8 @@ public class ChatTabsConfigScreen extends BaseSettingsScreen {
 			case ALL -> t("describe.all");
 			case CHANNEL -> tab.pattern.isEmpty()
 				? t("describe.channel_empty")
-				: t("describe.channel", tab.match == TabConfig.Match.REGEX ? t("describe.regex") : Component.literal(tab.pattern));
+				: t("describe.channel", tab.match == TabConfig.Match.REGEX ? t("describe.regex") : Component.literal(tab.pattern))
+					.append(tab.switchCommand == null || tab.switchCommand.isBlank() ? Component.empty() : Component.literal(" → " + tab.switchCommand));
 		};
 	}
 }

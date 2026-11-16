@@ -26,9 +26,18 @@ public final class ChatTabs {
 	private static final ChatTabs INSTANCE = new ChatTabs();
 
 	/** Ergebnis der Zuordnung einer Nachricht. channel == null und player == null bedeutet "System". */
-	private record Classification(@Nullable ChatTab channel, @Nullable String player) {
-		static final Classification SYSTEM = new Classification(null, null);
+	private record Classification(@Nullable ChatTab channel, @Nullable String player, boolean everywhere) {
+		static final Classification SYSTEM = new Classification(null, null, false);
+		static final Classification EVERYWHERE = new Classification(null, null, true);
+
+		Classification(@Nullable ChatTab channel, @Nullable String player) {
+			this(channel, player, false);
+		}
 	}
+
+	/** Zuletzt (automatisch oder von Hand) gesendeter Kanalwechsel, z. B. "/ch global". */
+	private @Nullable String lastSwitchCommand;
+	private long lastSwitchTime;
 
 	private ChatTabsConfig config = ChatTabsConfig.createDefault();
 	private final List<ChatTab> configTabs = new ArrayList<>();
@@ -138,6 +147,70 @@ public final class ChatTabs {
 			this.active = tab;
 			this.refreshChat();
 		}
+		this.switchServerChannel(tab);
+	}
+
+	/** Schickt den Wechsel-Befehl des Tabs (z. B. "/ch global") an den Server, falls nicht schon in diesem Kanal. */
+	private void switchServerChannel(ChatTab tab) {
+		TabConfig tabConfig = tab.config();
+		if (!this.config.switchChannelOnTab || tabConfig == null || tabConfig.switchCommand == null || tabConfig.switchCommand.isBlank()) {
+			return;
+		}
+		String command = tabConfig.switchCommand.trim();
+		if (command.equalsIgnoreCase(this.lastSwitchCommand)) {
+			return;
+		}
+		Minecraft minecraft = Minecraft.getInstance();
+		if (minecraft.player == null || minecraft.getConnection() == null) {
+			return;
+		}
+		if (command.startsWith("/")) {
+			minecraft.getConnection().sendCommand(command.substring(1));
+		} else {
+			minecraft.getConnection().sendChat(command);
+		}
+		this.lastSwitchCommand = command;
+		this.lastSwitchTime = System.currentTimeMillis();
+	}
+
+	/** Merkt sich von Hand eingegebene Kanalwechsel, damit der nächste Tab-Klick wieder korrekt wechselt. */
+	public void onCommandSent(String message) {
+		if (message.startsWith("/")) {
+			for (ChatTab tab : this.configTabs) {
+				TabConfig tabConfig = tab.config();
+				String prefix = tabConfig == null || tabConfig.switchCommand == null ? "" : tabConfig.switchCommand.trim();
+				int space = prefix.indexOf(' ');
+				// Gleicher Befehl (z. B. "/ch ...") → der Server ist jetzt in einem Kanal, den wir nicht sicher kennen.
+				if (space > 0 && message.regionMatches(true, 0, prefix, 0, space + 1)) {
+					this.lastSwitchCommand = message.trim();
+					return;
+				}
+			}
+		}
+	}
+
+	/** Nach Verbindungsaufbau/-abbau ist unbekannt, in welchem Kanal der Server uns führt. */
+	public void resetServerChannel() {
+		this.lastSwitchCommand = null;
+	}
+
+	/** Server-Bestätigung eines automatischen Kanalwechsels ausblenden? */
+	public boolean shouldHide(net.minecraft.network.chat.Component message) {
+		String regex = this.config.hideSwitchConfirmation;
+		if (regex == null || regex.isBlank() || System.currentTimeMillis() - this.lastSwitchTime > 3000L) {
+			return false;
+		}
+		Pattern pattern = compile(regex);
+		String text = ChatFormatting.stripFormatting(message.getString());
+		return pattern != null && text != null && pattern.matcher(text).find();
+	}
+
+	/** Inhalte (z. B. die Trennlinie des wiederhergestellten Verlaufs), die in allen Tabs erscheinen. */
+	private final java.util.Set<net.minecraft.network.chat.Component> everywhere =
+		java.util.Collections.newSetFromMap(new MapMaker().weakKeys().<net.minecraft.network.chat.Component, Boolean>makeMap());
+
+	public void markEverywhere(net.minecraft.network.chat.Component content) {
+		this.everywhere.add(content);
 	}
 
 	public void closePrivateTab(ChatTab tab) {
@@ -163,6 +236,11 @@ public final class ChatTabs {
 		Classification cached = this.cache.get(message);
 		if (cached != null) {
 			return cached;
+		}
+
+		if (this.everywhere.contains(message.content())) {
+			this.cache.put(message, Classification.EVERYWHERE);
+			return Classification.EVERYWHERE;
 		}
 
 		String text = ChatFormatting.stripFormatting(message.content().getString());
@@ -202,6 +280,9 @@ public final class ChatTabs {
 	}
 
 	private static boolean belongsTo(Classification c, ChatTab tab) {
+		if (c.everywhere()) {
+			return true;
+		}
 		return switch (tab.kind()) {
 			case ALL -> true;
 			case SYSTEM -> c.channel() == null && c.player() == null;
@@ -222,6 +303,10 @@ public final class ChatTabs {
 	/** Wird für jede neu empfangene Nachricht aufgerufen und zählt ungelesene Nachrichten. */
 	public void onNewMessage(GuiMessage message) {
 		Classification c = this.classify(message);
+		if (ChatHistory.get().isRestoring()) {
+			return;
+		}
+		ChatHistory.get().onMessage(message);
 		boolean playSound = false;
 		for (ChatTab tab : this.tabs()) {
 			if (tab != this.active && belongsTo(c, tab)) {
@@ -264,6 +349,10 @@ public final class ChatTabs {
 	}
 
 	public void onClear(boolean disconnect) {
+		if (disconnect) {
+			ChatHistory.get().onChatCleared();
+			this.resetServerChannel();
+		}
 		for (ChatTab tab : this.tabs()) {
 			tab.clearUnread();
 		}

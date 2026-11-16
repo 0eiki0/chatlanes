@@ -42,6 +42,16 @@ public class ChatTabsConfig {
 	/** Anzahl ungelesener Nachrichten hinter dem Tab-Namen anzeigen, z. B. "Global (3)". */
 	public boolean showUnreadCount = true;
 
+	/** Beim Auswählen eines Kanal-Tabs dessen Wechsel-Befehl (z. B. "/ch global") an den Server senden. */
+	public boolean switchChannelOnTab = true;
+	/**
+	 * Optional: Server-Antworten auf den Kanalwechsel ausblenden (regulärer Ausdruck, leer = nichts ausblenden).
+	 * Gilt nur für Nachrichten, die bis zu 3 Sekunden nach einem automatischen Wechsel ankommen.
+	 */
+	public String hideSwitchConfirmation = "";
+	/** Nachrichten aller Tabs pro Server speichern und beim nächsten Betreten wiederherstellen. */
+	public boolean saveHistory = true;
+
 	/** Automatisch einen Tab pro Spieler für private Nachrichten anlegen. */
 	public boolean pmTabs = true;
 	/**
@@ -81,6 +91,8 @@ public class ChatTabsConfig {
 		public String pattern = "";
 		/** Textfarbe des Tabs (siehe {@link TabColor}). */
 		public TabColor color = TabColor.DEFAULT;
+		/** Wird beim Auswählen des Tabs an den Server gesendet, z. B. "/ch global" (leer = nichts senden). */
+		public String switchCommand;
 		/** Wird beim Senden aus diesem Tab vor die Nachricht gesetzt, z. B. "/g " (leer = normal senden). */
 		public String sendPrefix = "";
 		/** Tab blinkt bei ungelesenen Nachrichten. */
@@ -90,6 +102,11 @@ public class ChatTabsConfig {
 		}
 
 		public TabConfig(String name, Type type, Match match, String pattern, String sendPrefix, boolean blink, TabColor color) {
+			this(name, type, match, pattern, "", sendPrefix, blink, color);
+		}
+
+		public TabConfig(String name, Type type, Match match, String pattern, String switchCommand, String sendPrefix, boolean blink, TabColor color) {
+			this.switchCommand = switchCommand;
 			this.name = name;
 			this.type = type;
 			this.match = match;
@@ -100,15 +117,15 @@ public class ChatTabsConfig {
 		}
 
 		public TabConfig copy() {
-			return new TabConfig(this.name, this.type, this.match, this.pattern, this.sendPrefix, this.blink, this.color);
+			return new TabConfig(this.name, this.type, this.match, this.pattern, this.switchCommand, this.sendPrefix, this.blink, this.color);
 		}
 	}
 
 	public static ChatTabsConfig createDefault() {
 		ChatTabsConfig config = new ChatTabsConfig();
 		config.tabs.add(new TabConfig("System", TabConfig.Type.SYSTEM, TabConfig.Match.TAG, "", "", false, TabColor.DEFAULT));
-		config.tabs.add(new TabConfig("Global", TabConfig.Type.CHANNEL, TabConfig.Match.TAG, "[G]", "", false, TabColor.GREEN));
-		config.tabs.add(new TabConfig("Handel", TabConfig.Type.CHANNEL, TabConfig.Match.TAG, "[H]", "", false, TabColor.GOLD));
+		config.tabs.add(new TabConfig("Global", TabConfig.Type.CHANNEL, TabConfig.Match.TAG, "[G]", "/ch global", "", false, TabColor.GREEN));
+		config.tabs.add(new TabConfig("Handel", TabConfig.Type.CHANNEL, TabConfig.Match.TAG, "[H]", "/ch handel", "", false, TabColor.GOLD));
 		return config;
 	}
 
@@ -122,6 +139,7 @@ public class ChatTabsConfig {
 		if (this.showWhenClosed == null) this.showWhenClosed = defaults.showWhenClosed;
 		if (this.pmPattern == null) this.pmPattern = defaults.pmPattern;
 		if (this.pmSendCommand == null) this.pmSendCommand = defaults.pmSendCommand;
+		if (this.hideSwitchConfirmation == null) this.hideSwitchConfirmation = "";
 		if (this.maxHistory < 100) this.maxHistory = 100;
 		if (this.maxHistory > 20000) this.maxHistory = 20000;
 		if (this.tabs == null) this.tabs = new ArrayList<>();
@@ -130,17 +148,24 @@ public class ChatTabsConfig {
 			if (tab.name == null || tab.name.isBlank()) tab.name = "Tab";
 			if (tab.type == null) tab.type = TabConfig.Type.CHANNEL;
 			// Ältere Configs (Version 1.0.x) kannten nur reguläre Ausdrücke.
-			if (tab.match == null) {
-				// Die Standard-Regex von 1.0.x ("^(?:\\[[^\\]]+\\] )?\\[G\\] ") wird zur einfachen Kennung "[G]".
-				java.util.regex.Matcher legacy = LEGACY_DEFAULT.matcher(tab.pattern);
-				if (legacy.matches()) {
-					tab.match = TabConfig.Match.TAG;
-					tab.pattern = "[" + legacy.group(1) + "]";
-				} else {
-					tab.match = TabConfig.Match.REGEX;
-				}
+			// Die Standard-Regex von 1.0.x ("^(?:\\[[^\\]]+\\] )?\\[G\\] ") wird zur einfachen Kennung "[G]".
+			java.util.regex.Matcher legacy = LEGACY_DEFAULT.matcher(tab.pattern);
+			if ((tab.match == null || tab.match == TabConfig.Match.REGEX) && legacy.matches()) {
+				tab.match = TabConfig.Match.TAG;
+				tab.pattern = "[" + legacy.group(1) + "]";
+			} else if (tab.match == null) {
+				tab.match = TabConfig.Match.REGEX;
 			}
 			if (tab.color == null) tab.color = TabColor.DEFAULT;
+			if (tab.switchCommand == null) {
+				// Configs vor 1.3.0: für die Standard-Kanäle den passenden Cubeside-Befehl eintragen.
+				String tag = tab.match == TabConfig.Match.TAG ? tab.pattern.trim() : "";
+				tab.switchCommand = switch (tag) {
+					case "[G]" -> "/ch global";
+					case "[H]" -> "/ch handel";
+					default -> "";
+				};
+			}
 			if (tab.pattern == null) tab.pattern = "";
 			if (tab.sendPrefix == null) tab.sendPrefix = "";
 		}

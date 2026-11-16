@@ -16,7 +16,7 @@ abstract class BaseSettingsScreen extends Screen {
 	protected static final int TITLE_COLOR = 0xFFFFFFFF;
 	protected static final int OK_COLOR = 0xFF55FF55;
 	protected static final int ERROR_COLOR = 0xFFFF5555;
-	protected static final int ROW = 24;
+	protected static final int ROW = 22;
 	protected static final int TOP = 30;
 
 	protected final @Nullable Screen parent;
@@ -33,7 +33,7 @@ abstract class BaseSettingsScreen extends Screen {
 		this.parent = parent;
 	}
 
-	static Component t(String key, Object... args) {
+	static net.minecraft.network.chat.MutableComponent t(String key, Object... args) {
 		return Component.translatable("chattabs.config." + key, args);
 	}
 
