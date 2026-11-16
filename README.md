@@ -11,7 +11,7 @@ Die `chattabs-<version>.jar` in den `mods`-Ordner legen. Benötigt **Fabric Load
 ## Bedienung
 - Chat öffnen (T) → Tabs direkt über dem Chat anklicken.
 - Msg-Tabs mit ungelesenen Nachrichten **blinken**, andere Tabs zeigen `(Anzahl)` in Gelb.
-- Msg-Tabs schließt du mit dem **×** am Tab (oder per Rechts-/Mittelklick).
+- Msg-Tabs schließt du mit dem **×** am Tab (oder per Rechts-/Mittelklick). Sie bleiben auch nach einem Neustart zu, bis der Spieler dir wieder schreibt.
 - Das Chatfeld hat bei offenem Chat immer die volle Höhe, damit die Tabs immer an derselben Stelle sitzen (abschaltbar unter *Allgemein → Feste Chatgröße*).
 - Schreibst du im Msg-Tab, wird automatisch `/msg <Spieler> <Text>` gesendet (Befehle mit `/` bleiben unverändert).
 - Wählst du einen Kanal-Tab aus, wechselt die Mod auch auf dem Server in diesen Kanal (Global → `/ch global`, Handel → `/ch handel`; pro Tab einstellbar).

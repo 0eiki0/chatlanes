@@ -42,6 +42,12 @@ public final class ChatTabs {
 	private ChatTabsConfig config = ChatTabsConfig.createDefault();
 	private final List<ChatTab> configTabs = new ArrayList<>();
 	private final Map<String, ChatTab> privateTabs = new LinkedHashMap<>();
+	/**
+	 * Msg-Tabs, die der Spieler mit × geschlossen hat (Spielername klein → Zeitpunkt des Schließens).
+	 * Ältere Nachrichten (z. B. aus dem gespeicherten Verlauf) öffnen sie nicht wieder,
+	 * erst eine neue private Nachricht nach dem Schließen.
+	 */
+	private final Map<String, Long> closedPrivateTabs = new java.util.HashMap<>();
 	private @Nullable Pattern pmPattern;
 	private List<String> pmGroups = List.of();
 	private @Nullable ChatTab active;
@@ -217,7 +223,10 @@ public final class ChatTabs {
 		if (!tab.isPrivate()) {
 			return;
 		}
-		this.privateTabs.remove(tab.player().toLowerCase(Locale.ROOT));
+		String key = tab.player().toLowerCase(Locale.ROOT);
+		this.privateTabs.remove(key);
+		this.closedPrivateTabs.put(key, System.currentTimeMillis());
+		ChatHistory.get().saveClosedTabs(this.closedPrivateTabs);
 		if (this.active == tab) {
 			this.active = this.firstTab();
 			this.refreshChat();
@@ -270,7 +279,10 @@ public final class ChatTabs {
 				if (player != null && !player.isEmpty()) {
 					String name = player;
 					result = new Classification(null, name);
-					this.privateTabs.computeIfAbsent(name.toLowerCase(Locale.ROOT), key -> ChatTab.privateTab(name));
+					// Geschlossene Tabs werden hier nicht wieder geöffnet – das entscheidet onNewMessage anhand der Uhrzeit.
+					if (!this.closedPrivateTabs.containsKey(name.toLowerCase(Locale.ROOT))) {
+						this.privateTabs.computeIfAbsent(name.toLowerCase(Locale.ROOT), key -> ChatTab.privateTab(name));
+					}
 				}
 			}
 		}
@@ -303,6 +315,7 @@ public final class ChatTabs {
 	/** Wird für jede neu empfangene Nachricht aufgerufen und zählt ungelesene Nachrichten. */
 	public void onNewMessage(GuiMessage message) {
 		Classification c = this.classify(message);
+		this.reopenIfNewer(c, ChatHistory.get().isRestoring() ? ChatHistory.get().restoreTime() : System.currentTimeMillis());
 		if (ChatHistory.get().isRestoring()) {
 			return;
 		}
@@ -318,6 +331,33 @@ public final class ChatTabs {
 			Minecraft.getInstance().getSoundManager().play(
 				net.minecraft.client.resources.sounds.SimpleSoundInstance.forUI(net.minecraft.sounds.SoundEvents.NOTE_BLOCK_PLING, 1.5F)
 			);
+		}
+	}
+
+	/** Ein mit × geschlossener Msg-Tab öffnet sich erst wieder, wenn eine Nachricht NACH dem Schließen kommt. */
+	private void reopenIfNewer(Classification c, long messageTime) {
+		if (c.player() == null || !this.config.pmTabs) {
+			return;
+		}
+		String key = c.player().toLowerCase(Locale.ROOT);
+		Long closedAt = this.closedPrivateTabs.get(key);
+		if (closedAt != null) {
+			if (messageTime <= closedAt) {
+				return;
+			}
+			this.closedPrivateTabs.remove(key);
+			ChatHistory.get().saveClosedTabs(this.closedPrivateTabs);
+		}
+		String player = c.player();
+		this.privateTabs.computeIfAbsent(key, k -> ChatTab.privateTab(player));
+	}
+
+	/** Beim Betreten eines Servers: dort geschlossene Msg-Tabs laden. */
+	void setClosedPrivateTabs(Map<String, Long> closed) {
+		this.closedPrivateTabs.clear();
+		this.closedPrivateTabs.putAll(closed);
+		for (String key : closed.keySet()) {
+			this.privateTabs.remove(key);
 		}
 	}
 

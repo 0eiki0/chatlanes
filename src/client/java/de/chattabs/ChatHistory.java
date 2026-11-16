@@ -51,6 +51,8 @@ public final class ChatHistory {
 	private @Nullable Path file;
 	private @Nullable RegistryOps<JsonElement> ops;
 	private boolean restoring;
+	/** Zeitstempel der gerade wiederhergestellten Nachricht. */
+	private long restoreTime;
 	private boolean restoredThisSession;
 	private int linesInFile;
 
@@ -67,6 +69,47 @@ public final class ChatHistory {
 
 	public boolean isRestoring() {
 		return this.restoring;
+	}
+
+	public long restoreTime() {
+		return this.restoreTime;
+	}
+
+	private @Nullable Path closedFile() {
+		return this.file == null ? null : this.file.resolveSibling(this.file.getFileName().toString().replace(".jsonl", ".closed.json"));
+	}
+
+	/** Mit × geschlossene Msg-Tabs pro Server merken, damit sie nach einem Neustart geschlossen bleiben. */
+	void saveClosedTabs(java.util.Map<String, Long> closed) {
+		Path path = this.closedFile();
+		if (path == null) {
+			return;
+		}
+		JsonObject json = new JsonObject();
+		closed.forEach(json::addProperty);
+		String text = json.toString();
+		this.io.submit(() -> {
+			try {
+				Files.createDirectories(path.getParent());
+				Files.writeString(path, text, StandardCharsets.UTF_8);
+			} catch (IOException e) {
+				LOGGER.warn("Konnte geschlossene Msg-Tabs nicht speichern: {}", e.getMessage());
+			}
+		});
+	}
+
+	private java.util.Map<String, Long> loadClosedTabs() {
+		Path path = this.closedFile();
+		java.util.Map<String, Long> closed = new java.util.HashMap<>();
+		if (path != null && Files.exists(path)) {
+			try {
+				JsonObject json = JsonParser.parseString(Files.readString(path, StandardCharsets.UTF_8)).getAsJsonObject();
+				json.entrySet().forEach(e -> closed.put(e.getKey(), e.getValue().getAsLong()));
+			} catch (IOException | RuntimeException e) {
+				LOGGER.warn("Konnte geschlossene Msg-Tabs nicht lesen: {}", e.getMessage());
+			}
+		}
+		return closed;
 	}
 
 	/** Dateiname aus Serveradresse bzw. Weltname, z. B. "server_cubeside.de.jsonl". */
@@ -86,6 +129,7 @@ public final class ChatHistory {
 	public void onJoin(ClientPacketListener connection, Minecraft minecraft) {
 		this.ops = connection.registryAccess().createSerializationContext(JsonOps.INSTANCE);
 		this.file = directory().resolve(serverKey(minecraft) + ".jsonl");
+		ChatTabs.get().setClosedPrivateTabs(this.loadClosedTabs());
 		if (!ChatTabs.get().config().saveHistory) {
 			return;
 		}
@@ -144,6 +188,7 @@ public final class ChatHistory {
 					JsonObject json = JsonParser.parseString(line).getAsJsonObject();
 					Component message = ComponentSerialization.CODEC.parse(this.ops, json.get("c")).getOrThrow();
 					lastTime = json.has("t") ? json.get("t").getAsLong() : lastTime;
+					this.restoreTime = lastTime;
 					chat.chattabs$addMessage(message, null, GuiMessageSource.SYSTEM_CLIENT, null);
 				} catch (RuntimeException e) {
 					LOGGER.debug("Überspringe beschädigte Zeile im Chatverlauf", e);
@@ -202,9 +247,11 @@ public final class ChatHistory {
 		}
 		int deleted = 0;
 		try (Stream<Path> files = Files.list(dir)) {
-			for (Path path : files.filter(p -> p.getFileName().toString().endsWith(".jsonl")).toList()) {
+			for (Path path : files.filter(p -> p.getFileName().toString().endsWith(".jsonl") || p.getFileName().toString().endsWith(".closed.json")).toList()) {
 				Files.deleteIfExists(path);
-				deleted++;
+				if (path.getFileName().toString().endsWith(".jsonl")) {
+					deleted++;
+				}
 			}
 		} catch (IOException e) {
 			LOGGER.warn("Konnte gespeicherte Chatverläufe nicht löschen", e);
