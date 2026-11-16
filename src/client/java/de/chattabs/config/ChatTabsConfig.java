@@ -33,6 +33,8 @@ public class ChatTabsConfig {
 
 	/** Tabs oberhalb oder unterhalb des Chats. */
 	public Position position = Position.TOP;
+	/** Chatfeld hat bei offenem Chat immer die volle Höhe, damit die Tabs immer an derselben Stelle sitzen. */
+	public boolean fixedChatSize = true;
 	/** Ob die Tab-Leiste auch bei geschlossenem Chat angezeigt wird. */
 	public ClosedChatMode showWhenClosed = ClosedChatMode.UNREAD;
 	/** Wie viele Nachrichten insgesamt gespeichert werden (Vanilla: 100). */

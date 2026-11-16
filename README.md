@@ -11,7 +11,8 @@ Die `chattabs-<version>.jar` in den `mods`-Ordner legen. Benötigt **Fabric Load
 ## Bedienung
 - Chat öffnen (T) → Tabs direkt über dem Chat anklicken.
 - Msg-Tabs mit ungelesenen Nachrichten **blinken**, andere Tabs zeigen `(Anzahl)` in Gelb.
-- Rechtsklick oder Mittelklick auf einen Msg-Tab schließt ihn.
+- Msg-Tabs schließt du mit dem **×** am Tab (oder per Rechts-/Mittelklick).
+- Das Chatfeld hat bei offenem Chat immer die volle Höhe, damit die Tabs immer an derselben Stelle sitzen (abschaltbar unter *Allgemein → Feste Chatgröße*).
 - Schreibst du im Msg-Tab, wird automatisch `/msg <Spieler> <Text>` gesendet (Befehle mit `/` bleiben unverändert).
 
 ## Einstellungsmenü
@@ -27,7 +28,7 @@ Im Menü:
   - *Kennung*: einfach z. B. `[G]` eintragen – Server-Präfixe wie `[Freebuild]` davor werden übersprungen
   - *Enthält Text*: alle Nachrichten mit diesem Text
   - *Regex*: regulärer Ausdruck für Profis
-- **Allgemein**: Tab-Leiste oben/unten, Anzeige bei geschlossenem Chat, Ungelesen-Zähler, Verlaufsgröße
+- **Allgemein**: Tab-Leiste oben/unten, feste Chatgröße, Anzeige bei geschlossenem Chat, Ungelesen-Zähler, Verlaufsgröße
 - **Private Nachrichten**: Msg-Tabs an/aus, Blinken, Ton, beim Trennen schließen, Senden-Befehl, Erkennung mit Live-Test
 
 Alles wird in `config/chattabs.json` gespeichert.

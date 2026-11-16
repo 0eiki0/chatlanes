@@ -29,6 +29,12 @@ class GeneralSettingsScreen extends BaseSettingsScreen {
 			.create(this.left, y, w, 20, t("position"), (b, v) -> this.working.position = v));
 		y += ROW;
 
+		CycleButton<Boolean> fixed = CycleButton.onOffBuilder(this.working.fixedChatSize)
+			.create(this.left, y, w, 20, t("fixed_size"), (b, v) -> this.working.fixedChatSize = v);
+		fixed.setTooltip(Tooltip.create(t("fixed_size.tooltip")));
+		this.addRenderableWidget(fixed);
+		y += ROW;
+
 		CycleButton<ChatTabsConfig.ClosedChatMode> closed = CycleButton.<ChatTabsConfig.ClosedChatMode>builder(
 				m -> t("closed." + m.name().toLowerCase()), this.working.showWhenClosed)
 			.withValues(ChatTabsConfig.ClosedChatMode.values())

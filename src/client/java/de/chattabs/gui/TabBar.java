@@ -11,7 +11,9 @@ import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.components.ChatComponent;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.util.ARGB;
 import org.jspecify.annotations.Nullable;
 
 /** Zeichnet die Tab-Leiste über bzw. unter dem Chat und verarbeitet Klicks darauf. */
@@ -19,7 +21,10 @@ public final class TabBar {
 	private static final int HEIGHT = 12;
 	private static final int PADDING = 4;
 	private static final int GAP = 2;
-	
+	private static final int CLOSE_WIDTH = 9;
+	private static final String CLOSE_LABEL = "×";
+	private static final int CLOSE_COLOR = 0xFF888888;
+	private static final int CLOSE_HOVER = 0xFFFF5555;
 
 	private static final int BG_ACTIVE = 0xE0000000;
 	private static final int BG_INACTIVE = 0x90000000;
@@ -31,50 +36,88 @@ public final class TabBar {
 	private static final int TEXT_UNREAD = 0xFFFFFF55;
 	private static final int TEXT_BLINK = 0xFF000000;
 
-	private record Entry(@Nullable ChatTab tab, String label, int x, int y, int width) {
+	private record Entry(@Nullable ChatTab tab, String label, int x, int y, int width, boolean closable) {
 		boolean contains(double mx, double my) {
 			return mx >= this.x && mx < this.x + this.width && my >= this.y && my < this.y + HEIGHT;
+		}
+
+		/** Bereich des "×" am rechten Rand eines Msg-Tabs. */
+		boolean closeContains(double mx, double my) {
+			return this.closable && this.contains(mx, my) && mx >= this.x + this.width - CLOSE_WIDTH - 1;
 		}
 	}
 
 	private TabBar() {
 	}
 
-	private static int barY(Minecraft minecraft, int screenHeight, boolean focused) {
+	/** Feste Geometrie des Chatfelds in Bildschirmkoordinaten. */
+	private record ChatBox(int top, int bottom, int right, double scale, int lineHeight, int lines, int scaledBottom) {
+	}
+
+	private static ChatBox chatBox(Minecraft minecraft, int screenHeight) {
+		double scale = minecraft.options.chatScale().get();
+		int lineHeight = (int) (9.0 * (minecraft.options.chatLineSpacing().get() + 1.0));
+		var chat = minecraft.gui.hud.getChat();
+		int lines;
+		if (ChatTabs.get().config().fixedChatSize) {
+			// Immer die fokussierte (volle) Chathöhe – unabhängig davon, wie viele Nachrichten gerade da sind.
+			lines = ChatComponent.getHeight(minecraft.options.chatHeightFocused().get()) / lineHeight;
+		} else {
+			// Direkt über der obersten sichtbaren Zeile.
+			lines = Math.max(1, Math.min(((ChatComponentAccessor) chat).chattabs$getTrimmedMessages().size(), chat.getLinesPerPage()));
+		}
+		int scaledBottom = (int) Math.floor((screenHeight - 40) / scale);
+		int bottom = (int) Math.floor(scaledBottom * scale);
+		int top = (int) Math.floor((scaledBottom - lines * lineHeight) * scale);
+		int maxWidth = (int) Math.ceil(ChatComponent.getWidth(minecraft.options.chatWidth().get()) / scale);
+		int right = (int) Math.floor((maxWidth + 12) * scale);
+		return new ChatBox(top, bottom, right, scale, lineHeight, lines, scaledBottom);
+	}
+
+	private static int barY(Minecraft minecraft, int screenHeight) {
 		ChatTabsConfig config = ChatTabs.get().config();
 		if (config.position == ChatTabsConfig.Position.BOTTOM) {
 			// Zwischen Chat und Eingabefeld (das Eingabefeld beginnt bei height - 14).
 			return screenHeight - 14 - HEIGHT - 1;
 		}
+		return Math.max(0, chatBox(minecraft, screenHeight).top() - HEIGHT);
+	}
 
-		double scale = minecraft.options.chatScale().get();
-		int lineHeight = (int) (9.0 * (minecraft.options.chatLineSpacing().get() + 1.0));
-		var chat = minecraft.gui.hud.getChat();
-		// Direkt über der obersten sichtbaren Zeile – mindestens eine Zeile Platz, höchstens die volle Chathöhe.
-		int visibleLines = Math.min(((ChatComponentAccessor) chat).chattabs$getTrimmedMessages().size(), chat.getLinesPerPage());
-		visibleLines = Math.max(1, visibleLines);
-		int chatBottom = (int) Math.floor((screenHeight - 40) / scale);
-		int chatTop = (int) Math.floor((chatBottom - visibleLines * lineHeight) * scale);
-		return Math.max(0, chatTop - HEIGHT - 1);
+	/**
+	 * Füllt bei geöffnetem Chat den leeren Bereich über den Nachrichten mit dem Chat-Hintergrund,
+	 * damit das Chatfeld immer gleich groß aussieht.
+	 */
+	private static void renderFixedBackground(Minecraft minecraft, GuiGraphicsExtractor graphics) {
+		ChatBox box = chatBox(minecraft, graphics.guiHeight());
+		var accessor = (ChatComponentAccessor) minecraft.gui.hud.getChat();
+		int drawnLines = Math.max(0, Math.min(accessor.chattabs$getTrimmedMessages().size() - accessor.chattabs$getScrollPos(),
+			minecraft.gui.hud.getChat().getLinesPerPage()));
+		int emptyBottomScaled = box.scaledBottom() - drawnLines * box.lineHeight();
+		int emptyBottom = (int) Math.floor(emptyBottomScaled * box.scale());
+		if (emptyBottom > box.top()) {
+			float opacity = minecraft.options.textBackgroundOpacity().get().floatValue();
+			graphics.fill(0, box.top(), box.right(), emptyBottom, ARGB.black(opacity));
+		}
 	}
 
 	private static List<Entry> layout(Minecraft minecraft, Font font, int screenHeight, boolean focused) {
 		List<Entry> entries = new ArrayList<>();
 		ChatTabs tabs = ChatTabs.get();
-		int y = barY(minecraft, screenHeight, focused);
+		int y = barY(minecraft, screenHeight);
 		int x = 2;
 		for (ChatTab tab : tabs.tabs()) {
 			String label = tab.name();
 			if (tabs.config().showUnreadCount && tab != tabs.active() && tab.unread() > 0) {
 				label += " (" + (tab.unread() > 99 ? "99+" : tab.unread()) + ")";
 			}
-			int width = font.width(label) + PADDING * 2;
-			entries.add(new Entry(tab, label, x, y, width));
+			boolean closable = tab.isPrivate();
+			int width = font.width(label) + PADDING * 2 + (closable ? CLOSE_WIDTH : 0);
+			entries.add(new Entry(tab, label, x, y, width, closable));
 			x += width + GAP;
 		}
 		if (focused) {
 			String settings = net.minecraft.client.resources.language.I18n.get("chattabs.tabbar.settings");
-			entries.add(new Entry(null, settings, x, y, font.width(settings) + PADDING * 2));
+			entries.add(new Entry(null, settings, x, y, font.width(settings) + PADDING * 2, false));
 		}
 		return entries;
 	}
@@ -95,6 +138,10 @@ public final class TabBar {
 		Minecraft minecraft = Minecraft.getInstance();
 		if (minecraft.options.chatVisibility().get() == net.minecraft.world.entity.player.ChatVisiblity.HIDDEN || !shouldRender(focused)) {
 			return;
+		}
+
+		if (focused && ChatTabs.get().config().fixedChatSize) {
+			renderFixedBackground(minecraft, graphics);
 		}
 
 		ChatTab active = ChatTabs.get().active();
@@ -128,6 +175,11 @@ public final class TabBar {
 				graphics.fill(x0, y0 + HEIGHT - 1, x0 + entry.width(), y0 + HEIGHT, ACCENT);
 			}
 			graphics.text(font, entry.label(), x0 + PADDING, y0 + 2, textColor, !blinking);
+			if (entry.closable()) {
+				boolean closeHovered = focused && entry.closeContains(mouseX, mouseY);
+				int closeColor = closeHovered ? CLOSE_HOVER : blinking ? TEXT_BLINK : CLOSE_COLOR;
+				graphics.text(font, CLOSE_LABEL, x0 + entry.width() - CLOSE_WIDTH - 1 + (CLOSE_WIDTH - font.width(CLOSE_LABEL)) / 2, y0 + 2, closeColor, !blinking);
+			}
 		}
 	}
 
@@ -151,7 +203,9 @@ public final class TabBar {
 				return true;
 			}
 			// Achtung: Seit 26.x nutzt Minecraft SDL-Nummern (links = 1, Mitte = 2, rechts = 3).
-			if (button == InputConstants.MOUSE_BUTTON_LEFT) {
+			if (button == InputConstants.MOUSE_BUTTON_LEFT && entry.closeContains(mouseX, mouseY)) {
+				tabs.closePrivateTab(tab);
+			} else if (button == InputConstants.MOUSE_BUTTON_LEFT) {
 				tabs.setActive(tab);
 			} else if ((button == InputConstants.MOUSE_BUTTON_RIGHT || button == InputConstants.MOUSE_BUTTON_MIDDLE) && tab.isPrivate()) {
 				tabs.closePrivateTab(tab);

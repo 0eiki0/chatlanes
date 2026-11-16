@@ -11,4 +11,7 @@ public interface ChatComponentAccessor {
 	/** Die aktuell sichtbaren Zeilen – damit die Tab-Leiste direkt über den Nachrichten sitzt. */
 	@Accessor("trimmedMessages")
 	List<GuiMessage.Line> chattabs$getTrimmedMessages();
+
+	@Accessor("chatScrollbarPos")
+	int chattabs$getScrollPos();
 }

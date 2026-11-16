@@ -98,5 +98,8 @@
 	"chattabs.color.red": "Rot",
 	"chattabs.color.dark_red": "Dunkelrot",
 	"chattabs.config.general.title": "Allgemein",
-	"chattabs.config.pm.title": "Private Nachrichten"
+	"chattabs.config.pm.title": "Private Nachrichten",
+	"chattabs.config.fixed_size": "Feste Chatgröße",
+	"chattabs.config.fixed_size.tooltip": "Der Chat hat bei geöffnetem Chat immer die volle Höhe (einstellbar unter Chat-Einstellungen → Höhe (fokussiert)). So sitzen die Tabs immer an derselben Stelle.",
+	"chattabs.tabbar.close": "Schließen"
 }
