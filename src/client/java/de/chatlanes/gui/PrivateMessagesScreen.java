@@ -48,6 +48,20 @@ class PrivateMessagesScreen extends BaseSettingsScreen {
 		this.addRenderableWidget(timestamps);
 		y += ROW;
 
+		CycleButton<Boolean> switchOnSend = onOff(this.working.pmSwitchOnSend)
+			.create(this.left, y, half, 20, t("pm_switch"), (b, v) -> this.working.pmSwitchOnSend = v);
+		switchOnSend.setTooltip(Tooltip.create(t("pm_switch.tooltip")));
+		this.addRenderableWidget(switchOnSend);
+		net.minecraft.client.gui.components.EditBox commands = new net.minecraft.client.gui.components.EditBox(
+			this.font, this.rightHalfX(), y + 1, half, 18, t("pm_switch.commands"));
+		commands.setMaxLength(256);
+		commands.setValue(this.working.pmCommands);
+		commands.moveCursorToStart(false);
+		commands.setTooltip(Tooltip.create(t("pm_switch.commands.tooltip")));
+		commands.setResponder(v -> this.working.pmCommands = v);
+		this.addRenderableWidget(commands);
+		y += ROW;
+
 		this.soundRow(y, this.working.pmSoundType, this.working.pmVolume, v -> this.working.pmSoundType = v, v -> this.working.pmVolume = v);
 		y += ROW + 4;
 

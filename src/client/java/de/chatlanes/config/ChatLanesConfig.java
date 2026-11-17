@@ -128,6 +128,12 @@ public class ChatLanesConfig {
 	public int pmVolume = 100;
 	/** Msg-Tabs nach einem Server-Wechsel automatisch schließen. */
 	public boolean pmCloseOnDisconnect = true;
+	/** Beim Senden einer eigenen privaten Nachricht (z. B. /msg Name …) in deren Msg-Tab wechseln. */
+	public boolean pmSwitchOnSend = true;
+	/** Befehle für private Nachrichten – erstes Argument ist der Spielername. */
+	public String pmCommands = "/msg, /tell, /w, /whisper, /m, /pm";
+	/** Antwort-Befehle – gehen an den Spieler, mit dem zuletzt geschrieben wurde. */
+	public String pmReplyCommands = "/r, /reply";
 
 	public List<TabConfig> tabs = new ArrayList<>();
 
@@ -292,6 +298,8 @@ public class ChatLanesConfig {
 		if (this.hideSwitchConfirmation == null) this.hideSwitchConfirmation = "";
 		if (this.defaultTab == null) this.defaultTab = "";
 		if (this.peekItems == null) this.peekItems = "";
+		if (this.pmCommands == null) this.pmCommands = "/msg, /tell, /w, /whisper, /m, /pm";
+		if (this.pmReplyCommands == null) this.pmReplyCommands = "/r, /reply";
 		if (this.peekIgnoredCommands == null) this.peekIgnoredCommands = "";
 		this.peekSeconds = Math.max(2, Math.min(600, this.peekSeconds));
 		// Alter Standard 1,5 s war für langsame Befehle (Datenbank-Abfragen, LogBlock) zu kurz – einmalig anheben

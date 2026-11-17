@@ -16,6 +16,7 @@ Die `chatlanes-<version>.jar` in den `mods`-Ordner legen. Benötigt **Fabric Loa
 - Msg-Tabs schließt du mit dem **×** am Tab (oder per Rechts-/Mittelklick). Sie bleiben auch nach einem Neustart zu, bis der Spieler dir wieder schreibt.
 - Das Chatfeld hat bei offenem Chat immer die volle Höhe, damit die Tabs immer an derselben Stelle sitzen (abschaltbar unter *Allgemein → Feste Chatgröße*).
 - **Chat durchsuchen:** im offenen Chat **Strg+F** drücken oder die **Lupe** ganz vorne in der Tab-Leiste anklicken. Gesucht wird im ganzen gespeicherten Verlauf (alle Tabs oder nur der aktuelle); ein Klick auf einen Treffer öffnet den passenden Tab und springt zur Nachricht.
+- Schickst du selbst `/msg Name …` (auch `/tell`, `/w`, `/r`), wechselt die Mod automatisch in den Tab `@Name` (abschaltbar).
 - Schreibst du im Msg-Tab, wird automatisch `/msg <Spieler> <Text>` gesendet (Befehle mit `/` bleiben unverändert).
 - Wählst du einen Kanal-Tab aus, wechselt die Mod auch auf dem Server in diesen Kanal (Global → `/ch global`, Handel → `/ch handel`; pro Tab einstellbar).
 - Die Nachrichten aller Tabs werden pro Server gespeichert und beim nächsten Betreten wieder in die richtigen Tabs geladen (abschaltbar).

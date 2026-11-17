@@ -214,6 +214,53 @@ public final class ChatLanes {
 		this.lastActivity = System.currentTimeMillis();
 		this.lastOwnInput = this.lastActivity;
 		this.onCommandIntent(message);
+		this.switchToPrivateTabFor(message);
+	}
+
+	/** Spieler, mit dem zuletzt privat geschrieben wurde (für /r). */
+	private @Nullable String lastPmPartner;
+
+	private static boolean listContains(String list, String command) {
+		for (String entry : list.split("[,;\\s]+")) {
+			if (!entry.isBlank() && ChatTab.commandName(entry).equals(command)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/** "/msg Alex hallo" → in den Tab @Alex wechseln (anlegen, falls nötig). */
+	private void switchToPrivateTabFor(String message) {
+		if (!this.config.pmTabs || !this.config.pmSwitchOnSend || !message.startsWith("/")) {
+			return;
+		}
+		String command = ChatTab.commandName(message);
+		String player = null;
+		if (listContains(this.config.pmCommands, command)) {
+			String[] parts = message.trim().split("\\s+");
+			if (parts.length >= 2) {
+				player = parts[1];
+			}
+		} else if (listContains(this.config.pmReplyCommands, command)) {
+			player = this.lastPmPartner;
+		}
+		if (player == null || !player.matches("[A-Za-z0-9_]{2,16}")) {
+			return;
+		}
+		ChatTab tab = this.openPrivateTab(player);
+		if (tab != null && tab != this.active) {
+			this.setActive(tab);
+		}
+	}
+
+	/** Msg-Tab öffnen bzw. anlegen – auch wenn er vorher mit × geschlossen wurde. */
+	public @Nullable ChatTab openPrivateTab(String player) {
+		String key = player.toLowerCase(Locale.ROOT);
+		if (this.closedPrivateTabs.remove(key) != null) {
+			ChatHistory.get().saveClosedTabs(this.closedPrivateTabs);
+		}
+		this.lastPmPartner = player;
+		return this.privateTabs.computeIfAbsent(key, k -> ChatTab.privateTab(player));
 	}
 
 	/**
@@ -261,6 +308,10 @@ public final class ChatLanes {
 	/** Befehle, die nie den System-Tab zeigen lassen: Wechsel-Befehle der Tabs und die eingestellten Ausnahmen. */
 	private boolean isPeekIgnored(String message) {
 		String command = ChatTab.commandName(message);
+		// Private Nachrichten springen nie in den System-Tab (dafür gibt es den Msg-Tab)
+		if (listContains(this.config.pmCommands, command) || listContains(this.config.pmReplyCommands, command)) {
+			return true;
+		}
 		for (String entry : this.config.peekIgnoredCommands.split("[,;\\s]+")) {
 			if (!entry.isBlank() && ChatTab.commandName(entry).equals(command)) {
 				return true;
@@ -685,6 +736,9 @@ public final class ChatLanes {
 				if (player != null && !player.isEmpty()) {
 					String name = player;
 					result = new Classification(null, name);
+					if (!ChatHistory.get().isRestoring()) {
+						this.lastPmPartner = name;
+					}
 					// Geschlossene Tabs werden hier nicht wieder geöffnet – das entscheidet onNewMessage anhand der Uhrzeit.
 					if (!this.closedPrivateTabs.containsKey(name.toLowerCase(Locale.ROOT))) {
 						this.privateTabs.computeIfAbsent(name.toLowerCase(Locale.ROOT), key -> ChatTab.privateTab(name));

@@ -262,5 +262,9 @@
 	"chatlanes.config.peek.replay.tooltip": "Kommen Nachrichten in deinen Tab, während die Ansicht kurz im System-Tab ist, werden sie nach dem Zurückspringen noch einmal eingeblendet – so, als wären sie gerade angekommen.",
 	"chatlanes.config.example.tab": "[Server] %s Spieler: Hallo",
 	"chatlanes.config.example.pm": "[Server] From Spieler: Hallo!",
-	"chatlanes.config.example.extra": "Info: Beispiel-Nachricht"
+	"chatlanes.config.example.extra": "Info: Beispiel-Nachricht",
+	"chatlanes.config.pm_switch": "Beim Senden wechseln",
+	"chatlanes.config.pm_switch.tooltip": "Schickst du selbst eine private Nachricht (z. B. /msg Name Hallo), wechselt die Mod in den Tab @Name und legt ihn bei Bedarf an. Bei /r in den Tab des letzten Gesprächspartners.",
+	"chatlanes.config.pm_switch.commands": "Msg-Befehle",
+	"chatlanes.config.pm_switch.commands.tooltip": "Befehle für private Nachrichten auf deinem Server – das erste Wort danach ist der Spielername. Mehrere mit Komma trennen."
 }

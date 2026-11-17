@@ -262,5 +262,9 @@
 	"chatlanes.config.peek.replay.tooltip": "Messages that arrive in your tab while the view is briefly on the System tab are shown again after returning – as if they had just arrived.",
 	"chatlanes.config.example.tab": "[Server] %s Player: Hello",
 	"chatlanes.config.example.pm": "[Server] From Player: Hello!",
-	"chatlanes.config.example.extra": "Info: example message"
+	"chatlanes.config.example.extra": "Info: example message",
+	"chatlanes.config.pm_switch": "Switch on send",
+	"chatlanes.config.pm_switch.tooltip": "When you send a private message yourself (e.g. /msg Name Hi), the mod switches to the tab @Name and creates it if needed. With /r it switches to your last conversation partner.",
+	"chatlanes.config.pm_switch.commands": "PM commands",
+	"chatlanes.config.pm_switch.commands.tooltip": "Private message commands on your server – the first word after it is the player name. Separate with commas."
 }
