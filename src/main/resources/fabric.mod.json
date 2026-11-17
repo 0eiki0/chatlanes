@@ -7,6 +7,7 @@
 	"authors": [
 		"0eiki0"
 	],
+	"license": "MIT",
 	"icon": "assets/chatlanes/icon.png",
 	"environment": "client",
 	"entrypoints": {

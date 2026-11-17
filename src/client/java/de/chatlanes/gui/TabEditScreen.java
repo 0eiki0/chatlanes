@@ -14,7 +14,7 @@ import net.minecraft.network.chat.Component;
 
 /** Einen einzelnen Tab bearbeiten – mit Live-Test, ob eine Beispielnachricht in diesem Tab landen würde. */
 class TabEditScreen extends BaseSettingsScreen {
-	private static String lastTestMessage = "[Freebuild] [G] Eiki: XD";
+	private static String lastTestMessage = "[Server] [G] Spieler: Hallo";
 
 	private final ChatLanesConfigScreen main;
 	private final TabConfig original;

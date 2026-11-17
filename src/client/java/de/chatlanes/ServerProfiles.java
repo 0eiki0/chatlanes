@@ -108,7 +108,7 @@ public final class ServerProfiles {
 		return entry == null || entry.enabled;
 	}
 
-	/** Name für die Anzeige, z. B. "Cubeside" oder "Standard-Profil". */
+	/** Name für die Anzeige, z. B. "Mein Server" oder "Standard-Profil". */
 	public static String displayName(@Nullable String key) {
 		if (key == null) {
 			return net.minecraft.client.resources.language.I18n.get("chatlanes.profiles.standard");

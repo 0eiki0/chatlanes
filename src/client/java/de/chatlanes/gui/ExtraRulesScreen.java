@@ -15,10 +15,10 @@ import net.minecraft.network.chat.Component;
 
 /**
  * Zusätzliche Regeln eines Kanals: Nachrichten, die sonst im System-Tab landen würden,
- * erscheinen in diesem Kanal, wenn eine Regel passt (z. B. "Enthält Text: Aktueller Chat").
+ * erscheinen in diesem Kanal, wenn eine Regel passt (z. B. "Enthält Text: Info").
  */
 class ExtraRulesScreen extends BaseSettingsScreen {
-	private static String lastTestMessage = "Aktueller Chat: Global";
+	private static String lastTestMessage = "Beispiel: Info-Nachricht";
 
 	private final TabConfig tab;
 	private int page;

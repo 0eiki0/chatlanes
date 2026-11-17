@@ -112,7 +112,7 @@ public final class ChatHistory {
 		return closed;
 	}
 
-	/** Dateiname aus Serveradresse bzw. Weltname, z. B. "server_cubeside.de.jsonl". */
+	/** Dateiname aus Serveradresse bzw. Weltname, z. B. "server_example.org.jsonl". */
 	public static String serverKey(Minecraft minecraft) {
 		ServerData server = minecraft.getCurrentServer();
 		String key;

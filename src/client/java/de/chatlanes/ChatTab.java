@@ -58,7 +58,7 @@ public final class ChatTab {
 			return null;
 		}
 		return switch (match == null ? TabConfig.Match.REGEX : match) {
-			// Beliebig viele "[Irgendwas] "-Präfixe (z. B. "[Freebuild] ") überspringen, dann muss die Kennung kommen.
+			// Beliebig viele "[Irgendwas] "-Präfixe (z. B. "[Server] ") überspringen, dann muss die Kennung kommen.
 			case TAG -> Pattern.compile("^(?:\\[[^\\]]*\\]\\s*)*?" + Pattern.quote(value.trim()));
 			case CONTAINS -> Pattern.compile(Pattern.quote(value), Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
 			case REGEX -> ChatLanes.compile(value);

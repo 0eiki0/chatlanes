@@ -106,6 +106,12 @@ class AutomationScreen extends BaseSettingsScreen {
 		this.addRenderableWidget(pick);
 		y += ROW;
 
+		CycleButton<Boolean> replay = onOff(this.working.peekReplay)
+			.create(this.left, y, w, 20, t("peek.replay"), (b, v) -> this.working.peekReplay = v);
+		replay.setTooltip(Tooltip.create(t("peek.replay.tooltip")));
+		this.addRenderableWidget(replay);
+		y += ROW;
+
 		this.textRow(y, t("peek.ignored"), this.working.peekIgnoredCommands, t("peek.ignored.hint"), t("peek.ignored.tooltip"),
 			v -> this.working.peekIgnoredCommands = v);
 

@@ -95,7 +95,7 @@ public final class TabBar {
 		int scroll = accessor.chatlanes$getScrollPos();
 		int perPage = chat.getLinesPerPage();
 		for (int i = 0; i < perPage && scroll + i < lines.size(); i++) {
-			if (lines.get(scroll + i).parent() == target) {
+			if (ChatLanes.get().originalOf(lines.get(scroll + i).parent()) == target) {
 				int bottom = (int) Math.floor((box.scaledBottom() - i * box.lineHeight()) * box.scale());
 				int top = (int) Math.floor((box.scaledBottom() - (i + 1) * box.lineHeight()) * box.scale());
 				graphics.fill(0, top, box.right(), bottom, 0x50FFFF55);

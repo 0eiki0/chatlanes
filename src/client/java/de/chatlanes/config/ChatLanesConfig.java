@@ -86,6 +86,8 @@ public class ChatLanesConfig {
 	public int peekSeconds = 15;
 	/** So lange nach der Aktion zählt eine System-Nachricht als "Antwort" darauf. */
 	public double peekReaction = 1.5;
+	/** Beim Zurückspringen die verpassten Nachrichten des Tabs noch einmal einblenden (wie neu angekommen). */
+	public boolean peekReplay = true;
 	/** Auch Block-Klicks (z. B. LogBlock-Abfragen) gelten als Aktion. */
 	public boolean peekBlockClicks = true;
 	/** Nur mit diesen Items in der Hand zählen Block-Klicks (leer = mit jedem Item). */
@@ -132,7 +134,7 @@ public class ChatLanesConfig {
 
 		/**
 		 * Wie {@link #pattern} gelesen wird:
-		 * TAG = Kennung wie "[G]" am Anfang (davor stehende Server-Präfixe wie "[Freebuild]" werden übersprungen),
+		 * TAG = Kennung wie "[G]" am Anfang (davor stehende Server-Präfixe wie "[Server]" werden übersprungen),
 		 * CONTAINS = Nachricht enthält den Text (Groß-/Kleinschreibung egal),
 		 * REGEX = regulärer Ausdruck für Profis.
 		 */
@@ -315,7 +317,7 @@ public class ChatLanesConfig {
 				if (rule.pattern == null) rule.pattern = "";
 			}
 			if (tab.switchCommand == null) {
-				// Configs vor 1.3.0: für die Standard-Kanäle den passenden Cubeside-Befehl eintragen.
+				// Configs vor 1.3.0: für die Standard-Kanäle den passenden Kanal-Befehl eintragen.
 				String tag = tab.match == TabConfig.Match.TAG ? tab.pattern.trim() : "";
 				tab.switchCommand = switch (tag) {
 					case "[G]" -> "/ch global";

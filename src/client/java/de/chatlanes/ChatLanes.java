@@ -177,6 +177,31 @@ public final class ChatLanes {
 	private @Nullable String peekReturnTab;
 	private long peekUntil;
 	private boolean pendingRefresh;
+	/** Nachrichten, die im Tab ankamen, in den zurückgesprungen wird – während die Ansicht im System-Tab war. */
+	private final List<GuiMessage> missedDuringPeek = new ArrayList<>();
+	/** Verpasste Nachrichten → Spiel-Tick, ab dem sie bei geschlossenem Chat neu eingeblendet werden. */
+	private final ConcurrentMap<GuiMessage, Integer> replayTick = new MapMaker().weakKeys().makeMap();
+	/** Kopien mit neuer Einblendzeit → Original (für Suche/Hervorheben). */
+	private final ConcurrentMap<GuiMessage, GuiMessage> replayOriginal = new MapMaker().weakKeys().makeMap();
+
+	/**
+	 * Wird beim Aufbau der sichtbaren Zeilen benutzt: verpasste Nachrichten bekommen eine Kopie mit
+	 * frischer Einblendzeit, damit sie bei geschlossenem Chat noch einmal erscheinen.
+	 */
+	public GuiMessage displayParent(GuiMessage message) {
+		Integer tick = this.replayTick.get(message);
+		if (tick == null || tick <= message.addedTime()) {
+			return message;
+		}
+		GuiMessage copy = new GuiMessage(tick, message.content(), message.signature(), message.source(), message.tag());
+		this.replayOriginal.put(copy, message);
+		return copy;
+	}
+
+	/** Original einer (evtl. neu eingeblendeten) Nachricht. */
+	public GuiMessage originalOf(GuiMessage message) {
+		return this.replayOriginal.getOrDefault(message, message);
+	}
 
 	/** Eine eigene Aktion (Befehl oder Block-Klick) – Antworten darauf dürfen kurz den System-Tab zeigen. */
 	public void onAction() {
@@ -274,6 +299,13 @@ public final class ChatLanes {
 		}
 		String name = this.peekReturnTab;
 		this.peekReturnTab = null;
+		if (this.config.peekReplay && !this.missedDuringPeek.isEmpty()) {
+			int now = minecraft.gui.hud.getGuiTicks();
+			for (GuiMessage missed : this.missedDuringPeek) {
+				this.replayTick.put(missed, now);
+			}
+		}
+		this.missedDuringPeek.clear();
 		for (ChatTab tab : this.tabs()) {
 			if (tab.name().equals(name)) {
 				this.active = tab;
@@ -381,7 +413,7 @@ public final class ChatLanes {
 		List<GuiMessage.Line> lines = accessor.chatlanes$getTrimmedMessages();
 		int index = -1;
 		for (int i = 0; i < lines.size(); i++) {
-			if (lines.get(i).parent() == hit.message()) {
+			if (this.originalOf(lines.get(i).parent()) == hit.message()) {
 				index = i;
 				break;
 			}
@@ -458,6 +490,7 @@ public final class ChatLanes {
 
 	public void setActive(ChatTab tab) {
 		this.peekReturnTab = null;
+		this.missedDuringPeek.clear();
 		this.lastActivity = System.currentTimeMillis();
 		tab.clearUnread();
 		if (this.active != tab) {
@@ -704,6 +737,14 @@ public final class ChatLanes {
 		}
 		ChatHistory.get().onMessage(message, this.captured.get(message));
 		this.maybePeek(c);
+		if (this.peekReturnTab != null) {
+			for (ChatTab tab : this.tabs()) {
+				if (tab.name().equals(this.peekReturnTab) && tab != this.active && belongsTo(c, tab)) {
+					this.missedDuringPeek.add(message);
+					break;
+				}
+			}
+		}
 		for (ChatTab tab : this.tabs()) {
 			if (tab != this.active && belongsTo(c, tab)) {
 				tab.addUnread();

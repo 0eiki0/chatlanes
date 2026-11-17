@@ -43,6 +43,16 @@ public abstract class ChatComponentMixin {
 		return original.call(withTime, font, width);
 	}
 
+	/** Verpasste Nachrichten nach dem Zurückspringen mit frischer Einblendzeit anzeigen. */
+	@WrapOperation(
+		method = "addMessageToDisplayQueue",
+		at = @At(value = "NEW", target = "(Lnet/minecraft/client/multiplayer/chat/GuiMessage;Lnet/minecraft/util/FormattedCharSequence;Z)Lnet/minecraft/client/multiplayer/chat/GuiMessage$Line;")
+	)
+	private GuiMessage.Line chatlanes$replayLine(GuiMessage parent, net.minecraft.util.FormattedCharSequence content, boolean endOfEntry,
+			Operation<GuiMessage.Line> original) {
+		return original.call(ChatLanes.get().displayParent(parent), content, endOfEntry);
+	}
+
 	/** Neue Nachricht: ungelesene Zähler der anderen Tabs erhöhen. */
 	@Inject(method = "addMessageToQueue", at = @At("HEAD"))
 	private void chatlanes$onNewMessage(GuiMessage message, CallbackInfo ci) {
@@ -54,7 +64,7 @@ public abstract class ChatComponentMixin {
 
 	/**
 	 * Größerer Verlauf (Vanilla: 100). Statt die Konstante 100 zu ändern (das kollidiert mit anderen
-	 * Mods wie Cubeside, die dieselbe Konstante ändern), wird die Größenabfrage in der Kürzungsschleife
+	 * andere Mods, die dieselbe Konstante ändern), wird die Größenabfrage in der Kürzungsschleife
 	 * angepasst: Solange die Liste unter unserem Limit liegt, meldet sie 0 Einträge, sonst die echte Größe.
 	 * Damit gilt am Ende das größere der beiden Limits – egal was andere Mods einstellen.
 	 */
