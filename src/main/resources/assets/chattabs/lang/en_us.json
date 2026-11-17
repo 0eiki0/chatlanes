@@ -202,7 +202,7 @@
 	"chattabs.search.scope": "Search in",
 	"chattabs.search.scope.tooltip": "All tabs: search the whole saved chat history.\nCurrent tab: only messages of the selected tab.",
 	"chattabs.search.close": "Close",
-	"chattabs.search.enter_text": "Type a search term above. Click a result to jump to the message.",
+	"chattabs.search.enter_text": "Type a search term – click a result to jump there.",
 	"chattabs.search.none": "No results.",
 	"chattabs.search.count": "%s results – click to jump to the message",
 	"chattabs.search.count_max": "More than %s results – narrow your search",
@@ -256,5 +256,6 @@
 	"chattabs.config.profiles.delete": "Remove server from list (deletes profile)",
 	"chattabs.config.profiles.delete.confirm": "Click again to remove",
 	"chattabs.config.profiles.delete.current": "The current server can't be removed",
-	"chattabs.config.profiles.current": "current"
+	"chattabs.config.profiles.current": "current",
+	"chattabs.tabbar.search_tooltip": "Search chat (Ctrl+F)"
 }

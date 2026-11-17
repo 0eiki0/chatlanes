@@ -216,7 +216,12 @@ public class ChatSearchScreen extends BaseSettingsScreen {
 		} else {
 			info = Component.translatable(this.hits.size() >= MAX_RESULTS ? "chattabs.search.count_max" : "chattabs.search.count", this.hits.size());
 		}
-		graphics.text(this.font, info, this.left, this.height - 20, LABEL_COLOR);
+		int infoWidth = this.contentWidth - 96;
+		if (this.font.width(info) <= infoWidth) {
+			graphics.text(this.font, info, this.left, this.height - 20, LABEL_COLOR);
+		} else {
+			graphics.text(this.font, ComponentRenderUtils.clipText(info, this.font, infoWidth), this.left, this.height - 20, LABEL_COLOR);
+		}
 
 		// Scrollbalken
 		int total = this.hits.size();

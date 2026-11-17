@@ -202,7 +202,7 @@
 	"chattabs.search.scope": "Suchen in",
 	"chattabs.search.scope.tooltip": "Alle Tabs: den ganzen gespeicherten Chatverlauf durchsuchen.\nAktueller Tab: nur Nachrichten des gerade gewählten Tabs.",
 	"chattabs.search.close": "Schließen",
-	"chattabs.search.enter_text": "Tippe oben einen Suchbegriff ein. Klick auf einen Treffer springt zur Nachricht.",
+	"chattabs.search.enter_text": "Suchbegriff eingeben – Klick auf Treffer springt hin.",
 	"chattabs.search.none": "Keine Treffer.",
 	"chattabs.search.count": "%s Treffer – Klick springt zur Nachricht",
 	"chattabs.search.count_max": "Mehr als %s Treffer – Suche genauer eingrenzen",
@@ -256,5 +256,6 @@
 	"chattabs.config.profiles.delete": "Server aus der Liste entfernen (Profil wird gelöscht)",
 	"chattabs.config.profiles.delete.confirm": "Nochmal klicken zum Entfernen",
 	"chattabs.config.profiles.delete.current": "Der aktuelle Server kann nicht entfernt werden",
-	"chattabs.config.profiles.current": "aktuell"
+	"chattabs.config.profiles.current": "aktuell",
+	"chattabs.tabbar.search_tooltip": "Chat durchsuchen (Strg+F)"
 }

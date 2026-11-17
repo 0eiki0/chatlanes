@@ -22,6 +22,7 @@ public final class TabBar {
 	private static final int PADDING = 4;
 	private static final int GAP = 2;
 	private static final int CLOSE_WIDTH = 9;
+	private static final int SEARCH_WIDTH = 12;
 	private static final String CLOSE_LABEL = "×";
 	private static final int CLOSE_COLOR = 0xFF888888;
 	private static final int CLOSE_HOVER = 0xFFFF5555;
@@ -133,6 +134,11 @@ public final class TabBar {
 		ChatTabs tabs = ChatTabs.get();
 		int y = barY(minecraft, screenHeight);
 		int x = 2;
+		// Lupe ganz vorne – der Platz bleibt auch bei geschlossenem Chat frei, damit die Tabs nicht verrutschen.
+		if (focused) {
+			entries.add(new Entry(null, "", x, y, SEARCH_WIDTH, false, Action.SEARCH));
+		}
+		x += SEARCH_WIDTH + GAP;
 		for (ChatTab tab : tabs.tabs()) {
 			String label = tab.name();
 			if (tabs.config().showUnreadCount && tab.showsUnreadCount() && tab != tabs.active() && tab.unread() > 0) {
@@ -144,10 +150,6 @@ public final class TabBar {
 			x += width + GAP;
 		}
 		if (focused) {
-			String search = net.minecraft.client.resources.language.I18n.get("chattabs.tabbar.search");
-			int searchWidth = font.width(search) + PADDING * 2;
-			entries.add(new Entry(null, search, x, y, searchWidth, false, Action.SEARCH));
-			x += searchWidth + GAP;
 			String settings = net.minecraft.client.resources.language.I18n.get("chattabs.tabbar.settings");
 			entries.add(new Entry(null, settings, x, y, font.width(settings) + PADDING * 2, false, Action.SETTINGS));
 		}
@@ -212,13 +214,35 @@ public final class TabBar {
 			if (isActive) {
 				graphics.fill(x0, y0 + HEIGHT - 1, x0 + entry.width(), y0 + HEIGHT, ACCENT);
 			}
-			graphics.text(font, entry.label(), x0 + PADDING, y0 + 2, textColor, !blinking);
+			if (entry.action() == Action.SEARCH) {
+				drawMagnifier(graphics, x0 + 2, y0 + 2, hovered ? TEXT_ACTIVE : TEXT_INACTIVE);
+				if (hovered) {
+					graphics.setTooltipForNextFrame(net.minecraft.network.chat.Component.translatable("chattabs.tabbar.search_tooltip"), mouseX, mouseY);
+				}
+			} else {
+				graphics.text(font, entry.label(), x0 + PADDING, y0 + 2, textColor, !blinking);
+			}
 			if (entry.closable()) {
 				boolean closeHovered = focused && entry.closeContains(mouseX, mouseY);
 				int closeColor = closeHovered ? CLOSE_HOVER : blinking ? TEXT_BLINK : CLOSE_COLOR;
 				graphics.text(font, CLOSE_LABEL, x0 + entry.width() - CLOSE_WIDTH - 1 + (CLOSE_WIDTH - font.width(CLOSE_LABEL)) / 2, y0 + 2, closeColor, !blinking);
 			}
 		}
+	}
+
+	/** Kleine Lupe (8 × 8 Pixel): Ring oben links, Griff nach unten rechts. */
+	private static void drawMagnifier(GuiGraphicsExtractor graphics, int x, int y, int color) {
+		// Ring (Kreis aus Pixeln, Durchmesser 6)
+		graphics.fill(x + 1, y, x + 5, y + 1, color);
+		graphics.fill(x + 1, y + 5, x + 5, y + 6, color);
+		graphics.fill(x, y + 1, x + 1, y + 5, color);
+		graphics.fill(x + 5, y + 1, x + 6, y + 5, color);
+		// Griff (diagonal)
+		graphics.fill(x + 5, y + 5, x + 6, y + 6, color);
+		graphics.fill(x + 6, y + 6, x + 7, y + 7, color);
+		graphics.fill(x + 7, y + 7, x + 8, y + 8, color);
+		graphics.fill(x + 6, y + 7, x + 7, y + 8, color);
+		graphics.fill(x + 7, y + 6, x + 8, y + 7, color);
 	}
 
 	/** @return true, wenn der Klick von der Tab-Leiste verarbeitet wurde. */
