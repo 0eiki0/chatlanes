@@ -2,7 +2,7 @@
 
 > Früher „Chat Tabs“. Beim ersten Start übernimmt ChatLanes automatisch alle Einstellungen, Server-Profile und den gespeicherten Verlauf. Die alte `chattabs-*.jar` bitte aus dem `mods`-Ordner löschen.
 
-[![Build](https://github.com/0eiki0/chattabs/actions/workflows/build.yml/badge.svg)](https://github.com/0eiki0/chattabs/actions/workflows/build.yml)
+[![Build](https://github.com/0eiki0/chatlanes/actions/workflows/build.yml/badge.svg)](https://github.com/0eiki0/chatlanes/actions/workflows/build.yml)
 
 Teilt den Chat in Tabs auf: **System** (alles Übrige), Kanäle wie **Global** (`[G]`) / **Handel** (`[H]`) und automatisch ein **Msg-Tab pro Spieler** (`@Name`).
 Läuft auch zusammen mit der CubesideMod.

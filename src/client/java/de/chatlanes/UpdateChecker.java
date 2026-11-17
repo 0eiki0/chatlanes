@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
  */
 public final class UpdateChecker {
 	private static final Logger LOGGER = LoggerFactory.getLogger("chatlanes");
-	private static final String API_URL = "https://api.github.com/repos/0eiki0/chattabs/releases/latest";
+	private static final String API_URL = "https://api.github.com/repos/0eiki0/chatlanes/releases/latest";
 	private static boolean checked;
 
 	private UpdateChecker() {
@@ -56,7 +56,7 @@ public final class UpdateChecker {
 			JsonObject release = JsonParser.parseString(response.body()).getAsJsonObject();
 			String tag = release.get("tag_name").getAsString();
 			String latest = baseVersion(tag);
-			String url = release.has("html_url") ? release.get("html_url").getAsString() : "https://github.com/0eiki0/chattabs/releases";
+			String url = release.has("html_url") ? release.get("html_url").getAsString() : "https://github.com/0eiki0/chatlanes/releases";
 			if (isNewer(latest, baseVersion(current))) {
 				minecraft.execute(() -> notify(minecraft, current, latest, url));
 			} else {
