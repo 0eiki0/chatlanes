@@ -266,5 +266,9 @@
 	"chatlanes.config.pm_switch": "Switch on send",
 	"chatlanes.config.pm_switch.tooltip": "When you send a private message yourself (e.g. /msg Name Hi), the mod switches to the tab @Name and creates it if needed. With /r it switches to your last conversation partner.",
 	"chatlanes.config.pm_switch.commands": "PM commands",
-	"chatlanes.config.pm_switch.commands.tooltip": "Private message commands on your server – the first word after it is the player name. Separate with commas."
+	"chatlanes.config.pm_switch.commands.tooltip": "Private message commands on your server – the first word after it is the player name. Separate with commas.",
+	"chatlanes.config.heads": "Skin heads",
+	"chatlanes.config.heads.tooltip": "Shows the player's skin head in front of their name in a message. Works for players who are (or were during this session) online on the server, and for private messages.",
+	"chatlanes.config.heads.hat": "Second skin layer",
+	"chatlanes.config.heads.hat.tooltip": "Draw the head with the hat/helmet layer of the skin."
 }

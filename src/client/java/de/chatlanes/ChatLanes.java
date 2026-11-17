@@ -939,6 +939,24 @@ public final class ChatLanes {
 		}
 	}
 
+	/** Spieler einer privaten Nachricht (für den Kopf), sonst null. */
+	public @Nullable String pmPlayerOf(GuiMessage message) {
+		return this.classify(message).player();
+	}
+
+	/** Anzeige-Inhalt einer Nachricht: Skin-Köpfe und Uhrzeit (gespeicherter Inhalt bleibt unverändert). */
+	public net.minecraft.network.chat.Component displayContent(GuiMessage message) {
+		net.minecraft.network.chat.Component content = message.content();
+		if (this.enabled && this.config.playerHeads && !this.classify(message).everywhere()) {
+			net.minecraft.network.chat.Component withHead = PlayerHeads.decorate(content, this.pmPlayerOf(message), this.config.playerHeadsHat);
+			if (withHead != null) {
+				content = withHead;
+			}
+		}
+		net.minecraft.network.chat.Component prefix = this.timestampFor(message);
+		return prefix == null ? content : prefix.copy().append(content);
+	}
+
 	/** Uhrzeit-Präfix für diese Nachricht oder null, wenn für ihren Tab keine Uhrzeit angezeigt wird. */
 	public net.minecraft.network.chat.@Nullable Component timestampFor(GuiMessage message) {
 		if (!this.enabled) {

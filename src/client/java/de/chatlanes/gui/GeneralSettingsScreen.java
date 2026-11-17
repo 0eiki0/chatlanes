@@ -76,6 +76,17 @@ class GeneralSettingsScreen extends BaseSettingsScreen {
 		this.addRenderableWidget(history);
 		y += ROW;
 
+		// Skin-Kopf vor Spielernamen
+		CycleButton<Boolean> heads = onOff(this.working.playerHeads)
+			.create(this.left, y, this.halfWidth(), 20, t("heads"), (b, v) -> this.working.playerHeads = v);
+		heads.setTooltip(Tooltip.create(t("heads.tooltip")));
+		this.addRenderableWidget(heads);
+		CycleButton<Boolean> hat = onOff(this.working.playerHeadsHat)
+			.create(this.rightHalfX(), y, this.halfWidth(), 20, t("heads.hat"), (b, v) -> this.working.playerHeadsHat = v);
+		hat.setTooltip(Tooltip.create(t("heads.hat.tooltip")));
+		this.addRenderableWidget(hat);
+		y += ROW;
+
 		// Uhrzeit vor Nachrichten: an/aus + Format
 		CycleButton<Boolean> timestamps = onOff(this.working.timestamps)
 			.create(this.left, y, this.halfWidth(), 20, t("timestamps"), (b, v) -> this.working.timestamps = v);

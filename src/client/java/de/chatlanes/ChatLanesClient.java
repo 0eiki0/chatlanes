@@ -46,6 +46,7 @@ public class ChatLanesClient implements ClientModInitializer {
 		ClientPlayConnectionEvents.JOIN.register((connection, sender, minecraft) -> {
 			// Erst das Profil des Servers laden (neue Server bekommen eins), dann alles Weitere
 			ServerProfiles.onJoin(minecraft);
+			PlayerHeads.clearCache();
 			ChatLanes.get().resetServerChannel();
 			ChatHistory.get().onJoin(connection, minecraft);
 			UpdateChecker.onJoin(minecraft);

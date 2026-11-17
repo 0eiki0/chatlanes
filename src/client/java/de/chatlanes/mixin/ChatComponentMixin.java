@@ -35,12 +35,12 @@ public abstract class ChatComponentMixin {
 	)
 	private List<net.minecraft.util.FormattedCharSequence> chatlanes$addTimestamp(GuiMessage message, Font font, int width,
 			Operation<List<net.minecraft.util.FormattedCharSequence>> original) {
-		net.minecraft.network.chat.Component prefix = ChatLanes.get().timestampFor(message);
-		if (prefix == null) {
+		net.minecraft.network.chat.Component display = ChatLanes.get().displayContent(message);
+		if (display == message.content()) {
 			return original.call(message, font, width);
 		}
-		GuiMessage withTime = new GuiMessage(message.addedTime(), prefix.copy().append(message.content()), message.signature(), message.source(), message.tag());
-		return original.call(withTime, font, width);
+		GuiMessage decorated = new GuiMessage(message.addedTime(), display, message.signature(), message.source(), message.tag());
+		return original.call(decorated, font, width);
 	}
 
 	/** Verpasste Nachrichten nach dem Zurückspringen mit frischer Einblendzeit anzeigen. */

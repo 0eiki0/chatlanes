@@ -51,6 +51,11 @@ public class ChatLanesConfig {
 		}
 	}
 
+	/** Skin-Kopf vor Spielernamen im Chat anzeigen. */
+	public boolean playerHeads = false;
+	/** Kopf mit zweiter Hautschicht (Hut/Helm) zeichnen. */
+	public boolean playerHeadsHat = true;
+
 	/** Uhrzeit vor jeder Nachricht anzeigen (Standard für alle Tabs, pro Tab übersteuerbar). */
 	public boolean timestamps = false;
 	public TimestampFormat timestampFormat = TimestampFormat.BRACKET_HM;

@@ -266,5 +266,9 @@
 	"chatlanes.config.pm_switch": "Beim Senden wechseln",
 	"chatlanes.config.pm_switch.tooltip": "Schickst du selbst eine private Nachricht (z. B. /msg Name Hallo), wechselt die Mod in den Tab @Name und legt ihn bei Bedarf an. Bei /r in den Tab des letzten Gesprächspartners.",
 	"chatlanes.config.pm_switch.commands": "Msg-Befehle",
-	"chatlanes.config.pm_switch.commands.tooltip": "Befehle für private Nachrichten auf deinem Server – das erste Wort danach ist der Spielername. Mehrere mit Komma trennen."
+	"chatlanes.config.pm_switch.commands.tooltip": "Befehle für private Nachrichten auf deinem Server – das erste Wort danach ist der Spielername. Mehrere mit Komma trennen.",
+	"chatlanes.config.heads": "Skin-Köpfe",
+	"chatlanes.config.heads.tooltip": "Zeigt den Skin-Kopf vor dem Spielernamen einer Nachricht. Erkannt werden Spieler, die auf dem Server online sind (oder es in dieser Sitzung waren), sowie private Nachrichten.",
+	"chatlanes.config.heads.hat": "Zweite Hautschicht",
+	"chatlanes.config.heads.hat.tooltip": "Kopf mit Hut/Helm-Schicht des Skins zeichnen (wie mit F5 im Spiel sichtbar)."
 }
