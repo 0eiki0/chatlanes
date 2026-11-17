@@ -259,7 +259,7 @@
 	"chatlanes.config.profiles.current": "current",
 	"chatlanes.tabbar.search_tooltip": "Search chat (Ctrl+F)",
 	"chatlanes.config.peek.replay": "Show missed messages afterwards",
-	"chatlanes.config.peek.replay.tooltip": "Messages that arrive in your tab while the view is briefly on the System tab are shown again after returning – as if they had just arrived.",
+	"chatlanes.config.peek.replay.tooltip": "When the mod automatically returns to a tab (after the system display or via “Auto return”), messages that arrived there in the meantime are shown again – as if they had just arrived.",
 	"chatlanes.config.example.tab": "[Server] %s Player: Hello",
 	"chatlanes.config.example.pm": "[Server] From Player: Hello!",
 	"chatlanes.config.example.extra": "Info: example message",

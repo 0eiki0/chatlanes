@@ -259,7 +259,7 @@
 	"chatlanes.config.profiles.current": "aktuell",
 	"chatlanes.tabbar.search_tooltip": "Chat durchsuchen (Strg+F)",
 	"chatlanes.config.peek.replay": "Verpasste Nachrichten danach einblenden",
-	"chatlanes.config.peek.replay.tooltip": "Kommen Nachrichten in deinen Tab, während die Ansicht kurz im System-Tab ist, werden sie nach dem Zurückspringen noch einmal eingeblendet – so, als wären sie gerade angekommen.",
+	"chatlanes.config.peek.replay.tooltip": "Springt die Mod automatisch in einen Tab zurück (nach der System-Anzeige oder durch „Automatisch zurück“), werden die Nachrichten, die dort in der Zwischenzeit angekommen sind, noch einmal eingeblendet – so, als wären sie gerade angekommen.",
 	"chatlanes.config.example.tab": "[Server] %s Spieler: Hallo",
 	"chatlanes.config.example.pm": "[Server] From Spieler: Hallo!",
 	"chatlanes.config.example.extra": "Info: Beispiel-Nachricht",

@@ -107,6 +107,7 @@ public final class ChatLanes {
 		this.enabled = enabled;
 		this.active = null;
 		this.peekReturnTab = null;
+		this.unseen.clear();
 		this.apply(newConfig);
 	}
 
@@ -179,6 +180,20 @@ public final class ChatLanes {
 	private boolean pendingRefresh;
 	/** Nachrichten, die im Tab ankamen, in den zurückgesprungen wird – während die Ansicht im System-Tab war. */
 	private final List<GuiMessage> missedDuringPeek = new ArrayList<>();
+	/** Pro Tab: Nachrichten, die ankamen, während der Tab nicht ausgewählt war (für das Einblenden beim Zurückspringen). */
+	private final Map<String, List<GuiMessage>> unseen = new java.util.HashMap<>();
+
+	/** Verpasste Nachrichten eines Tabs bei geschlossenem Chat noch einmal einblenden. */
+	private void replayUnseen(ChatTab tab) {
+		List<GuiMessage> missed = this.unseen.remove(tab.name());
+		if (missed == null || missed.isEmpty() || !this.config.peekReplay) {
+			return;
+		}
+		int now = Minecraft.getInstance().gui.hud.getGuiTicks();
+		for (GuiMessage message : missed) {
+			this.replayTick.put(message, now);
+		}
+	}
 	/** Verpasste Nachrichten → Spiel-Tick, ab dem sie bei geschlossenem Chat neu eingeblendet werden. */
 	private final ConcurrentMap<GuiMessage, Integer> replayTick = new MapMaker().weakKeys().makeMap();
 	/** Kopien mit neuer Einblendzeit → Original (für Suche/Hervorheben). */
@@ -379,12 +394,6 @@ public final class ChatLanes {
 		}
 		String name = this.peekReturnTab;
 		this.peekReturnTab = null;
-		if (this.config.peekReplay && !this.missedDuringPeek.isEmpty()) {
-			int now = minecraft.gui.hud.getGuiTicks();
-			for (GuiMessage missed : this.missedDuringPeek) {
-				this.replayTick.put(missed, now);
-			}
-		}
 		this.missedDuringPeek.clear();
 		ChatTab target = null;
 		for (ChatTab tab : this.tabs()) {
@@ -398,6 +407,7 @@ public final class ChatLanes {
 			target = this.defaultTabOrFirst();
 		}
 		if (target != null) {
+			this.replayUnseen(target);
 			this.active = target;
 			target.clearUnread();
 			this.refreshChat();
@@ -537,6 +547,7 @@ public final class ChatLanes {
 		if (System.currentTimeMillis() - this.lastActivity >= this.config.autoReturnSeconds * 1000L) {
 			// Der Server kann den Kanal inzwischen selbst geändert haben → Wechsel-Befehl auf jeden Fall senden
 			this.lastSwitchCommand = null;
+			this.replayUnseen(target);
 			this.setActive(target);
 		}
 	}
@@ -587,6 +598,7 @@ public final class ChatLanes {
 		}
 		this.lastActivity = System.currentTimeMillis();
 		tab.clearUnread();
+		this.unseen.remove(tab.name());
 		if (this.active != tab) {
 			this.active = tab;
 			this.refreshChat();
@@ -842,6 +854,11 @@ public final class ChatLanes {
 		for (ChatTab tab : this.tabs()) {
 			if (tab != this.active && belongsTo(c, tab)) {
 				tab.addUnread();
+				List<GuiMessage> list = this.unseen.computeIfAbsent(tab.name(), k -> new ArrayList<>());
+				list.add(message);
+				if (list.size() > 100) {
+					list.removeFirst();
+				}
 			}
 		}
 		this.playSoundFor(c);
