@@ -1,25 +1,25 @@
 {
 	"schemaVersion": 1,
-	"id": "chattabs",
+	"id": "chatlanes",
 	"version": "${version}",
-	"name": "Chat Tabs",
-	"description": "Teilt den Chat in anpassbare Tabs auf: System, Kanäle (z. B. [G] Global) und eigene Tabs für private Nachrichten.",
+	"name": "ChatLanes",
+	"description": "Teilt den Chat in anpassbare Tabs auf: System, Kanäle (z. B. [G] Global), eigene Tabs für private Nachrichten, Server-Profile, Suche und mehr.",
 	"authors": [
 		"0eiki0"
 	],
-	"icon": "assets/chattabs/icon.png",
+	"icon": "assets/chatlanes/icon.png",
 	"environment": "client",
 	"entrypoints": {
 		"client": [
-			"de.chattabs.ChatTabsClient"
+			"de.chatlanes.ChatLanesClient"
 		],
 		"modmenu": [
-			"de.chattabs.compat.ModMenuIntegration"
+			"de.chatlanes.compat.ModMenuIntegration"
 		]
 	},
 	"mixins": [
 		{
-			"config": "chattabs.client.mixins.json",
+			"config": "chatlanes.client.mixins.json",
 			"environment": "client"
 		}
 	],
@@ -35,5 +35,8 @@
 	},
 	"suggests": {
 		"modmenu": "*"
+	},
+	"breaks": {
+		"chattabs": "*"
 	}
 }

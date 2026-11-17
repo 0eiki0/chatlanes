@@ -1,0 +1,15 @@
+{
+	"required": true,
+	"package": "de.chatlanes.mixin",
+	"compatibilityLevel": "JAVA_25",
+	"client": [
+		"ChatComponentAccessor",
+		"ChatComponentMixin",
+		"ChatScreenMixin",
+		"ClientLanguageMixin",
+		"ConnectionMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}

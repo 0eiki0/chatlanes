@@ -1,4 +1,6 @@
-# Chat Tabs (Fabric, Minecraft 26.3)
+# ChatLanes (Fabric, Minecraft 26.3)
+
+> Früher „Chat Tabs“. Beim ersten Start übernimmt ChatLanes automatisch alle Einstellungen, Server-Profile und den gespeicherten Verlauf. Die alte `chattabs-*.jar` bitte aus dem `mods`-Ordner löschen.
 
 [![Build](https://github.com/0eiki0/chattabs/actions/workflows/build.yml/badge.svg)](https://github.com/0eiki0/chattabs/actions/workflows/build.yml)
 
@@ -6,7 +8,7 @@ Teilt den Chat in Tabs auf: **System** (alles Übrige), Kanäle wie **Global** (
 Läuft auch zusammen mit der CubesideMod.
 
 ## Installation
-Die `chattabs-<version>.jar` in den `mods`-Ordner legen. Benötigt **Fabric Loader ≥ 0.20** und **Fabric API**. [Mod Menu](https://modrinth.com/mod/modmenu) ist optional.
+Die `chatlanes-<version>.jar` in den `mods`-Ordner legen. Benötigt **Fabric Loader ≥ 0.20** und **Fabric API**. [Mod Menu](https://modrinth.com/mod/modmenu) ist optional.
 
 ## Bedienung
 - Chat öffnen (T) → Tabs direkt über dem Chat anklicken.
@@ -20,17 +22,17 @@ Die `chattabs-<version>.jar` in den `mods`-Ordner legen. Benötigt **Fabric Load
 
 ## Server-Profile
 - Jeder Server bekommt beim ersten Betreten automatisch ein **eigenes Profil** (Tabs, Kanäle und alle Einstellungen) – als Kopie des **Standard-Profils**. Das Standard-Profil gilt im Einzelspieler und ist die Vorlage für neue Server.
-- Unter **Server-Profile …** (oben im Menü) siehst du alle bekannten Server: Chat Tabs pro Server **an/aus**, Profil bearbeiten, auf Standard zurücksetzen (↺) oder entfernen (✕).
-- **Auf neuen Servern:** einstellbar, ob Chat Tabs auf einem unbekannten Server an oder aus ist. Aus = der Chat sieht aus wie in normalem Minecraft.
+- Unter **Server-Profile …** (oben im Menü) siehst du alle bekannten Server: ChatLanes pro Server **an/aus**, Profil bearbeiten, auf Standard zurücksetzen (↺) oder entfernen (✕).
+- **Auf neuen Servern:** einstellbar, ob ChatLanes auf einem unbekannten Server an oder aus ist. Aus = der Chat sieht aus wie in normalem Minecraft.
 - Sprache und Update-Prüfung gelten für alle Profile gemeinsam.
-- Gespeichert in `config/chattabs/servers.json` und `config/chattabs/profiles/`.
+- Gespeichert in `config/chatlanes/servers.json` und `config/chatlanes/profiles/`.
 
 ## Einstellungsmenü
 Öffnen über **eine** dieser Möglichkeiten:
-- Taste **K** (änderbar unter *Optionen → Steuerung → Chat Tabs*)
-- Befehl **`/chattabs`**
+- Taste **K** (änderbar unter *Optionen → Steuerung → ChatLanes*)
+- Befehl **`/chatlanes`** (der alte Befehl `/chattabs` geht weiterhin)
 - **„Optionen“** am Ende der Tab-Leiste
-- **Mod Menu** → Chat Tabs → Einstellungs-Symbol
+- **Mod Menu** → ChatLanes → Einstellungs-Symbol
 
 Im Menü:
 - **Tabs**: hinzufügen, bearbeiten, verschieben (↑/↓), löschen
@@ -40,19 +42,19 @@ Im Menü:
   - *Regex*: regulärer Ausdruck für Profis
 - **Allgemein**: Nach Updates suchen (Meldung im Chat, wenn auf GitHub eine neuere Version liegt), Sprache der Mod (Automatisch wie Minecraft / Deutsch / English), Tab-Leiste oben/unten, feste Chatgröße, Anzeige bei geschlossenem Chat, Ungelesen-Zähler, Verlaufsgröße, **Uhrzeit vor Nachrichten** (an/aus, Format `[14:05]`, `[14:05:33]`, `14:05`, `14:05:33`)
 - **Automatik**: **Standard-Tab** (bei jedem Spielstart ausgewählt), **automatisch zurück** in den Standard-Tab nach einstellbarer Zeit ohne eigene Nachricht, **System-Ausgabe kurz anzeigen** (nach Befehlen oder Block-Klicks, z. B. LogBlock mit Holzspitzhacke/Bedrock, springt die Ansicht kurz in den System-Tab und danach zurück; Dauer, Reaktionszeit, Items per Auswahl-Menü mit allen Items, Ausnahme-Befehle einstellbar)
-- **Kanäle & Verlauf**: Kanal beim Tab-Klick wechseln, Server-Bestätigung ausblenden, Nachrichten speichern, gespeicherten Verlauf löschen (gespeichert in `config/chattabs/history/`)
+- **Kanäle & Verlauf**: Kanal beim Tab-Klick wechseln, Server-Bestätigung ausblenden, Nachrichten speichern, gespeicherten Verlauf löschen (gespeichert in `config/chatlanes/history/`)
 - **Private Nachrichten**: Msg-Tabs an/aus, Blinken, Uhrzeit, Ton mit Lautstärke, beim Trennen schließen, Senden-Befehl, Erkennung mit Live-Test
 
-Alles wird in `config/chattabs.json` gespeichert.
+Alles wird in `config/chatlanes.json` gespeichert.
 
 ## Download
 - **Releases:** Nach jedem Push auf `main` erstellt GitHub automatisch ein Release mit der fertigen `.jar` – rechts auf der Repo-Seite unter *Releases*.
   - Neue Version in `gradle.properties` → Release `v<Version>` (z. B. `v1.6.0`)
   - Version unverändert → Release `v<Version>-build.<Nummer>`
-- **Testversionen anderer Branches:** Reiter *Actions* → Lauf auswählen → unten bei *Artifacts* „chattabs“.
+- **Testversionen anderer Branches:** Reiter *Actions* → Lauf auswählen → unten bei *Artifacts* „chatlanes“.
 
 ## Selbst bauen
 Benötigt JDK 25:
 ```
-./gradlew build   # → build/libs/chattabs-<version>.jar
+./gradlew build   # → build/libs/chatlanes-<version>.jar
 ```

@@ -19,7 +19,7 @@ loom {
 	splitEnvironmentSourceSets()
 
 	mods {
-		"chattabs" {
+		"chatlanes" {
 			sourceSet sourceSets.main
 			sourceSet sourceSets.client
 		}
@@ -31,7 +31,7 @@ dependencies {
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
 	implementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
-	// Fabric API: Tastenbelegung, Client-Befehl /chattabs und Tick-Events
+	// Fabric API: Tastenbelegung, Client-Befehl /chatlanes und Tick-Events
 	implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
 
 	// Mod Menu: optionaler "Konfigurieren"-Knopf in der Mod-Liste

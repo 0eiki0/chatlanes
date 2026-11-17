@@ -45,7 +45,7 @@ jobs:
       - name: Jar als Artifact hochladen
         uses: actions/upload-artifact@v7
         with:
-          name: chattabs
+          name: chatlanes
           path: dist/*.jar
           if-no-files-found: error
 
@@ -55,11 +55,11 @@ jobs:
         run: |
           version=$(grep '^version=' gradle.properties | cut -d= -f2 | tr -d '[:space:]')
           tag="v${version}"
-          title="Chat Tabs ${version}"
+          title="ChatLanes ${version}"
           if git rev-parse -q --verify "refs/tags/${tag}" >/dev/null; then
             # Version schon veröffentlicht → Build-Nummer anhängen, nichts überschreiben
             tag="v${version}-build.${GITHUB_RUN_NUMBER}"
-            title="Chat Tabs ${version} (Build ${GITHUB_RUN_NUMBER})"
+            title="ChatLanes ${version} (Build ${GITHUB_RUN_NUMBER})"
           fi
           echo "tag=${tag}" >> "$GITHUB_OUTPUT"
           echo "title=${title}" >> "$GITHUB_OUTPUT"
