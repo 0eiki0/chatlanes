@@ -193,5 +193,17 @@
 	"chattabs.config.default_tab.tooltip": "Dieser Tab ist bei jedem Spielstart ausgewählt. Schreibst du nach dem Login dort, wechselt die Mod vorher automatisch in dessen Kanal (Wechsel-Befehl).",
 	"chattabs.config.auto_return": "Autom. zurück",
 	"chattabs.config.auto_return.time": "Nach",
-	"chattabs.config.auto_return.tooltip": "Wechselt automatisch zurück in den Standard-Tab, wenn du so lange im aktuellen Tab nichts geschrieben hast. Passiert erst, wenn der Chat geschlossen ist – beim Lesen springt nichts weg."
+	"chattabs.config.auto_return.tooltip": "Wechselt automatisch zurück in den Standard-Tab, wenn du so lange im aktuellen Tab nichts geschrieben hast. Passiert erst, wenn der Chat geschlossen ist – beim Lesen springt nichts weg.",
+	"chattabs.tabbar.search": "Suchen",
+	"chattabs.search.title": "Chat durchsuchen",
+	"chattabs.search.hint": "Suchbegriff eingeben (mehrere Wörter = alle müssen vorkommen)",
+	"chattabs.search.all_tabs": "Alle Tabs",
+	"chattabs.search.current_tab": "Aktueller Tab",
+	"chattabs.search.scope": "Suchen in",
+	"chattabs.search.scope.tooltip": "Alle Tabs: den ganzen gespeicherten Chatverlauf durchsuchen.\nAktueller Tab: nur Nachrichten des gerade gewählten Tabs.",
+	"chattabs.search.close": "Schließen",
+	"chattabs.search.enter_text": "Tippe oben einen Suchbegriff ein. Klick auf einen Treffer springt zur Nachricht.",
+	"chattabs.search.none": "Keine Treffer.",
+	"chattabs.search.count": "%s Treffer – Klick springt zur Nachricht",
+	"chattabs.search.count_max": "Mehr als %s Treffer – Suche genauer eingrenzen"
 }

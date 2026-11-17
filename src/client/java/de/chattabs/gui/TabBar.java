@@ -36,7 +36,14 @@ public final class TabBar {
 	private static final int TEXT_UNREAD = 0xFFFFFF55;
 	private static final int TEXT_BLINK = 0xFF000000;
 
-	private record Entry(@Nullable ChatTab tab, String label, int x, int y, int width, boolean closable) {
+	/** Was ein Eintrag ohne Tab tut. */
+	private enum Action { TAB, SEARCH, SETTINGS }
+
+	private record Entry(@Nullable ChatTab tab, String label, int x, int y, int width, boolean closable, Action action) {
+		Entry(@Nullable ChatTab tab, String label, int x, int y, int width, boolean closable) {
+			this(tab, label, x, y, width, closable, Action.TAB);
+		}
+
 		boolean contains(double mx, double my) {
 			return mx >= this.x && mx < this.x + this.width && my >= this.y && my < this.y + HEIGHT;
 		}
@@ -72,6 +79,27 @@ public final class TabBar {
 		int maxWidth = (int) Math.ceil(ChatComponent.getWidth(minecraft.options.chatWidth().get()) / scale);
 		int right = (int) Math.floor((maxWidth + 12) * scale);
 		return new ChatBox(top, bottom, right, scale, lineHeight, lines, scaledBottom);
+	}
+
+	/** Hebt die per Suche angesprungene Nachricht ein paar Sekunden lang gelb hervor. */
+	private static void renderSearchHighlight(Minecraft minecraft, GuiGraphicsExtractor graphics) {
+		net.minecraft.client.multiplayer.chat.GuiMessage target = ChatTabs.get().highlighted();
+		if (target == null) {
+			return;
+		}
+		ChatBox box = chatBox(minecraft, graphics.guiHeight());
+		var chat = minecraft.gui.hud.getChat();
+		var accessor = (ChatComponentAccessor) chat;
+		java.util.List<net.minecraft.client.multiplayer.chat.GuiMessage.Line> lines = accessor.chattabs$getTrimmedMessages();
+		int scroll = accessor.chattabs$getScrollPos();
+		int perPage = chat.getLinesPerPage();
+		for (int i = 0; i < perPage && scroll + i < lines.size(); i++) {
+			if (lines.get(scroll + i).parent() == target) {
+				int bottom = (int) Math.floor((box.scaledBottom() - i * box.lineHeight()) * box.scale());
+				int top = (int) Math.floor((box.scaledBottom() - (i + 1) * box.lineHeight()) * box.scale());
+				graphics.fill(0, top, box.right(), bottom, 0x50FFFF55);
+			}
+		}
 	}
 
 	private static int barY(Minecraft minecraft, int screenHeight) {
@@ -116,8 +144,12 @@ public final class TabBar {
 			x += width + GAP;
 		}
 		if (focused) {
+			String search = net.minecraft.client.resources.language.I18n.get("chattabs.tabbar.search");
+			int searchWidth = font.width(search) + PADDING * 2;
+			entries.add(new Entry(null, search, x, y, searchWidth, false, Action.SEARCH));
+			x += searchWidth + GAP;
 			String settings = net.minecraft.client.resources.language.I18n.get("chattabs.tabbar.settings");
-			entries.add(new Entry(null, settings, x, y, font.width(settings) + PADDING * 2, false));
+			entries.add(new Entry(null, settings, x, y, font.width(settings) + PADDING * 2, false, Action.SETTINGS));
 		}
 		return entries;
 	}
@@ -142,6 +174,9 @@ public final class TabBar {
 
 		if (focused && ChatTabs.get().config().fixedChatSize) {
 			renderFixedBackground(minecraft, graphics);
+		}
+		if (focused) {
+			renderSearchHighlight(minecraft, graphics);
 		}
 
 		ChatTab active = ChatTabs.get().active();
@@ -198,7 +233,7 @@ public final class TabBar {
 			ChatTab tab = entry.tab();
 			if (tab == null) {
 				if (button == InputConstants.MOUSE_BUTTON_LEFT) {
-					minecraft.gui.setScreen(new ChatTabsConfigScreen(screen));
+					minecraft.gui.setScreen(entry.action() == Action.SEARCH ? new ChatSearchScreen(screen) : new ChatTabsConfigScreen(screen));
 				}
 				return true;
 			}

@@ -21,6 +21,13 @@ public interface ChatComponentAccessor {
 	@Accessor("chatScrollbarPos")
 	int chattabs$getScrollPos();
 
+	@Accessor("chatScrollbarPos")
+	void chattabs$setScrollPos(int pos);
+
+	/** Alle gespeicherten Nachrichten (neueste zuerst) – für die Suche. */
+	@Accessor("allMessages")
+	List<GuiMessage> chattabs$getAllMessages();
+
 	@Invoker("addMessage")
 	void chattabs$addMessage(Component contents, @Nullable MessageSignature signature, GuiMessageSource source, @Nullable GuiMessageTag tag);
 }

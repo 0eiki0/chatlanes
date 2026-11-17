@@ -22,6 +22,15 @@ public abstract class ChatScreenMixin {
 		}
 	}
 
+	/** Strg+F im Chat öffnet die Suche. */
+	@Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true)
+	private void chattabs$searchShortcut(net.minecraft.client.input.KeyEvent event, CallbackInfoReturnable<Boolean> cir) {
+		if (event.shortcutKey() == 'f' && event.hasControlDownWithQuirk() && !event.hasShiftDown() && !event.hasAltDown()) {
+			net.minecraft.client.Minecraft.getInstance().gui.setScreen(new de.chattabs.gui.ChatSearchScreen((ChatScreen) (Object) this));
+			cir.setReturnValue(true);
+		}
+	}
+
 	/** Im Msg-Tab wird automatisch "/msg <Spieler> ..." gesendet, in Kanal-Tabs ggf. ein Präfix vorangestellt. */
 	@WrapOperation(
 		method = "handleChatInput",

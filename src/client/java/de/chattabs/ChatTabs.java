@@ -143,6 +143,117 @@ public final class ChatTabs {
 		return this.firstTab();
 	}
 
+	// ---------------------------------------------------------------- Suche
+
+	/** Ein Suchtreffer: Nachricht, Text ohne Farben, Empfangszeit und der Tab, in den sie gehört. */
+	public record SearchHit(GuiMessage message, String text, long time, @Nullable ChatTab tab) {
+	}
+
+	/** Der Tab, in dem eine Nachricht hauptsächlich steht (Kanal, Msg-Tab, sonst System, sonst "Alle"). */
+	private @Nullable ChatTab primaryTab(Classification c) {
+		if (c.channel() != null) {
+			return c.channel();
+		}
+		if (c.player() != null) {
+			ChatTab pm = this.privateTabs.get(c.player().toLowerCase(Locale.ROOT));
+			if (pm != null) {
+				return pm;
+			}
+		}
+		ChatTab fallback = null;
+		for (ChatTab tab : this.tabs()) {
+			if (belongsTo(c, tab)) {
+				if (tab.kind() == ChatTab.Kind.SYSTEM) {
+					return tab;
+				}
+				if (fallback == null) {
+					fallback = tab;
+				}
+			}
+		}
+		return fallback;
+	}
+
+	/**
+	 * Durchsucht alle gespeicherten Nachrichten (neueste zuerst), ohne Groß-/Kleinschreibung.
+	 * Mehrere Wörter = alle müssen vorkommen.
+	 */
+	public List<SearchHit> search(String query, boolean currentTabOnly) {
+		List<SearchHit> hits = new ArrayList<>();
+		String[] words = query.trim().toLowerCase(Locale.ROOT).split("\\s+");
+		if (query.isBlank()) {
+			return hits;
+		}
+		List<GuiMessage> messages = ((de.chattabs.mixin.ChatComponentAccessor) Minecraft.getInstance().gui.hud.getChat()).chattabs$getAllMessages();
+		for (GuiMessage message : List.copyOf(messages)) {
+			Classification c = this.classify(message);
+			if (c.everywhere() || (currentTabOnly && this.active != null && !belongsTo(c, this.active))) {
+				continue;
+			}
+			String text = ChatFormatting.stripFormatting(message.content().getString());
+			if (text == null) {
+				continue;
+			}
+			String lower = text.toLowerCase(Locale.ROOT);
+			boolean all = true;
+			for (String word : words) {
+				if (!lower.contains(word)) {
+					all = false;
+					break;
+				}
+			}
+			if (all) {
+				hits.add(new SearchHit(message, text, this.receivedAt.getOrDefault(message, 0L), this.primaryTab(c)));
+			}
+		}
+		return hits;
+	}
+
+	/** Gerade per Suche angesprungene Nachricht – wird kurz hervorgehoben. */
+	private @Nullable GuiMessage highlighted;
+	private long highlightUntil;
+
+	public @Nullable GuiMessage highlighted() {
+		return System.currentTimeMillis() < this.highlightUntil ? this.highlighted : null;
+	}
+
+	/**
+	 * Springt zu einem Suchtreffer: wechselt (ohne Kanalwechsel auf dem Server) in den passenden Tab,
+	 * öffnet den Chat und scrollt so, dass die Nachricht in der Mitte steht.
+	 */
+	public void jumpTo(SearchHit hit) {
+		Minecraft minecraft = Minecraft.getInstance();
+		Classification c = this.classify(hit.message());
+		if (this.active == null || !belongsTo(c, this.active)) {
+			ChatTab tab = hit.tab();
+			if (tab != null) {
+				this.active = tab;
+				tab.clearUnread();
+				this.lastActivity = System.currentTimeMillis();
+				this.refreshChat();
+			}
+		}
+		minecraft.gui.setScreen(new net.minecraft.client.gui.screens.ChatScreen("", false));
+
+		var chat = minecraft.gui.hud.getChat();
+		var accessor = (de.chattabs.mixin.ChatComponentAccessor) chat;
+		List<GuiMessage.Line> lines = accessor.chattabs$getTrimmedMessages();
+		int index = -1;
+		for (int i = 0; i < lines.size(); i++) {
+			if (lines.get(i).parent() == hit.message()) {
+				index = i;
+				break;
+			}
+		}
+		if (index >= 0) {
+			int perPage = chat.getLinesPerPage();
+			int max = Math.max(0, lines.size() - perPage);
+			accessor.chattabs$setScrollPos(Math.max(0, Math.min(max, index - perPage / 2)));
+		}
+		this.highlighted = hit.message();
+		this.highlightUntil = System.currentTimeMillis() + 4000L;
+	}
+
 	/** Zeitpunkt, zu dem du zuletzt einen Tab gewählt oder etwas geschrieben hast. */
 	private long lastActivity = System.currentTimeMillis();
 
