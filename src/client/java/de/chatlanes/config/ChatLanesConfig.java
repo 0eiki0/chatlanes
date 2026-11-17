@@ -265,7 +265,7 @@ public class ChatLanesConfig {
 		config.pmSoundType = TabSound.NONE;
 		config.tabs.add(new TabConfig("System", TabConfig.Type.SYSTEM, TabConfig.Match.TAG, "", "", false, TabColor.DEFAULT));
 		config.tabs.add(new TabConfig("Global", TabConfig.Type.CHANNEL, TabConfig.Match.TAG, "[G]", "/ch global", "", false, TabColor.GREEN));
-		config.tabs.add(new TabConfig("Handel", TabConfig.Type.CHANNEL, TabConfig.Match.TAG, "[H]", "/ch handel", "", false, TabColor.GOLD));
+		config.tabs.add(new TabConfig("Trade", TabConfig.Type.CHANNEL, TabConfig.Match.TAG, "[T]", "/ch trade", "", false, TabColor.GOLD));
 		return config;
 	}
 

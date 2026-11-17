@@ -18,7 +18,7 @@ import net.minecraft.network.chat.Component;
  * erscheinen in diesem Kanal, wenn eine Regel passt (z. B. "Enthält Text: Info").
  */
 class ExtraRulesScreen extends BaseSettingsScreen {
-	private static String lastTestMessage = "Beispiel: Info-Nachricht";
+	private static String lastTestMessage;
 
 	private final TabConfig tab;
 	private int page;
@@ -58,6 +58,9 @@ class ExtraRulesScreen extends BaseSettingsScreen {
 
 	@Override
 	protected void init() {
+		if (lastTestMessage == null) {
+			lastTestMessage = t("example.extra").getString();
+		}
 		this.beginLayout(380);
 		List<Rule> rules = this.tab.extraRulesOrEmpty();
 		int y = TOP;

@@ -14,7 +14,7 @@ import net.minecraft.network.chat.Component;
 
 /** Einen einzelnen Tab bearbeiten – mit Live-Test, ob eine Beispielnachricht in diesem Tab landen würde. */
 class TabEditScreen extends BaseSettingsScreen {
-	private static String lastTestMessage = "[Server] [G] Spieler: Hallo";
+	private static String lastTestMessage;
 
 	private final ChatLanesConfigScreen main;
 	private final TabConfig original;
@@ -33,6 +33,11 @@ class TabEditScreen extends BaseSettingsScreen {
 
 	@Override
 	protected void init() {
+		if (lastTestMessage == null) {
+			// Beispiel passend zum Tab, z. B. "[Server] [T] Player: Hello" für die Kennung [T]
+			String tag = this.edited.match == TabConfig.Match.TAG && !this.edited.pattern.isBlank() ? this.edited.pattern.trim() : "[G]";
+			lastTestMessage = t("example.tab", tag).getString();
+		}
 		this.beginLayout(360);
 		int y = TOP;
 		int half = this.halfWidth();

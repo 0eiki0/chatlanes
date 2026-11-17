@@ -13,7 +13,7 @@ import net.minecraft.network.chat.Component;
 
 /** Einstellungen für Msg-Tabs (private Nachrichten), inklusive Live-Test der Erkennung. */
 class PrivateMessagesScreen extends BaseSettingsScreen {
-	private static String lastTestMessage = "[Server] From Spieler: Hallo!";
+	private static String lastTestMessage;
 
 	private final ChatLanesConfig working;
 	private int resultY;
@@ -25,6 +25,9 @@ class PrivateMessagesScreen extends BaseSettingsScreen {
 
 	@Override
 	protected void init() {
+		if (lastTestMessage == null) {
+			lastTestMessage = t("example.pm").getString();
+		}
 		this.beginLayout(360);
 		int y = TOP;
 		int half = this.halfWidth();
