@@ -85,6 +85,11 @@ public class ChatLanesConfigScreen extends BaseSettingsScreen {
 			this.minecraft.gui.setScreen(new TabEditScreen(this, tab, true));
 		}).bounds(x, bottomY, 80, 20).build());
 		x += 82;
+		Button arrange = Button.builder(t("arrange"), b -> this.minecraft.gui.setScreen(new TabLayoutScreen(this)))
+			.bounds(x, bottomY, 80, 20).build();
+		arrange.setTooltip(net.minecraft.client.gui.components.Tooltip.create(t("arrange.tooltip")));
+		this.addRenderableWidget(arrange);
+		x += 82;
 		if (pages > 1) {
 			Button prev = Button.builder(Component.literal("<"), b -> {
 				this.page--;
@@ -100,7 +105,7 @@ public class ChatLanesConfigScreen extends BaseSettingsScreen {
 			this.addRenderableWidget(next);
 		}
 
-		int buttonWidth = Math.min(80, (this.contentWidth - 82 - 50) / 2);
+		int buttonWidth = Math.min(80, (this.contentWidth - 164 - 50) / 2);
 		this.addRenderableWidget(Button.builder(t("cancel"), b -> this.onClose())
 			.bounds(this.left + this.contentWidth - buttonWidth, bottomY, buttonWidth, 20).build());
 		this.addRenderableWidget(Button.builder(t("save"), b -> this.saveAndClose())
@@ -212,7 +217,7 @@ public class ChatLanesConfigScreen extends BaseSettingsScreen {
 
 		int pages = this.pageCount();
 		if (pages > 1) {
-			graphics.text(this.font, (this.page + 1) + "/" + pages, this.left + 82 + 48, this.height - 20, LABEL_COLOR);
+			graphics.text(this.font, (this.page + 1) + "/" + pages, this.left + 164 + 48, this.height - 20, LABEL_COLOR);
 		}
 	}
 

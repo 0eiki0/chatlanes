@@ -58,7 +58,7 @@
 	"chatlanes.config.edit.test.empty": "Enter a detection above.",
 	"chatlanes.config.edit.test.match": "✔ Goes to tab “%s”",
 	"chatlanes.config.edit.test.no_match": "✘ Does not go to tab “%s”",
-	"chatlanes.config.position": "Tab bar",
+	"chatlanes.config.position": "Bar for new tabs",
 	"chatlanes.config.position.top": "Top",
 	"chatlanes.config.position.bottom": "Bottom",
 	"chatlanes.config.closed": "While chat is closed",
@@ -295,5 +295,13 @@
 	"chatlanes.config.appearance.smooth.tooltip": "New messages fade in softly and disappear slowly instead of abruptly while the chat is closed.",
 	"chatlanes.config.appearance.display": "Visible for",
 	"chatlanes.config.appearance.fadeout": "Fade out",
-	"chatlanes.config.appearance.preview": "Preview: this is the chat background"
+	"chatlanes.config.appearance.preview": "Preview: this is the chat background",
+	"chatlanes.config.arrange": "Arrange …",
+	"chatlanes.config.arrange.tooltip": "Sort tabs by drag & drop and spread them over the top and bottom bar.",
+	"chatlanes.config.arrange.title": "Arrange tabs",
+	"chatlanes.config.arrange.top": "Top bar (above the chat)",
+	"chatlanes.config.arrange.bottom": "Bottom bar (above the input field)",
+	"chatlanes.config.arrange.pm": "@ PM tabs",
+	"chatlanes.config.arrange.empty": "Drag here …",
+	"chatlanes.config.arrange.hint": "Drag tabs with the mouse – then save in the main menu."
 }

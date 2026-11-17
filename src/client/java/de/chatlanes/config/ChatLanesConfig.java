@@ -144,6 +144,18 @@ public class ChatLanesConfig {
 	public int pmVolume = 100;
 	/** Msg-Tabs nach einem Server-Wechsel automatisch schließen. */
 	public boolean pmCloseOnDisconnect = true;
+	/** In welcher Leiste die Msg-Tabs stehen (fehlt = wie unter Allgemein). */
+	public Position pmRow;
+
+	/** Leiste eines Tabs (eigene Einstellung oder die allgemeine Position). */
+	public Position rowOf(TabConfig tab) {
+		return tab.row != null ? tab.row : this.position;
+	}
+
+	public Position pmRowOrDefault() {
+		return this.pmRow != null ? this.pmRow : this.position;
+	}
+
 	/** Beim Senden einer eigenen privaten Nachricht (z. B. /msg Name …) in deren Msg-Tab wechseln. */
 	public boolean pmSwitchOnSend = true;
 	/** Befehle für private Nachrichten – erstes Argument ist der Spielername. */
@@ -192,6 +204,9 @@ public class ChatLanesConfig {
 			}
 			return this.extraRules;
 		}
+
+		/** In welcher Leiste der Tab steht (oben über dem Chat / unten über dem Eingabefeld; fehlt = wie unter Allgemein). */
+		public Position row;
 
 		/** Uhrzeit vor Nachrichten dieses Tabs (fehlt = wie unter Allgemein). */
 		public TimestampMode timestamps;
@@ -248,6 +263,7 @@ public class ChatLanesConfig {
 			copy.showUnread = this.showUnread;
 			copy.sound = this.sound;
 			copy.timestamps = this.timestamps;
+			copy.row = this.row;
 			copy.extraAlsoInSystem = this.extraAlsoInSystem;
 			copy.extraRules = new ArrayList<>();
 			for (Rule rule : this.extraRulesOrEmpty()) {

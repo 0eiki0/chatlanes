@@ -58,7 +58,7 @@
 	"chatlanes.config.edit.test.empty": "Gib oben eine Erkennung ein.",
 	"chatlanes.config.edit.test.match": "✔ Landet im Tab „%s“",
 	"chatlanes.config.edit.test.no_match": "✘ Landet nicht im Tab „%s“",
-	"chatlanes.config.position": "Tab-Leiste",
+	"chatlanes.config.position": "Leiste für neue Tabs",
 	"chatlanes.config.position.top": "Oben",
 	"chatlanes.config.position.bottom": "Unten",
 	"chatlanes.config.closed": "Bei geschlossenem Chat",
@@ -295,5 +295,13 @@
 	"chatlanes.config.appearance.smooth.tooltip": "Neue Nachrichten blenden weich ein und verschwinden bei geschlossenem Chat langsam statt abrupt.",
 	"chatlanes.config.appearance.display": "Sichtbar für",
 	"chatlanes.config.appearance.fadeout": "Ausblenden",
-	"chatlanes.config.appearance.preview": "Vorschau: so sieht der Chat-Hintergrund aus"
+	"chatlanes.config.appearance.preview": "Vorschau: so sieht der Chat-Hintergrund aus",
+	"chatlanes.config.arrange": "Anordnen …",
+	"chatlanes.config.arrange.tooltip": "Tabs per Drag & Drop sortieren und auf die obere und untere Leiste verteilen.",
+	"chatlanes.config.arrange.title": "Tabs anordnen",
+	"chatlanes.config.arrange.top": "Obere Leiste (über dem Chat)",
+	"chatlanes.config.arrange.bottom": "Untere Leiste (über dem Eingabefeld)",
+	"chatlanes.config.arrange.pm": "@ Msg-Tabs",
+	"chatlanes.config.arrange.empty": "Hierher ziehen …",
+	"chatlanes.config.arrange.hint": "Tabs mit der Maus ziehen – danach im Hauptmenü speichern."
 }

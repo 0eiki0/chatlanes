@@ -103,9 +103,8 @@ public final class TabBar {
 		}
 	}
 
-	private static int barY(Minecraft minecraft, int screenHeight) {
-		ChatLanesConfig config = ChatLanes.get().config();
-		if (config.position == ChatLanesConfig.Position.BOTTOM) {
+	private static int rowY(Minecraft minecraft, int screenHeight, ChatLanesConfig.Position position) {
+		if (position == ChatLanesConfig.Position.BOTTOM) {
 			// Zwischen Chat und Eingabefeld (das Eingabefeld beginnt bei height - 14).
 			return screenHeight - 14 - HEIGHT - 1;
 		}
@@ -132,14 +131,36 @@ public final class TabBar {
 	private static List<Entry> layout(Minecraft minecraft, Font font, int screenHeight, boolean focused) {
 		List<Entry> entries = new ArrayList<>();
 		ChatLanes tabs = ChatLanes.get();
-		int y = barY(minecraft, screenHeight);
-		int x = 2;
-		// Lupe ganz vorne – der Platz bleibt auch bei geschlossenem Chat frei, damit die Tabs nicht verrutschen.
-		if (focused) {
-			entries.add(new Entry(null, "", x, y, SEARCH_WIDTH, false, Action.SEARCH));
-		}
-		x += SEARCH_WIDTH + GAP;
+		ChatLanesConfig config = tabs.config();
+
+		// Tabs auf die beiden Leisten verteilen (Reihenfolge wie in der Tab-Liste)
+		List<ChatTab> top = new ArrayList<>();
+		List<ChatTab> bottom = new ArrayList<>();
 		for (ChatTab tab : tabs.tabs()) {
+			ChatLanesConfig.Position row = tab.isPrivate() ? config.pmRowOrDefault() : config.rowOf(tab.config());
+			(row == ChatLanesConfig.Position.BOTTOM ? bottom : top).add(tab);
+		}
+		// Lupe und "Optionen" gehören in die obere Leiste – außer sie ist leer
+		boolean controlsTop = !top.isEmpty() || bottom.isEmpty();
+		addRow(entries, font, top, rowY(minecraft, screenHeight, ChatLanesConfig.Position.TOP), focused, controlsTop);
+		addRow(entries, font, bottom, rowY(minecraft, screenHeight, ChatLanesConfig.Position.BOTTOM), focused, !controlsTop);
+		return entries;
+	}
+
+	private static void addRow(List<Entry> entries, Font font, List<ChatTab> rowTabs, int y, boolean focused, boolean controls) {
+		if (rowTabs.isEmpty() && !controls) {
+			return;
+		}
+		ChatLanes tabs = ChatLanes.get();
+		int x = 2;
+		if (controls) {
+			// Lupe ganz vorne – der Platz bleibt auch bei geschlossenem Chat frei, damit die Tabs nicht verrutschen.
+			if (focused) {
+				entries.add(new Entry(null, "", x, y, SEARCH_WIDTH, false, Action.SEARCH));
+			}
+			x += SEARCH_WIDTH + GAP;
+		}
+		for (ChatTab tab : rowTabs) {
 			String label = tab.name();
 			if (tabs.config().showUnreadCount && tab.showsUnreadCount() && tab != tabs.active() && tab.unread() > 0) {
 				label += " (" + (tab.unread() > 99 ? "99+" : tab.unread()) + ")";
@@ -149,11 +170,10 @@ public final class TabBar {
 			entries.add(new Entry(tab, label, x, y, width, closable));
 			x += width + GAP;
 		}
-		if (focused) {
+		if (controls && focused) {
 			String settings = net.minecraft.client.resources.language.I18n.get("chatlanes.tabbar.settings");
 			entries.add(new Entry(null, settings, x, y, font.width(settings) + PADDING * 2, false, Action.SETTINGS));
 		}
-		return entries;
 	}
 
 	private static boolean shouldRender(boolean focused) {
