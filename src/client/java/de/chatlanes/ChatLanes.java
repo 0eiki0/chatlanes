@@ -334,7 +334,9 @@ public final class ChatLanes {
 		}
 		long now = System.currentTimeMillis();
 		boolean peeking = this.peekReturnTab != null;
-		if (!peeking && now > this.actionUntil) {
+		// Nur Antworten auf eine eigene Aktion zählen – fremde System-Nachrichten (Joins, Durchsagen)
+		// lösen nichts aus und verlängern die Anzeigezeit nicht.
+		if (now > this.actionUntil) {
 			return;
 		}
 		ChatTab system = null;
@@ -351,14 +353,18 @@ public final class ChatLanes {
 			if (this.active == system || this.active == null) {
 				return; // du bist schon im System-Tab
 			}
-			this.peekReturnTab = this.active.name();
+			ChatTab back = this.config.peekReturnToDefault ? this.defaultTabOrFirst() : this.active;
+			if (back == null || back == system) {
+				back = this.active;
+			}
+			this.peekReturnTab = back.name();
 			this.active = system;
 			this.pendingRefresh = true; // im nächsten Tick neu aufbauen – dann ist die neue Nachricht schon gespeichert
 		}
 		if (this.active == system) {
 			system.clearUnread();
-			this.peekUntil = now + this.config.peekSeconds * 1000L;
 		}
+		this.peekUntil = now + this.config.peekSeconds * 1000L;
 	}
 
 	/** Nach Ablauf (und bei geschlossenem Chat) zurück in den vorherigen Tab. */
@@ -573,8 +579,12 @@ public final class ChatLanes {
 	}
 
 	public void setActive(ChatTab tab) {
-		this.peekReturnTab = null;
-		this.missedDuringPeek.clear();
+		// Ein Tab-Klick bricht das Zurückspringen nach "System-Ausgabe kurz anzeigen" nicht mehr ab:
+		// nach Ablauf der Zeit geht es trotzdem zurück. Nur wer den Ziel-Tab selbst wählt, beendet es.
+		if (this.peekReturnTab != null && tab.name().equals(this.peekReturnTab)) {
+			this.peekReturnTab = null;
+			this.missedDuringPeek.clear();
+		}
 		this.lastActivity = System.currentTimeMillis();
 		tab.clearUnread();
 		if (this.active != tab) {
@@ -685,7 +695,7 @@ public final class ChatLanes {
 		this.closedPrivateTabs.put(key, System.currentTimeMillis());
 		ChatHistory.get().saveClosedTabs(this.closedPrivateTabs);
 		if (this.active == tab) {
-			this.active = this.firstTab();
+			this.active = this.defaultTabOrFirst();
 			this.refreshChat();
 		}
 	}

@@ -270,5 +270,10 @@
 	"chatlanes.config.heads": "Skin-Köpfe",
 	"chatlanes.config.heads.tooltip": "Zeigt den Skin-Kopf vor dem Spielernamen einer Nachricht. Erkannt werden Spieler, die auf dem Server online sind (oder es in dieser Sitzung waren), sowie private Nachrichten.",
 	"chatlanes.config.heads.hat": "Zweite Hautschicht",
-	"chatlanes.config.heads.hat.tooltip": "Kopf mit Hut/Helm-Schicht des Skins zeichnen (wie mit F5 im Spiel sichtbar)."
+	"chatlanes.config.heads.hat.tooltip": "Kopf mit Hut/Helm-Schicht des Skins zeichnen (wie mit F5 im Spiel sichtbar).",
+	"chatlanes.config.peek.return": "Danach zurück in",
+	"chatlanes.config.peek.return.default": "Standard-Tab",
+	"chatlanes.config.peek.return.previous": "vorherigen Tab",
+	"chatlanes.config.peek.return.tooltip": "Wohin nach Ablauf der Anzeigezeit gesprungen wird. Tab-Klicks in der Zwischenzeit (z. B. Msg-Tab öffnen oder schließen) brechen das nicht ab. Die Zeit verlängert sich nur durch Antworten auf weitere eigene Befehle.",
+	"chatlanes.config.peek.replay_short": "Verpasstes einblenden"
 }

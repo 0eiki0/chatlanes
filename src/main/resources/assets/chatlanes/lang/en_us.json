@@ -270,5 +270,10 @@
 	"chatlanes.config.heads": "Skin heads",
 	"chatlanes.config.heads.tooltip": "Shows the player's skin head in front of their name in a message. Works for players who are (or were during this session) online on the server, and for private messages.",
 	"chatlanes.config.heads.hat": "Second skin layer",
-	"chatlanes.config.heads.hat.tooltip": "Draw the head with the hat/helmet layer of the skin."
+	"chatlanes.config.heads.hat.tooltip": "Draw the head with the hat/helmet layer of the skin.",
+	"chatlanes.config.peek.return": "Then return to",
+	"chatlanes.config.peek.return.default": "Default tab",
+	"chatlanes.config.peek.return.previous": "Previous tab",
+	"chatlanes.config.peek.return.tooltip": "Where to jump after the display time. Tab clicks in the meantime (e.g. opening or closing a PM tab) don't cancel it. The time is only extended by replies to further commands of your own.",
+	"chatlanes.config.peek.replay_short": "Show missed"
 }

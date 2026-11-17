@@ -93,6 +93,8 @@ public class ChatLanesConfig {
 	public double peekReaction = 3.0;
 	/** Version des Config-Formats (für einmalige Anpassungen beim Update). */
 	public int configVersion;
+	/** Nach der Anzeigezeit in den Standard-Tab springen (statt in den vorher gewählten Tab). */
+	public boolean peekReturnToDefault = true;
 	/** Beim Zurückspringen die verpassten Nachrichten des Tabs noch einmal einblenden (wie neu angekommen). */
 	public boolean peekReplay = true;
 	/** Auch Block-Klicks (z. B. LogBlock-Abfragen) gelten als Aktion. */
