@@ -41,6 +41,7 @@ Im Menü:
   - *Kennung*: einfach z. B. `[G]` eintragen – Server-Präfixe wie `[Freebuild]` davor werden übersprungen
   - *Enthält Text*: alle Nachrichten mit diesem Text
   - *Regex*: regulärer Ausdruck für Profis
+- **Aussehen**: Chat-Breite, -Höhe, Textgröße, Zeilenabstand und Deckkraft (Minecraft-Einstellungen direkt im Menü), **Hintergrundfarbe** (Vorgaben oder eigener Hex-Wert), **sanftes Ein- und Ausblenden** mit einstellbarer Anzeige- und Ausblendzeit
 - **Allgemein**: Nach Updates suchen (Meldung im Chat, wenn auf GitHub eine neuere Version liegt), Sprache der Mod (Automatisch wie Minecraft / Deutsch / English), Tab-Leiste oben/unten, feste Chatgröße, Anzeige bei geschlossenem Chat, Ungelesen-Zähler, Verlaufsgröße, **Skin-Köpfe vor Spielernamen** (optional mit zweiter Hautschicht), **Uhrzeit vor Nachrichten** (an/aus, Format `[14:05]`, `[14:05:33]`, `14:05`, `14:05:33`)
 - **Automatik**: **Standard-Tab** (bei jedem Spielstart ausgewählt), **automatisch zurück** in den Standard-Tab nach einstellbarer Zeit ohne eigene Nachricht, **System-Ausgabe kurz anzeigen** (verpasste Nachrichten werden nach dem Zurückspringen noch einmal eingeblendet; nach Befehlen oder Block-Klicks, z. B. LogBlock mit Holzspitzhacke/Bedrock, springt die Ansicht kurz in den System-Tab und danach zurück; Dauer, Reaktionszeit, Items per Auswahl-Menü mit allen Items, Ausnahme-Befehle einstellbar)
 - **Kanäle & Verlauf**: Kanal beim Tab-Klick wechseln, Server-Bestätigung ausblenden, Nachrichten speichern, gespeicherten Verlauf löschen (gespeichert in `config/chatlanes/history/`)

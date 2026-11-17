@@ -53,6 +53,24 @@ public abstract class ChatComponentMixin {
 		return original.call(ChatLanes.get().displayParent(parent), content, endOfEntry);
 	}
 
+	/** Sanftes Ein- und Ausblenden der Nachrichten bei geschlossenem Chat. */
+	@org.spongepowered.asm.mixin.injection.ModifyVariable(method = "forEachLine", at = @At("STORE"), ordinal = 0)
+	private float chatlanes$smoothAlpha(float alpha, @com.llamalad7.mixinextras.sugar.Local GuiMessage.Line message) {
+		return de.chatlanes.ChatLook.alpha(message, alpha);
+	}
+
+	/** Hintergrundfarbe des Chats. */
+	@WrapOperation(
+		method = {
+			"extractRenderState(Lnet/minecraft/client/gui/components/ChatComponent$ChatGraphicsAccess;IILnet/minecraft/client/gui/components/ChatComponent$DisplayMode;)V",
+			"lambda$extractRenderState$1"
+		},
+		at = @At(value = "INVOKE", target = "Lnet/minecraft/util/ARGB;black(F)I")
+	)
+	private static int chatlanes$background(float alpha, Operation<Integer> original) {
+		return de.chatlanes.ChatLook.tint(original.call(alpha));
+	}
+
 	/** Neue Nachricht: ungelesene Zähler der anderen Tabs erhöhen. */
 	@Inject(method = "addMessageToQueue", at = @At("HEAD"))
 	private void chatlanes$onNewMessage(GuiMessage message, CallbackInfo ci) {

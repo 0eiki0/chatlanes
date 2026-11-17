@@ -16,7 +16,7 @@ import org.jspecify.annotations.Nullable;
  * Erreichbar über die Taste K, den Befehl /chatlanes, "Optionen" in der Tab-Leiste und Mod Menu.
  */
 public class ChatLanesConfigScreen extends BaseSettingsScreen {
-	private static final int LIST_TOP = TOP + ROW * 3 + 18;
+	private static final int LIST_TOP = TOP + ROW * 4 + 18;
 
 	/** Arbeitskopie – wird erst bei "Speichern" übernommen. */
 	final ChatLanesConfig working;
@@ -62,6 +62,8 @@ public class ChatLanesConfigScreen extends BaseSettingsScreen {
 			.bounds(this.left, TOP + ROW * 2, half, 20).build());
 		this.addRenderableWidget(Button.builder(t("pm"), b -> this.minecraft.gui.setScreen(new PrivateMessagesScreen(this)))
 			.bounds(this.rightHalfX(), TOP + ROW * 2, half, 20).build());
+		this.addRenderableWidget(Button.builder(t("appearance"), b -> this.minecraft.gui.setScreen(new AppearanceScreen(this)))
+			.bounds(this.left, TOP + ROW * 3, this.contentWidth, 20).build());
 
 		this.label(t("tabs_header"), this.left, LIST_TOP - 11);
 

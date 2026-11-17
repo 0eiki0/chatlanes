@@ -51,6 +51,15 @@ public class ChatLanesConfig {
 		}
 	}
 
+	/** Hintergrundfarbe des Chats (RGB, ohne Transparenz – die kommt aus der Minecraft-Einstellung). */
+	public int chatBackgroundColor = 0x000000;
+	/** Nachrichten sanft ein- und ausblenden. */
+	public boolean smoothFade = true;
+	/** So lange bleiben Nachrichten bei geschlossenem Chat sichtbar (Sekunden, Vanilla ≈ 10). */
+	public double fadeDisplaySeconds = 10.0;
+	/** Dauer des Ausblendens (Sekunden). */
+	public double fadeOutSeconds = 1.5;
+
 	/** Skin-Kopf vor Spielernamen im Chat anzeigen. */
 	public boolean playerHeads = false;
 	/** Kopf mit zweiter Hautschicht (Hut/Helm) zeichnen. */
@@ -305,6 +314,9 @@ public class ChatLanesConfig {
 		if (this.hideSwitchConfirmation == null) this.hideSwitchConfirmation = "";
 		if (this.defaultTab == null) this.defaultTab = "";
 		if (this.peekItems == null) this.peekItems = "";
+		this.chatBackgroundColor &= 0xFFFFFF;
+		this.fadeDisplaySeconds = Math.max(1.0, Math.min(120.0, this.fadeDisplaySeconds));
+		this.fadeOutSeconds = Math.max(0.1, Math.min(10.0, this.fadeOutSeconds));
 		if (this.pmCommands == null) this.pmCommands = "/msg, /tell, /w, /whisper, /m, /pm";
 		if (this.pmReplyCommands == null) this.pmReplyCommands = "/r, /reply";
 		if (this.peekIgnoredCommands == null) this.peekIgnoredCommands = "";

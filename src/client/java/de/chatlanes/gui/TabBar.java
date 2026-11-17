@@ -125,7 +125,7 @@ public final class TabBar {
 		int emptyBottom = (int) Math.floor(emptyBottomScaled * box.scale());
 		if (emptyBottom > box.top()) {
 			float opacity = minecraft.options.textBackgroundOpacity().get().floatValue();
-			graphics.fill(0, box.top(), box.right(), emptyBottom, ARGB.black(opacity));
+			graphics.fill(0, box.top(), box.right(), emptyBottom, de.chatlanes.ChatLook.tint(ARGB.black(opacity)));
 		}
 	}
 
