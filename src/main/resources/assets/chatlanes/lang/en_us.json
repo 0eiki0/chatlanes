@@ -303,5 +303,6 @@
 	"chatlanes.config.arrange.bottom": "Bottom bar (above the input field)",
 	"chatlanes.config.arrange.pm": "@ PM tabs",
 	"chatlanes.config.arrange.empty": "Drag here …",
-	"chatlanes.config.arrange.hint": "Drag tabs with the mouse – then save in the main menu."
+	"chatlanes.config.arrange.hint": "Drag tabs with the mouse – then save in the main menu.",
+	"chatlanes.config.arrange.closed.tooltip": "What this bar does while the chat is closed: always show, only with unread messages (blinking tabs in this bar) or hide."
 }

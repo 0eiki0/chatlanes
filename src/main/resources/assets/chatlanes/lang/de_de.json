@@ -303,5 +303,6 @@
 	"chatlanes.config.arrange.bottom": "Untere Leiste (über dem Eingabefeld)",
 	"chatlanes.config.arrange.pm": "@ Msg-Tabs",
 	"chatlanes.config.arrange.empty": "Hierher ziehen …",
-	"chatlanes.config.arrange.hint": "Tabs mit der Maus ziehen – danach im Hauptmenü speichern."
+	"chatlanes.config.arrange.hint": "Tabs mit der Maus ziehen – danach im Hauptmenü speichern.",
+	"chatlanes.config.arrange.closed.tooltip": "Was diese Leiste bei geschlossenem Chat macht: immer anzeigen, nur bei ungelesenen Nachrichten (blinkende Tabs dieser Leiste) oder ausblenden."
 }

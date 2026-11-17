@@ -40,7 +40,11 @@ public final class TabBar {
 	/** Was ein Eintrag ohne Tab tut. */
 	private enum Action { TAB, SEARCH, SETTINGS }
 
-	private record Entry(@Nullable ChatTab tab, String label, int x, int y, int width, boolean closable, Action action) {
+	private record Entry(@Nullable ChatTab tab, String label, int x, int y, int width, boolean closable, Action action, boolean bottom) {
+		Entry(@Nullable ChatTab tab, String label, int x, int y, int width, boolean closable, Action action) {
+			this(tab, label, x, y, width, closable, action, false);
+		}
+
 		Entry(@Nullable ChatTab tab, String label, int x, int y, int width, boolean closable) {
 			this(tab, label, x, y, width, closable, Action.TAB);
 		}
@@ -143,7 +147,13 @@ public final class TabBar {
 		// Lupe und "Optionen" gehören in die obere Leiste – außer sie ist leer
 		boolean controlsTop = !top.isEmpty() || bottom.isEmpty();
 		addRow(entries, font, top, rowY(minecraft, screenHeight, ChatLanesConfig.Position.TOP), focused, controlsTop);
+		int topCount = entries.size();
 		addRow(entries, font, bottom, rowY(minecraft, screenHeight, ChatLanesConfig.Position.BOTTOM), focused, !controlsTop);
+		// Einträge der unteren Leiste markieren (für "bei geschlossenem Chat" pro Leiste)
+		for (int i = topCount; i < entries.size(); i++) {
+			Entry e = entries.get(i);
+			entries.set(i, new Entry(e.tab(), e.label(), e.x(), e.y(), e.width(), e.closable(), e.action(), true));
+		}
 		return entries;
 	}
 
@@ -176,15 +186,25 @@ public final class TabBar {
 		}
 	}
 
-	private static boolean shouldRender(boolean focused) {
+	/** Soll eine Leiste bei geschlossenem Chat sichtbar sein? (Einstellung pro Leiste, sonst die allgemeine) */
+	private static boolean shouldRenderRow(boolean focused, boolean bottom, List<Entry> entries) {
 		if (focused) {
 			return true;
 		}
-		ChatLanes tabs = ChatLanes.get();
-		return switch (tabs.config().showWhenClosed) {
+		ChatLanesConfig config = ChatLanes.get().config();
+		ChatLanesConfig.ClosedChatMode mode = config.closedModeFor(bottom ? ChatLanesConfig.Position.BOTTOM : ChatLanesConfig.Position.TOP);
+		return switch (mode) {
 			case NEVER -> false;
 			case ALWAYS -> true;
-			case UNREAD -> tabs.hasBlinkingUnread();
+			case UNREAD -> {
+				ChatTab active = ChatLanes.get().active();
+				for (Entry e : entries) {
+					if (e.bottom() == bottom && e.tab() != null && e.tab() != active && e.tab().unread() > 0 && e.tab().blinks()) {
+						yield true;
+					}
+				}
+				yield false;
+			}
 		};
 	}
 
@@ -193,7 +213,13 @@ public final class TabBar {
 		if (!ChatLanes.get().isEnabled()) {
 			return;
 		}
-		if (minecraft.options.chatVisibility().get() == net.minecraft.world.entity.player.ChatVisiblity.HIDDEN || !shouldRender(focused)) {
+		if (minecraft.options.chatVisibility().get() == net.minecraft.world.entity.player.ChatVisiblity.HIDDEN) {
+			return;
+		}
+		List<Entry> all = layout(minecraft, font, graphics.guiHeight(), focused);
+		boolean showTop = shouldRenderRow(focused, false, all);
+		boolean showBottom = shouldRenderRow(focused, true, all);
+		if (!showTop && !showBottom) {
 			return;
 		}
 
@@ -206,7 +232,10 @@ public final class TabBar {
 
 		ChatTab active = ChatLanes.get().active();
 		boolean blinkOn = (System.currentTimeMillis() / 500L) % 2L == 0L;
-		for (Entry entry : layout(minecraft, font, graphics.guiHeight(), focused)) {
+		for (Entry entry : all) {
+			if (entry.bottom() ? !showBottom : !showTop) {
+				continue;
+			}
 			ChatTab tab = entry.tab();
 			boolean isActive = tab != null && tab == active;
 			boolean hovered = focused && entry.contains(mouseX, mouseY);

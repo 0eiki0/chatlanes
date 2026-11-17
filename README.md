@@ -37,7 +37,7 @@ Die `chatlanes-<version>.jar` in den `mods`-Ordner legen. Benötigt **Fabric Loa
 
 Im Menü:
 - **Tabs**: hinzufügen, bearbeiten, verschieben (↑/↓), löschen
-- **Anordnen**: Tabs per Drag & Drop sortieren und auf eine **obere** (über dem Chat) und **untere Leiste** (über dem Eingabefeld) verteilen – auch die Msg-Tabs
+- **Anordnen**: Tabs per Drag & Drop sortieren und auf eine **obere** (über dem Chat) und **untere Leiste** (über dem Eingabefeld) verteilen – auch die Msg-Tabs; pro Leiste einstellbar, ob sie bei geschlossenem Chat immer, nur bei Ungelesenem oder gar nicht angezeigt wird
 - **Tab bearbeiten**: Name, Uhrzeit (Standard/An/Aus), Typ (System / Kanal / Alle), Erkennung, Wechsel-Befehl, Sende-Präfix, Blinken, Zähler „(3)“ an/aus, Farbe, **Ton mit Lautstärke** (rund 20 Töne, ▶ zum Probehören), **Zusätzliche Nachrichten** (eigene Regeln, mit denen Nachrichten, die sonst im System-Tab landen, in diesen Kanal kommen – per Kennung, Text, Regex oder **Befehl-Ausgabe**, z. B. die komplette Ausgabe von `/where`, Zeitfenster pro Befehl einstellbar (0,1–60 s), funktioniert auch mit Makro-Mods; optional zusätzlich in System) und ein **Live-Test** („✔ Landet im Tab …“)
   - *Kennung*: einfach z. B. `[G]` eintragen – Server-Präfixe wie `[Freebuild]` davor werden übersprungen
   - *Enthält Text*: alle Nachrichten mit diesem Text

@@ -144,6 +144,15 @@ public class ChatLanesConfig {
 	public int pmVolume = 100;
 	/** Msg-Tabs nach einem Server-Wechsel automatisch schließen. */
 	public boolean pmCloseOnDisconnect = true;
+	/** Pro Leiste: bei geschlossenem Chat anzeigen? (fehlt = wie unter Allgemein) */
+	public ClosedChatMode closedTop;
+	public ClosedChatMode closedBottom;
+
+	public ClosedChatMode closedModeFor(Position row) {
+		ClosedChatMode mode = row == Position.BOTTOM ? this.closedBottom : this.closedTop;
+		return mode != null ? mode : this.showWhenClosed;
+	}
+
 	/** In welcher Leiste die Msg-Tabs stehen (fehlt = wie unter Allgemein). */
 	public Position pmRow;
 

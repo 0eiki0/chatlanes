@@ -52,10 +52,28 @@ class TabLayoutScreen extends BaseSettingsScreen {
 	protected void init() {
 		this.beginLayout(420);
 		int zoneH = Math.max(40, (this.height - 30 - 60 - TOP - 24) / 2);
-		this.zoneTop[0] = TOP + 22;
+		this.zoneTop[0] = TOP + 26;
 		this.zoneBottom[0] = this.zoneTop[0] + zoneH;
-		this.zoneTop[1] = this.zoneBottom[0] + 24;
+		this.zoneTop[1] = this.zoneBottom[0] + 28;
 		this.zoneBottom[1] = this.zoneTop[1] + zoneH;
+		// Pro Leiste: bei geschlossenem Chat anzeigen?
+		for (int zone = 0; zone < 2; zone++) {
+			Position row = zone == 0 ? Position.TOP : Position.BOTTOM;
+			int bw = 170;
+			var mode = net.minecraft.client.gui.components.CycleButton.<ChatLanesConfig.ClosedChatMode>builder(
+					m -> t("closed." + m.name().toLowerCase()), this.working.closedModeFor(row))
+				.withValues(ChatLanesConfig.ClosedChatMode.values())
+				.displayOnlyValue()
+				.create(this.left + this.contentWidth - bw, this.zoneTop[zone] - 20, bw, 18, t("closed"), (b, v) -> {
+					if (row == Position.TOP) {
+						this.working.closedTop = v;
+					} else {
+						this.working.closedBottom = v;
+					}
+				});
+			mode.setTooltip(net.minecraft.client.gui.components.Tooltip.create(t("arrange.closed.tooltip")));
+			this.addRenderableWidget(mode);
+		}
 		this.addRenderableWidget(Button.builder(t("done"), b -> this.onClose())
 			.bounds(this.left, this.height - 26, this.contentWidth, 20).build());
 	}
