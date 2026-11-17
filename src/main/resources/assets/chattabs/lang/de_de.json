@@ -220,8 +220,18 @@
 	"chattabs.config.peek.blocks.tooltip": "Auch Rechts-/Linksklicks auf Blöcke zählen als Aktion – z. B. LogBlock-Abfragen. Rechts kannst du einschränken, mit welchen Items in der Hand.",
 	"chattabs.config.peek.items": "Items",
 	"chattabs.config.peek.items.hint": "leer = jedes Item",
-	"chattabs.config.peek.items.tooltip": "Nur mit diesen Items in der Hand zählen Block-Klicks, z. B. wooden_pickaxe, bedrock (LogBlock-Standard). Mehrere mit Komma trennen, leer = jedes Item.",
+	"chattabs.config.peek.items.tooltip": "Nur mit diesen Items in der Hand zählen Block-Klicks, z. B. oak_log oder wooden_pickaxe. Mit „Wählen …“ bequem aus allen Items aussuchen. Leer = jedes Item.",
 	"chattabs.config.peek.ignored": "Ausnahmen",
 	"chattabs.config.peek.ignored.hint": "z. B. /ch, /msg",
-	"chattabs.config.peek.ignored.tooltip": "Diese Befehle springen nie in den System-Tab. Die Wechsel-Befehle deiner Tabs sind automatisch ausgenommen. Mehrere mit Komma trennen."
+	"chattabs.config.peek.ignored.tooltip": "Diese Befehle springen nie in den System-Tab. Die Wechsel-Befehle deiner Tabs sind automatisch ausgenommen. Mehrere mit Komma trennen.",
+	"chattabs.config.peek.items.pick": "Wählen …",
+	"chattabs.config.peek.items.pick.tooltip": "Öffnet eine Liste mit allen Items zum Anklicken.",
+	"chattabs.picker.title": "Items auswählen",
+	"chattabs.picker.search": "Suchen nach Name oder ID, z. B. Stamm oder oak_log",
+	"chattabs.picker.clear": "Alle abwählen",
+	"chattabs.picker.selected": "Ausgewählt: %s",
+	"chattabs.picker.none": "keine (= jedes Item zählt)",
+	"chattabs.picker.click_add": "Klick: auswählen",
+	"chattabs.picker.click_remove": "Klick: abwählen",
+	"chattabs.config.peek.items.current": "Aktuell: %s"
 }

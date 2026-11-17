@@ -220,8 +220,18 @@
 	"chattabs.config.peek.blocks.tooltip": "Right/left clicks on blocks also count as an action – e.g. LogBlock lookups. Restrict to items in hand on the right.",
 	"chattabs.config.peek.items": "Items",
 	"chattabs.config.peek.items.hint": "empty = any item",
-	"chattabs.config.peek.items.tooltip": "Block clicks only count with these items in hand, e.g. wooden_pickaxe, bedrock (LogBlock default). Separate with commas, empty = any item.",
+	"chattabs.config.peek.items.tooltip": "Block clicks only count with these items in hand, e.g. oak_log or wooden_pickaxe. Use “Pick …” to choose from all items. Empty = any item.",
 	"chattabs.config.peek.ignored": "Exceptions",
 	"chattabs.config.peek.ignored.hint": "e.g. /ch, /msg",
-	"chattabs.config.peek.ignored.tooltip": "These commands never jump to the System tab. Your tabs' switch commands are excluded automatically. Separate with commas."
+	"chattabs.config.peek.ignored.tooltip": "These commands never jump to the System tab. Your tabs' switch commands are excluded automatically. Separate with commas.",
+	"chattabs.config.peek.items.pick": "Pick …",
+	"chattabs.config.peek.items.pick.tooltip": "Opens a list of all items to click.",
+	"chattabs.picker.title": "Select items",
+	"chattabs.picker.search": "Search by name or ID, e.g. log or oak_log",
+	"chattabs.picker.clear": "Clear all",
+	"chattabs.picker.selected": "Selected: %s",
+	"chattabs.picker.none": "none (= any item counts)",
+	"chattabs.picker.click_add": "Click: select",
+	"chattabs.picker.click_remove": "Click: deselect",
+	"chattabs.config.peek.items.current": "Current: %s"
 }

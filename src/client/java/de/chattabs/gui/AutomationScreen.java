@@ -88,14 +88,22 @@ class AutomationScreen extends BaseSettingsScreen {
 			.create(this.left, y, half, 20, t("peek.blocks"), (b, v) -> this.working.peekBlockClicks = v);
 		blocks.setTooltip(Tooltip.create(t("peek.blocks.tooltip")));
 		this.addRenderableWidget(blocks);
-		EditBox items = new EditBox(this.font, this.rightHalfX(), y + 1, half, 18, t("peek.items"));
+		int pickWidth = 60;
+		EditBox items = new EditBox(this.font, this.rightHalfX(), y + 1, half - pickWidth - 4, 18, t("peek.items"));
 		items.setMaxLength(512);
 		items.setValue(this.working.peekItems);
 		items.moveCursorToStart(false);
 		items.setHint(t("peek.items.hint"));
-		items.setTooltip(Tooltip.create(t("peek.items.tooltip")));
+		items.setTooltip(Tooltip.create(this.working.peekItems.isBlank() ? t("peek.items.tooltip")
+			: t("peek.items.tooltip").append("\n\n").append(t("peek.items.current", this.working.peekItems))));
 		items.setResponder(v -> this.working.peekItems = v);
 		this.addRenderableWidget(items);
+		// Auswahl-Menü mit allen Items
+		Button pick = Button.builder(t("peek.items.pick"), b -> this.minecraft.gui.setScreen(
+				new ItemPickerScreen(this, this.working.peekItems, v -> this.working.peekItems = v)))
+			.bounds(this.rightHalfX() + half - pickWidth, y, pickWidth, 20).build();
+		pick.setTooltip(Tooltip.create(t("peek.items.pick.tooltip")));
+		this.addRenderableWidget(pick);
 		y += ROW;
 
 		this.textRow(y, t("peek.ignored"), this.working.peekIgnoredCommands, t("peek.ignored.hint"), t("peek.ignored.tooltip"),

@@ -32,7 +32,7 @@ Im Menü:
   - *Enthält Text*: alle Nachrichten mit diesem Text
   - *Regex*: regulärer Ausdruck für Profis
 - **Allgemein**: Nach Updates suchen (Meldung im Chat, wenn auf GitHub eine neuere Version liegt), Sprache der Mod (Automatisch wie Minecraft / Deutsch / English), Tab-Leiste oben/unten, feste Chatgröße, Anzeige bei geschlossenem Chat, Ungelesen-Zähler, Verlaufsgröße, **Uhrzeit vor Nachrichten** (an/aus, Format `[14:05]`, `[14:05:33]`, `14:05`, `14:05:33`)
-- **Automatik**: **Standard-Tab** (bei jedem Spielstart ausgewählt), **automatisch zurück** in den Standard-Tab nach einstellbarer Zeit ohne eigene Nachricht, **System-Ausgabe kurz anzeigen** (nach Befehlen oder Block-Klicks, z. B. LogBlock mit Holzspitzhacke/Bedrock, springt die Ansicht kurz in den System-Tab und danach zurück; Dauer, Reaktionszeit, Items und Ausnahme-Befehle einstellbar)
+- **Automatik**: **Standard-Tab** (bei jedem Spielstart ausgewählt), **automatisch zurück** in den Standard-Tab nach einstellbarer Zeit ohne eigene Nachricht, **System-Ausgabe kurz anzeigen** (nach Befehlen oder Block-Klicks, z. B. LogBlock mit Holzspitzhacke/Bedrock, springt die Ansicht kurz in den System-Tab und danach zurück; Dauer, Reaktionszeit, Items per Auswahl-Menü mit allen Items, Ausnahme-Befehle einstellbar)
 - **Kanäle & Verlauf**: Kanal beim Tab-Klick wechseln, Server-Bestätigung ausblenden, Nachrichten speichern, gespeicherten Verlauf löschen (gespeichert in `config/chattabs/history/`)
 - **Private Nachrichten**: Msg-Tabs an/aus, Blinken, Uhrzeit, Ton mit Lautstärke, beim Trennen schließen, Senden-Befehl, Erkennung mit Live-Test
 
