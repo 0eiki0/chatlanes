@@ -77,6 +77,22 @@ public class ChatTabsConfig {
 	/** Nach so vielen Sekunden ohne eigene Nachricht zurückwechseln. */
 	public int autoReturnSeconds = 60;
 
+	/**
+	 * System-Ausgabe kurz anzeigen: Kommt kurz nach einer eigenen Aktion (Befehl, Block-Klick) etwas in den
+	 * System-Tab, springt die Ansicht dorthin und nach {@link #peekSeconds} wieder zurück.
+	 */
+	public boolean peekSystem = true;
+	/** So lange bleibt die Ansicht im System-Tab (verlängert sich bei weiteren System-Nachrichten). */
+	public int peekSeconds = 15;
+	/** So lange nach der Aktion zählt eine System-Nachricht als "Antwort" darauf. */
+	public double peekReaction = 1.5;
+	/** Auch Block-Klicks (z. B. LogBlock-Abfragen) gelten als Aktion. */
+	public boolean peekBlockClicks = true;
+	/** Nur mit diesen Items in der Hand zählen Block-Klicks (leer = mit jedem Item). */
+	public String peekItems = "wooden_pickaxe, bedrock";
+	/** Befehle, die nie in den System-Tab springen lassen (zusätzlich zu den Wechsel-Befehlen der Tabs). */
+	public String peekIgnoredCommands = "/ch";
+
 	/** Beim Auswählen eines Kanal-Tabs dessen Wechsel-Befehl (z. B. "/ch global") an den Server senden. */
 	public boolean switchChannelOnTab = true;
 	/**
@@ -271,6 +287,10 @@ public class ChatTabsConfig {
 		if (this.pmSendCommand == null) this.pmSendCommand = defaults.pmSendCommand;
 		if (this.hideSwitchConfirmation == null) this.hideSwitchConfirmation = "";
 		if (this.defaultTab == null) this.defaultTab = "";
+		if (this.peekItems == null) this.peekItems = "";
+		if (this.peekIgnoredCommands == null) this.peekIgnoredCommands = "";
+		this.peekSeconds = Math.max(2, Math.min(600, this.peekSeconds));
+		this.peekReaction = Math.max(0.2, Math.min(10.0, this.peekReaction));
 		this.autoReturnSeconds = Math.max(5, Math.min(3600, this.autoReturnSeconds));
 		if (this.maxHistory < 100) this.maxHistory = 100;
 		if (this.maxHistory > 20000) this.maxHistory = 20000;

@@ -26,6 +26,15 @@ public abstract class ConnectionMixin {
 			ChatTabs.get().onCommandSent("/" + command.command());
 		} else if (packet instanceof ServerboundChatPacket chat) {
 			ChatTabs.get().onCommandSent(chat.message());
+		} else if (packet instanceof net.minecraft.network.protocol.game.ServerboundUseItemOnPacket
+				|| (packet instanceof net.minecraft.network.protocol.game.ServerboundPlayerActionPacket action
+					&& action.getAction() == net.minecraft.network.protocol.game.ServerboundPlayerActionPacket.Action.START_DESTROY_BLOCK)) {
+			// Block-Klick (rechts oder links) – z. B. LogBlock-Abfrage mit Holzspitzhacke oder Bedrock
+			var player = net.minecraft.client.Minecraft.getInstance().player;
+			if (player != null) {
+				String item = net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(player.getMainHandItem().getItem()).toString();
+				ChatTabs.get().onBlockClick(item);
+			}
 		}
 	}
 }

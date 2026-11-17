@@ -143,6 +143,120 @@ public final class ChatTabs {
 		return this.firstTab();
 	}
 
+	// ---------------------------------------------------------------- System-Ausgabe kurz anzeigen
+
+	/** true, solange die Mod selbst einen Kanalwechsel-Befehl sendet (löst kein "System anzeigen" aus). */
+	private boolean sendingOwnSwitch;
+	/** Bis zu diesem Zeitpunkt gilt eine System-Nachricht als Antwort auf deine Aktion. */
+	private long actionUntil;
+	/** Tab, in den nach dem kurzen Anzeigen zurückgesprungen wird (null = gerade nicht aktiv). */
+	private @Nullable String peekReturnTab;
+	private long peekUntil;
+	private boolean pendingRefresh;
+
+	/** Eine eigene Aktion (Befehl oder Block-Klick) – Antworten darauf dürfen kurz den System-Tab zeigen. */
+	public void onAction() {
+		if (this.config.peekSystem) {
+			this.actionUntil = System.currentTimeMillis() + Math.round(this.config.peekReaction * 1000.0);
+		}
+	}
+
+	/** Block-Klick: zählt als Aktion, wenn eingeschaltet und (falls eingestellt) das passende Item in der Hand ist. */
+	public void onBlockClick(String heldItemId) {
+		if (!this.config.peekSystem || !this.config.peekBlockClicks) {
+			return;
+		}
+		String items = this.config.peekItems.trim();
+		if (!items.isEmpty()) {
+			boolean match = false;
+			for (String entry : items.split("[,;\\s]+")) {
+				String id = entry.trim().toLowerCase(Locale.ROOT);
+				if (!id.isEmpty() && (heldItemId.equals(id) || heldItemId.equals("minecraft:" + id))) {
+					match = true;
+					break;
+				}
+			}
+			if (!match) {
+				return;
+			}
+		}
+		this.onAction();
+	}
+
+	/** Befehle, die nie den System-Tab zeigen lassen: Wechsel-Befehle der Tabs und die eingestellten Ausnahmen. */
+	private boolean isPeekIgnored(String message) {
+		String command = ChatTab.commandName(message);
+		for (String entry : this.config.peekIgnoredCommands.split("[,;\\s]+")) {
+			if (!entry.isBlank() && ChatTab.commandName(entry).equals(command)) {
+				return true;
+			}
+		}
+		for (ChatTab tab : this.configTabs) {
+			TabConfig tabConfig = tab.config();
+			if (tabConfig != null && tabConfig.switchCommand != null && !tabConfig.switchCommand.isBlank()
+					&& ChatTab.commandName(tabConfig.switchCommand).equals(command)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/** Neue System-Nachricht kurz nach einer Aktion → Ansicht in den System-Tab (ohne Kanalwechsel auf dem Server). */
+	private void maybePeek(Classification c) {
+		if (!this.config.peekSystem || c.channel() != null || c.player() != null) {
+			return;
+		}
+		long now = System.currentTimeMillis();
+		boolean peeking = this.peekReturnTab != null;
+		if (!peeking && now > this.actionUntil) {
+			return;
+		}
+		ChatTab system = null;
+		for (ChatTab tab : this.configTabs) {
+			if (tab.kind() == ChatTab.Kind.SYSTEM) {
+				system = tab;
+				break;
+			}
+		}
+		if (system == null) {
+			return;
+		}
+		if (!peeking) {
+			if (this.active == system || this.active == null) {
+				return; // du bist schon im System-Tab
+			}
+			this.peekReturnTab = this.active.name();
+			this.active = system;
+			this.pendingRefresh = true; // im nächsten Tick neu aufbauen – dann ist die neue Nachricht schon gespeichert
+		}
+		if (this.active == system) {
+			system.clearUnread();
+			this.peekUntil = now + this.config.peekSeconds * 1000L;
+		}
+	}
+
+	/** Nach Ablauf (und bei geschlossenem Chat) zurück in den vorherigen Tab. */
+	private void tickPeek(Minecraft minecraft) {
+		if (this.pendingRefresh) {
+			this.pendingRefresh = false;
+			this.refreshChat();
+		}
+		if (this.peekReturnTab == null || System.currentTimeMillis() < this.peekUntil
+				|| minecraft.gui.screen() instanceof net.minecraft.client.gui.screens.ChatScreen) {
+			return;
+		}
+		String name = this.peekReturnTab;
+		this.peekReturnTab = null;
+		for (ChatTab tab : this.tabs()) {
+			if (tab.name().equals(name)) {
+				this.active = tab;
+				tab.clearUnread();
+				this.refreshChat();
+				return;
+			}
+		}
+	}
+
 	// ---------------------------------------------------------------- Suche
 
 	/** Ein Suchtreffer: Nachricht, Text ohne Farben, Empfangszeit und der Tab, in den sie gehört. */
@@ -262,7 +376,8 @@ public final class ChatTabs {
 	 * Passiert nur bei geschlossenem Chat, damit dir beim Lesen nichts wegspringt.
 	 */
 	public void tick(Minecraft minecraft) {
-		if (!this.config.autoReturn || minecraft.player == null || this.active == null) {
+		this.tickPeek(minecraft);
+		if (!this.config.autoReturn || minecraft.player == null || this.active == null || this.peekReturnTab != null) {
 			return;
 		}
 		ChatTab target = this.defaultTabOrFirst();
@@ -312,6 +427,7 @@ public final class ChatTabs {
 	}
 
 	public void setActive(ChatTab tab) {
+		this.peekReturnTab = null;
 		this.lastActivity = System.currentTimeMillis();
 		tab.clearUnread();
 		if (this.active != tab) {
@@ -335,10 +451,15 @@ public final class ChatTabs {
 		if (minecraft.player == null || minecraft.getConnection() == null) {
 			return;
 		}
-		if (command.startsWith("/")) {
-			minecraft.getConnection().sendCommand(command.substring(1));
-		} else {
-			minecraft.getConnection().sendChat(command);
+		this.sendingOwnSwitch = true;
+		try {
+			if (command.startsWith("/")) {
+				minecraft.getConnection().sendCommand(command.substring(1));
+			} else {
+				minecraft.getConnection().sendChat(command);
+			}
+		} finally {
+			this.sendingOwnSwitch = false;
 		}
 		this.lastSwitchCommand = command;
 		this.lastSwitchTime = System.currentTimeMillis();
@@ -348,6 +469,9 @@ public final class ChatTabs {
 	public void onCommandSent(String message) {
 		this.lastOwnInput = System.currentTimeMillis();
 		this.lastActivity = this.lastOwnInput;
+		if (message.startsWith("/") && !this.sendingOwnSwitch && !this.isPeekIgnored(message)) {
+			this.onAction();
+		}
 		if (message.startsWith("/")) {
 			String command = ChatTab.commandName(message);
 			for (ChatTab tab : this.configTabs) {
@@ -537,6 +661,7 @@ public final class ChatTabs {
 			return;
 		}
 		ChatHistory.get().onMessage(message, this.captured.get(message));
+		this.maybePeek(c);
 		for (ChatTab tab : this.tabs()) {
 			if (tab != this.active && belongsTo(c, tab)) {
 				tab.addUnread();

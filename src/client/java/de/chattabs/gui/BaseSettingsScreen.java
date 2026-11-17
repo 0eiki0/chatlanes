@@ -80,6 +80,23 @@ abstract class BaseSettingsScreen extends Screen {
 			.withValues(de.chattabs.config.ChatTabsConfig.TimestampMode.values());
 	}
 
+	/** 45 → "45 s", 120 → "2 min", 90 → "1:30 min" */
+	static Component formatDuration(int seconds) {
+		if (seconds < 60) {
+			return Component.literal(seconds + " s");
+		}
+		int minutes = seconds / 60;
+		int rest = seconds % 60;
+		return Component.literal(rest == 0 ? minutes + " min" : minutes + ":" + String.format("%02d", rest) + " min");
+	}
+
+	/** 1.5 → "1,5 s" (Deutsch) bzw. "1.5 s" (Englisch) */
+	static Component secondsLabel(double value) {
+		java.text.DecimalFormatSymbols symbols = new java.text.DecimalFormatSymbols(java.util.Locale.ROOT);
+		symbols.setDecimalSeparator(net.minecraft.client.resources.language.I18n.get("chattabs.config.decimal_separator").charAt(0));
+		return Component.literal(new java.text.DecimalFormat("0.##", symbols).format(value) + " s");
+	}
+
 	/** Muss am Anfang jedes init() aufgerufen werden. */
 	protected void beginLayout(int maxWidth) {
 		this.labels.clear();

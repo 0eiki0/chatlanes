@@ -16,7 +16,7 @@ import org.jspecify.annotations.Nullable;
  * Erreichbar über die Taste K, den Befehl /chattabs, "Optionen" in der Tab-Leiste und Mod Menu.
  */
 public class ChatTabsConfigScreen extends BaseSettingsScreen {
-	private static final int LIST_TOP = TOP + ROW + 18;
+	private static final int LIST_TOP = TOP + ROW * 2 + 18;
 
 	/** Arbeitskopie – wird erst bei "Speichern" übernommen. */
 	final ChatTabsConfig working;
@@ -31,13 +31,16 @@ public class ChatTabsConfigScreen extends BaseSettingsScreen {
 	@Override
 	protected void init() {
 		this.beginLayout(380);
-		int third = (this.contentWidth - 8) / 3;
+		// Unterseiten: 2 × 2 Knöpfe
+		int half = this.halfWidth();
 		this.addRenderableWidget(Button.builder(t("general"), b -> this.minecraft.gui.setScreen(new GeneralSettingsScreen(this)))
-			.bounds(this.left, TOP, third, 20).build());
+			.bounds(this.left, TOP, half, 20).build());
 		this.addRenderableWidget(Button.builder(t("channels"), b -> this.minecraft.gui.setScreen(new ChannelHistoryScreen(this)))
-			.bounds(this.left + third + 4, TOP, third, 20).build());
+			.bounds(this.rightHalfX(), TOP, half, 20).build());
+		this.addRenderableWidget(Button.builder(t("automation"), b -> this.minecraft.gui.setScreen(new AutomationScreen(this)))
+			.bounds(this.left, TOP + ROW, half, 20).build());
 		this.addRenderableWidget(Button.builder(t("pm"), b -> this.minecraft.gui.setScreen(new PrivateMessagesScreen(this)))
-			.bounds(this.left + (third + 4) * 2, TOP, this.contentWidth - (third + 4) * 2, 20).build());
+			.bounds(this.rightHalfX(), TOP + ROW, half, 20).build());
 
 		this.label(t("tabs_header"), this.left, LIST_TOP - 11);
 
