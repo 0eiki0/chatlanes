@@ -334,7 +334,11 @@ public class ChatTabsConfig {
 	}
 
 	public static ChatTabsConfig load() {
-		Path path = file();
+		return load(file());
+	}
+
+	/** Lädt ein Profil aus einer Datei; fehlt sie, wird ein Standardprofil angelegt. */
+	public static ChatTabsConfig load(Path path) {
 		if (Files.exists(path)) {
 			try (Reader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {
 				ChatTabsConfig config = GSON.fromJson(reader, ChatTabsConfig.class);
@@ -348,12 +352,19 @@ public class ChatTabsConfig {
 		}
 
 		ChatTabsConfig config = createDefault();
-		config.save();
+		config.save(path);
 		return config;
 	}
 
+	public static Path standardFile() {
+		return file();
+	}
+
 	public void save() {
-		Path path = file();
+		this.save(file());
+	}
+
+	public void save(Path path) {
 		try {
 			Files.createDirectories(path.getParent());
 			try (Writer writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {

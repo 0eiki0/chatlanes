@@ -113,7 +113,7 @@ public final class ChatHistory {
 	}
 
 	/** Dateiname aus Serveradresse bzw. Weltname, z. B. "server_cubeside.de.jsonl". */
-	private static String serverKey(Minecraft minecraft) {
+	public static String serverKey(Minecraft minecraft) {
 		ServerData server = minecraft.getCurrentServer();
 		String key;
 		if (server != null && server.ip != null && !server.ip.isBlank()) {
@@ -130,7 +130,7 @@ public final class ChatHistory {
 		this.ops = connection.registryAccess().createSerializationContext(JsonOps.INSTANCE);
 		this.file = directory().resolve(serverKey(minecraft) + ".jsonl");
 		ChatTabs.get().setClosedPrivateTabs(this.loadClosedTabs());
-		if (!ChatTabs.get().config().saveHistory) {
+		if (!ChatTabs.get().config().saveHistory || !ChatTabs.get().isEnabled()) {
 			return;
 		}
 

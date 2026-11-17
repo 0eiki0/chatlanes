@@ -16,31 +16,52 @@ import org.jspecify.annotations.Nullable;
  * Erreichbar über die Taste K, den Befehl /chattabs, "Optionen" in der Tab-Leiste und Mod Menu.
  */
 public class ChatTabsConfigScreen extends BaseSettingsScreen {
-	private static final int LIST_TOP = TOP + ROW * 2 + 18;
+	private static final int LIST_TOP = TOP + ROW * 3 + 18;
 
 	/** Arbeitskopie – wird erst bei "Speichern" übernommen. */
 	final ChatTabsConfig working;
 	private int page;
 	private int rowsPerPage = 1;
 
+	/** Welches Profil bearbeitet wird (null = Standard-Profil). */
+	final @Nullable String profileKey;
+
+	/** Bearbeitet das Profil des aktuellen Servers. */
 	public ChatTabsConfigScreen(@Nullable Screen parent) {
-		super(Component.translatable("chattabs.config.title"), parent);
-		this.working = ChatTabs.get().config().copy();
+		this(parent, de.chattabs.ServerProfiles.activeKey());
+	}
+
+	/** Bearbeitet ein bestimmtes Profil (aus der Server-Liste). */
+	public ChatTabsConfigScreen(@Nullable Screen parent, @Nullable String profileKey) {
+		super(Component.translatable("chattabs.config.title_profile", de.chattabs.ServerProfiles.displayName(profileKey)), parent);
+		this.profileKey = profileKey;
+		this.working = java.util.Objects.equals(profileKey, de.chattabs.ServerProfiles.activeKey())
+			? ChatTabs.get().config().copy()
+			: de.chattabs.ServerProfiles.load(profileKey);
 	}
 
 	@Override
 	protected void init() {
 		this.beginLayout(380);
+		// Server-Profile (oben, ganze Breite)
+		boolean fromList = this.parent instanceof ServerProfilesScreen;
+		Button profiles = Button.builder(t("profiles.button", de.chattabs.ServerProfiles.displayName(this.profileKey)),
+				b -> this.minecraft.gui.setScreen(new ServerProfilesScreen(this)))
+			.bounds(this.left, TOP, this.contentWidth, 20).build();
+		profiles.active = !fromList;
+		profiles.setTooltip(net.minecraft.client.gui.components.Tooltip.create(t("profiles.button.tooltip")));
+		this.addRenderableWidget(profiles);
+
 		// Unterseiten: 2 × 2 Knöpfe
 		int half = this.halfWidth();
 		this.addRenderableWidget(Button.builder(t("general"), b -> this.minecraft.gui.setScreen(new GeneralSettingsScreen(this)))
-			.bounds(this.left, TOP, half, 20).build());
-		this.addRenderableWidget(Button.builder(t("channels"), b -> this.minecraft.gui.setScreen(new ChannelHistoryScreen(this)))
-			.bounds(this.rightHalfX(), TOP, half, 20).build());
-		this.addRenderableWidget(Button.builder(t("automation"), b -> this.minecraft.gui.setScreen(new AutomationScreen(this)))
 			.bounds(this.left, TOP + ROW, half, 20).build());
-		this.addRenderableWidget(Button.builder(t("pm"), b -> this.minecraft.gui.setScreen(new PrivateMessagesScreen(this)))
+		this.addRenderableWidget(Button.builder(t("channels"), b -> this.minecraft.gui.setScreen(new ChannelHistoryScreen(this)))
 			.bounds(this.rightHalfX(), TOP + ROW, half, 20).build());
+		this.addRenderableWidget(Button.builder(t("automation"), b -> this.minecraft.gui.setScreen(new AutomationScreen(this)))
+			.bounds(this.left, TOP + ROW * 2, half, 20).build());
+		this.addRenderableWidget(Button.builder(t("pm"), b -> this.minecraft.gui.setScreen(new PrivateMessagesScreen(this)))
+			.bounds(this.rightHalfX(), TOP + ROW * 2, half, 20).build());
 
 		this.label(t("tabs_header"), this.left, LIST_TOP - 11);
 
@@ -141,8 +162,7 @@ public class ChatTabsConfigScreen extends BaseSettingsScreen {
 	}
 
 	private void saveAndClose() {
-		ChatTabs.get().apply(this.working.copy());
-		ChatTabs.get().config().save();
+		de.chattabs.ServerProfiles.save(this.profileKey, this.working.copy());
 		this.onClose();
 	}
 
@@ -163,6 +183,15 @@ public class ChatTabsConfigScreen extends BaseSettingsScreen {
 	@Override
 	public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
 		super.extractRenderState(graphics, mouseX, mouseY, a);
+
+		// Hinweis, wenn Chat Tabs für diesen Server ausgeschaltet ist
+		if (this.profileKey != null) {
+			var entry = de.chattabs.ServerProfiles.list().servers.get(this.profileKey);
+			if (entry != null && !entry.enabled) {
+				Component note = t("profiles.disabled_note");
+				graphics.text(this.font, note, this.left + this.contentWidth - this.font.width(note), LIST_TOP - 11, ERROR_COLOR);
+			}
+		}
 
 		int start = this.page * this.rowsPerPage;
 		int end = Math.min(this.working.tabs.size(), start + this.rowsPerPage);

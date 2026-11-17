@@ -18,6 +18,13 @@ Die `chattabs-<version>.jar` in den `mods`-Ordner legen. Benötigt **Fabric Load
 - Wählst du einen Kanal-Tab aus, wechselt die Mod auch auf dem Server in diesen Kanal (Global → `/ch global`, Handel → `/ch handel`; pro Tab einstellbar).
 - Die Nachrichten aller Tabs werden pro Server gespeichert und beim nächsten Betreten wieder in die richtigen Tabs geladen (abschaltbar).
 
+## Server-Profile
+- Jeder Server bekommt beim ersten Betreten automatisch ein **eigenes Profil** (Tabs, Kanäle und alle Einstellungen) – als Kopie des **Standard-Profils**. Das Standard-Profil gilt im Einzelspieler und ist die Vorlage für neue Server.
+- Unter **Server-Profile …** (oben im Menü) siehst du alle bekannten Server: Chat Tabs pro Server **an/aus**, Profil bearbeiten, auf Standard zurücksetzen (↺) oder entfernen (✕).
+- **Auf neuen Servern:** einstellbar, ob Chat Tabs auf einem unbekannten Server an oder aus ist. Aus = der Chat sieht aus wie in normalem Minecraft.
+- Sprache und Update-Prüfung gelten für alle Profile gemeinsam.
+- Gespeichert in `config/chattabs/servers.json` und `config/chattabs/profiles/`.
+
 ## Einstellungsmenü
 Öffnen über **eine** dieser Möglichkeiten:
 - Taste **K** (änderbar unter *Optionen → Steuerung → Chat Tabs*)

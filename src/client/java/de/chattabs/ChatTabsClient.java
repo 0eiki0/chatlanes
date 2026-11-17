@@ -38,11 +38,16 @@ public class ChatTabsClient implements ClientModInitializer {
 
 		// Gespeicherten Verlauf beim Betreten eines Servers wiederherstellen
 		ClientPlayConnectionEvents.JOIN.register((connection, sender, minecraft) -> {
+			// Erst das Profil des Servers laden (neue Server bekommen eins), dann alles Weitere
+			ServerProfiles.onJoin(minecraft);
 			ChatTabs.get().resetServerChannel();
 			ChatHistory.get().onJoin(connection, minecraft);
 			UpdateChecker.onJoin(minecraft);
 		});
-		ClientPlayConnectionEvents.DISCONNECT.register((connection, minecraft) -> ChatHistory.get().onDisconnect());
+		ClientPlayConnectionEvents.DISCONNECT.register((connection, minecraft) -> {
+			ChatHistory.get().onDisconnect();
+			minecraft.execute(ServerProfiles::onDisconnect);
+		});
 
 		ClientTickEvents.END_CLIENT_TICK.register(minecraft -> {
 			while (openSettings.consumeClick()) {

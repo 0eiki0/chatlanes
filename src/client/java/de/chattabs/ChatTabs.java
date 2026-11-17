@@ -86,6 +86,30 @@ public final class ChatTabs {
 		}
 	}
 
+	/** Ist Chat Tabs gerade aktiv? (aus = Chat wie in normalem Minecraft) */
+	private boolean enabled = true;
+
+	public boolean isEnabled() {
+		return this.enabled;
+	}
+
+	/** An/Aus für den aktuellen Server – baut den sichtbaren Chat sofort neu auf. */
+	public void setEnabled(boolean enabled) {
+		if (this.enabled != enabled) {
+			this.enabled = enabled;
+			this.peekReturnTab = null;
+			this.refreshChat();
+		}
+	}
+
+	/** Profil wechseln (anderer Server): Tabs neu, Standard-Tab des Profils wählen. */
+	public void applyProfile(ChatTabsConfig newConfig, boolean enabled) {
+		this.enabled = enabled;
+		this.active = null;
+		this.peekReturnTab = null;
+		this.apply(newConfig);
+	}
+
 	/** Übernimmt eine (neue) Konfiguration und baut die Tabs neu auf. */
 	public void apply(ChatTabsConfig newConfig) {
 		String activeName = this.active == null ? null : this.active.name();
@@ -156,6 +180,9 @@ public final class ChatTabs {
 
 	/** Eine eigene Aktion (Befehl oder Block-Klick) – Antworten darauf dürfen kurz den System-Tab zeigen. */
 	public void onAction() {
+		if (!this.enabled) {
+			return;
+		}
 		if (this.config.peekSystem) {
 			this.actionUntil = System.currentTimeMillis() + Math.round(this.config.peekReaction * 1000.0);
 		}
@@ -376,6 +403,9 @@ public final class ChatTabs {
 	 * Passiert nur bei geschlossenem Chat, damit dir beim Lesen nichts wegspringt.
 	 */
 	public void tick(Minecraft minecraft) {
+		if (!this.enabled) {
+			return;
+		}
 		this.tickPeek(minecraft);
 		if (!this.config.autoReturn || minecraft.player == null || this.active == null || this.peekReturnTab != null) {
 			return;
@@ -394,7 +424,7 @@ public final class ChatTabs {
 	 * (z. B. direkt nach dem Login im Standard-Tab).
 	 */
 	public void ensureServerChannel() {
-		if (this.active != null) {
+		if (this.enabled && this.active != null) {
 			this.switchServerChannel(this.active);
 		}
 	}
@@ -467,6 +497,9 @@ public final class ChatTabs {
 
 	/** Merkt sich von Hand eingegebene Kanalwechsel, damit der nächste Tab-Klick wieder korrekt wechselt. */
 	public void onCommandSent(String message) {
+		if (!this.enabled) {
+			return;
+		}
 		this.lastOwnInput = System.currentTimeMillis();
 		this.lastActivity = this.lastOwnInput;
 		if (message.startsWith("/") && !this.sendingOwnSwitch && !this.isPeekIgnored(message)) {
@@ -504,6 +537,9 @@ public final class ChatTabs {
 
 	/** Server-Bestätigung eines automatischen Kanalwechsels ausblenden? */
 	public boolean shouldHide(net.minecraft.network.chat.Component message) {
+		if (!this.enabled) {
+			return false;
+		}
 		String regex = this.config.hideSwitchConfirmation;
 		if (regex == null || regex.isBlank() || System.currentTimeMillis() - this.lastSwitchTime > 3000L) {
 			return false;
@@ -642,6 +678,9 @@ public final class ChatTabs {
 
 	/** Soll die Nachricht im aktuell gewählten Tab angezeigt werden? */
 	public boolean isVisible(GuiMessage message) {
+		if (!this.enabled) {
+			return true;
+		}
 		Classification c = this.classify(message);
 		if (this.active == null) {
 			return true;
@@ -651,6 +690,9 @@ public final class ChatTabs {
 
 	/** Wird für jede neu empfangene Nachricht aufgerufen und zählt ungelesene Nachrichten. */
 	public void onNewMessage(GuiMessage message) {
+		if (!this.enabled) {
+			return;
+		}
 		Classification c = this.classify(message);
 		this.reopenIfNewer(c, ChatHistory.get().isRestoring() ? ChatHistory.get().restoreTime() : System.currentTimeMillis());
 		if (ChatHistory.get().isRestoring()) {
@@ -774,6 +816,9 @@ public final class ChatTabs {
 
 	/** Uhrzeit-Präfix für diese Nachricht oder null, wenn für ihren Tab keine Uhrzeit angezeigt wird. */
 	public net.minecraft.network.chat.@Nullable Component timestampFor(GuiMessage message) {
+		if (!this.enabled) {
+			return null;
+		}
 		Classification c = this.classify(message);
 		if (c.everywhere()) {
 			return null;
@@ -824,6 +869,9 @@ public final class ChatTabs {
 
 	/** Liefert den zu sendenden Text für den aktiven Tab oder null, wenn die Nachricht unverändert gesendet wird. */
 	public @Nullable String transformOutgoing(String message) {
+		if (!this.enabled) {
+			return null;
+		}
 		if (this.active == null) {
 			return null;
 		}

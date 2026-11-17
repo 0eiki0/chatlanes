@@ -168,6 +168,9 @@ public final class TabBar {
 
 	public static void render(GuiGraphicsExtractor graphics, Font font, boolean focused, int mouseX, int mouseY) {
 		Minecraft minecraft = Minecraft.getInstance();
+		if (!ChatTabs.get().isEnabled()) {
+			return;
+		}
 		if (minecraft.options.chatVisibility().get() == net.minecraft.world.entity.player.ChatVisiblity.HIDDEN || !shouldRender(focused)) {
 			return;
 		}
@@ -221,6 +224,9 @@ public final class TabBar {
 	/** @return true, wenn der Klick von der Tab-Leiste verarbeitet wurde. */
 	public static boolean mouseClicked(Screen screen, double mouseX, double mouseY, int button) {
 		Minecraft minecraft = Minecraft.getInstance();
+		if (!ChatTabs.get().isEnabled()) {
+			return false;
+		}
 		if (minecraft.options.chatVisibility().get() == net.minecraft.world.entity.player.ChatVisiblity.HIDDEN) {
 			return false;
 		}
