@@ -7,6 +7,7 @@
 		"ChatComponentMixin",
 		"ChatScreenMixin",
 		"ClientLanguageMixin",
+		"ClientPacketListenerMixin",
 		"ConnectionMixin"
 	],
 	"injectors": {

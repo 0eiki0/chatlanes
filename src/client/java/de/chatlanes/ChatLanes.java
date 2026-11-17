@@ -203,6 +203,29 @@ public final class ChatLanes {
 		return this.replayOriginal.getOrDefault(message, message);
 	}
 
+	/**
+	 * Du hast selbst etwas geschrieben (Chatfeld) – zählt für "automatisch zurück".
+	 * Befehle, die im Hintergrund von anderen Mods gesendet werden, setzen den Timer nicht mehr zurück.
+	 */
+	public void onUserInput(String message) {
+		if (!this.enabled) {
+			return;
+		}
+		this.lastActivity = System.currentTimeMillis();
+		this.lastOwnInput = this.lastActivity;
+		this.onCommandIntent(message);
+	}
+
+	/**
+	 * Ein Befehl wird ausgeführt – egal ob als Paket an den Server, als Client-Befehl einer anderen Mod
+	 * oder per Makro. Antworten darauf dürfen kurz den System-Tab zeigen.
+	 */
+	public void onCommandIntent(String message) {
+		if (this.enabled && message.startsWith("/") && !this.sendingOwnSwitch && !this.isPeekIgnored(message)) {
+			this.onAction();
+		}
+	}
+
 	/** Eine eigene Aktion (Befehl oder Block-Klick) – Antworten darauf dürfen kurz den System-Tab zeigen. */
 	public void onAction() {
 		if (!this.enabled) {
@@ -306,13 +329,21 @@ public final class ChatLanes {
 			}
 		}
 		this.missedDuringPeek.clear();
+		ChatTab target = null;
 		for (ChatTab tab : this.tabs()) {
 			if (tab.name().equals(name)) {
-				this.active = tab;
-				tab.clearUnread();
-				this.refreshChat();
-				return;
+				target = tab;
+				break;
 			}
+		}
+		if (target == null) {
+			// z. B. Msg-Tab wurde inzwischen geschlossen → in den Standard-Tab
+			target = this.defaultTabOrFirst();
+		}
+		if (target != null) {
+			this.active = target;
+			target.clearUnread();
+			this.refreshChat();
 		}
 	}
 
@@ -447,6 +478,8 @@ public final class ChatLanes {
 			return;
 		}
 		if (System.currentTimeMillis() - this.lastActivity >= this.config.autoReturnSeconds * 1000L) {
+			// Der Server kann den Kanal inzwischen selbst geändert haben → Wechsel-Befehl auf jeden Fall senden
+			this.lastSwitchCommand = null;
 			this.setActive(target);
 		}
 	}
@@ -534,10 +567,7 @@ public final class ChatLanes {
 			return;
 		}
 		this.lastOwnInput = System.currentTimeMillis();
-		this.lastActivity = this.lastOwnInput;
-		if (message.startsWith("/") && !this.sendingOwnSwitch && !this.isPeekIgnored(message)) {
-			this.onAction();
-		}
+		this.onCommandIntent(message);
 		if (message.startsWith("/")) {
 			String command = ChatTab.commandName(message);
 			for (ChatTab tab : this.configTabs) {

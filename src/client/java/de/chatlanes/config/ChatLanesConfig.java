@@ -85,7 +85,9 @@ public class ChatLanesConfig {
 	/** So lange bleibt die Ansicht im System-Tab (verlängert sich bei weiteren System-Nachrichten). */
 	public int peekSeconds = 15;
 	/** So lange nach der Aktion zählt eine System-Nachricht als "Antwort" darauf. */
-	public double peekReaction = 1.5;
+	public double peekReaction = 3.0;
+	/** Version des Config-Formats (für einmalige Anpassungen beim Update). */
+	public int configVersion;
 	/** Beim Zurückspringen die verpassten Nachrichten des Tabs noch einmal einblenden (wie neu angekommen). */
 	public boolean peekReplay = true;
 	/** Auch Block-Klicks (z. B. LogBlock-Abfragen) gelten als Aktion. */
@@ -292,6 +294,11 @@ public class ChatLanesConfig {
 		if (this.peekItems == null) this.peekItems = "";
 		if (this.peekIgnoredCommands == null) this.peekIgnoredCommands = "";
 		this.peekSeconds = Math.max(2, Math.min(600, this.peekSeconds));
+		// Alter Standard 1,5 s war für langsame Befehle (Datenbank-Abfragen, LogBlock) zu kurz – einmalig anheben
+		if (this.configVersion < 2) {
+			if (this.peekReaction == 1.5) this.peekReaction = 3.0;
+			this.configVersion = 2;
+		}
 		this.peekReaction = Math.max(0.2, Math.min(10.0, this.peekReaction));
 		this.autoReturnSeconds = Math.max(5, Math.min(3600, this.autoReturnSeconds));
 		if (this.maxHistory < 100) this.maxHistory = 100;

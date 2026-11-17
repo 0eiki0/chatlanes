@@ -75,7 +75,7 @@ class AutomationScreen extends BaseSettingsScreen {
 			.create(this.left, y, half, 20, t("peek.time"), (b, v) -> this.working.peekSeconds = v);
 		peekTime.setTooltip(Tooltip.create(t("peek.time.tooltip")));
 		this.addRenderableWidget(peekTime);
-		TreeSet<Double> reaction = new TreeSet<>(List.of(0.5, 1.0, 1.5, 2.0, 3.0, 5.0));
+		TreeSet<Double> reaction = new TreeSet<>(List.of(0.5, 1.0, 1.5, 2.0, 3.0, 4.0, 5.0, 8.0, 10.0));
 		reaction.add(this.working.peekReaction);
 		CycleButton<Double> reactionTime = CycleButton.<Double>builder(BaseSettingsScreen::secondsLabel, this.working.peekReaction)
 			.withValues(List.copyOf(reaction))

@@ -22,6 +22,12 @@ public abstract class ChatScreenMixin {
 		}
 	}
 
+	/** Im Chatfeld getippt (auch Client-Befehle anderer Mods, die nie an den Server gehen). */
+	@Inject(method = "handleChatInput", at = @At("HEAD"))
+	private void chatlanes$userInput(String message, boolean addToRecent, org.spongepowered.asm.mixin.injection.callback.CallbackInfo ci) {
+		ChatLanes.get().onUserInput(message.trim());
+	}
+
 	/** Strg+F im Chat öffnet die Suche. */
 	@Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true)
 	private void chatlanes$searchShortcut(net.minecraft.client.input.KeyEvent event, CallbackInfoReturnable<Boolean> cir) {
