@@ -54,6 +54,11 @@ public final class ChatHistory {
 	/** Zeitstempel der gerade wiederhergestellten Nachricht. */
 	private long restoreTime;
 	private boolean restoredThisSession;
+	/**
+	 * Netzwerkverbindung, für die der Verlauf schon geladen wurde. Ein Proxy (Velocity/BungeeCord) behält beim
+	 * Serverwechsel dieselbe Verbindung, Minecraft baut aber eine neue Spielsitzung auf (JOIN feuert erneut).
+	 */
+	private java.lang.ref.WeakReference<net.minecraft.network.Connection> restoredConnection = new java.lang.ref.WeakReference<>(null);
 	private int linesInFile;
 
 	private ChatHistory() {
@@ -134,11 +139,13 @@ public final class ChatHistory {
 			return;
 		}
 
-		if (this.restoredThisSession) {
-			// z. B. Server-Transfer: Minecraft hat den Chat selbst übernommen, nicht doppelt einfügen.
+		net.minecraft.network.Connection network = connection.getConnection();
+		if (this.restoredThisSession || this.restoredConnection.get() == network) {
+			// z. B. Server-Transfer oder Serverwechsel hinter einem Proxy: nur beim echten Betreten laden.
 			return;
 		}
 		this.restoredThisSession = true;
+		this.restoredConnection = new java.lang.ref.WeakReference<>(network);
 		// Direkt lesen (die Datei ist auf maxHistory Zeilen begrenzt), damit der alte Verlauf VOR den neuen Nachrichten steht.
 		List<String> lines = readLastLines(this.file, ChatLanes.get().config().maxHistory);
 		this.linesInFile = lines.size();
