@@ -981,7 +981,8 @@ public final class ChatLanes {
 			}
 		}
 		net.minecraft.network.chat.Component prefix = this.timestampFor(message);
-		return prefix == null ? content : prefix.copy().append(content);
+		// Nebeneinander in einen leeren Container, sonst erbt die Nachricht das Grau der Uhrzeit.
+		return prefix == null ? content : net.minecraft.network.chat.Component.empty().append(prefix).append(content);
 	}
 
 	/** Uhrzeit-Präfix für diese Nachricht oder null, wenn für ihren Tab keine Uhrzeit angezeigt wird. */
