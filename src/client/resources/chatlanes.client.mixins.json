@@ -5,10 +5,12 @@
 	"client": [
 		"ChatComponentAccessor",
 		"ChatComponentMixin",
+		"ChatScreenAccessor",
 		"ChatScreenMixin",
 		"ClientLanguageMixin",
 		"ClientPacketListenerMixin",
-		"ConnectionMixin"
+		"ConnectionMixin",
+		"MouseHandlerAccessor"
 	],
 	"injectors": {
 		"defaultRequire": 1

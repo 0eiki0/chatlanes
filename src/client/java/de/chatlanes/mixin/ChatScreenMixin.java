@@ -17,7 +17,31 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class ChatScreenMixin {
 	@Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true)
 	private void chatlanes$clickTab(MouseButtonEvent event, boolean doubleClick, CallbackInfoReturnable<Boolean> cir) {
-		if (TabBar.mouseClicked((ChatScreen) (Object) this, event.x(), event.y(), event.button())) {
+		ChatScreen screen = (ChatScreen) (Object) this;
+		if (TabBar.mouseClicked(screen, event.x(), event.y(), event.button())) {
+			cir.setReturnValue(true);
+			return;
+		}
+		// Rechtsklick auf eine Nachricht (im Chat oder in einem Fenster): Filter erstellen
+		if (event.button() == com.mojang.blaze3d.platform.InputConstants.MOUSE_BUTTON_RIGHT && ChatLanes.get().isEnabled()) {
+			net.minecraft.client.multiplayer.chat.GuiMessage message = de.chatlanes.ChatWindows.get().isOverWindow(event.x(), event.y())
+				? de.chatlanes.ChatWindows.get().messageAt(event.x(), event.y())
+				: TabBar.messageAt(screen.height, event.x(), event.y());
+			if (message != null) {
+				net.minecraft.client.Minecraft.getInstance().gui.setScreen(new de.chatlanes.gui.FilterScreen(screen, message));
+				cir.setReturnValue(true);
+				return;
+			}
+		}
+		if (de.chatlanes.ChatWindows.get().mouseClicked(screen, event.x(), event.y(), event.button(), event.hasShiftDown())) {
+			cir.setReturnValue(true);
+		}
+	}
+
+	/** Mausrad über einem eigenen Chatfenster scrollt nur dieses Fenster. */
+	@Inject(method = "mouseScrolled", at = @At("HEAD"), cancellable = true)
+	private void chatlanes$scrollWindow(double x, double y, double scrollX, double scrollY, CallbackInfoReturnable<Boolean> cir) {
+		if (scrollY != 0 && de.chatlanes.ChatWindows.get().mouseScrolled(x, y, scrollY)) {
 			cir.setReturnValue(true);
 		}
 	}

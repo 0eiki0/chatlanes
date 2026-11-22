@@ -21,6 +21,21 @@ Die `chatlanes-<version>.jar` in den `mods`-Ordner legen. Benötigt **Fabric Loa
 - Wählst du einen Kanal-Tab aus, wechselt die Mod auch auf dem Server in diesen Kanal (Global → `/ch global`, Handel → `/ch handel`; pro Tab einstellbar).
 - Die Nachrichten aller Tabs werden pro Server gespeichert und beim nächsten Betreten wieder in die richtigen Tabs geladen (abschaltbar).
 
+## Eigene Chatfenster und Filter
+Neben den Tabs kann ChatLanes Nachrichten in **eigene Chatfenster** legen, die ständig sichtbar sind, z. B. ein kleines Fenster nur für Join/Leave-Nachrichten oder für Ankündigungen wie „[Advent 2026] Der Cubeside Weihnachtsmarkt hat geöffnet!“. Der Hauptchat bleibt dadurch übersichtlich.
+
+- **Filter erstellen:** Im offenen Chat (T) mit **Rechtsklick** auf eine Nachricht klicken, im normalen Chat oder in einem Fenster.
+  - *Vorlage*: **Ganze Nachricht** (z. B. nur, wenn Max_Mustermann „Hallo Welt!“ schreibt), **Ohne Absender** (der Text, egal von wem) oder **Nur Kennung** (alles mit z. B. `[Advent 2026]` am Anfang). Den Text kannst du danach noch anpassen, auch als Regex.
+  - *Ziel*: **Neues Fenster**, **neuer Tab** oder ein bestehendes Fenster bzw. ein bestehender Kanal-Tab.
+  - **Auch im normalen Chat anzeigen**: Aus = die Nachricht wird ins Fenster *verschoben*, An = sie erscheint zusätzlich dort, wo sie sonst landen würde.
+  - Vorschau: wie viele Nachrichten im Verlauf schon passen.
+  - Filter von Fenstern gelten für **jede** Nachricht, auch für Kanal-Nachrichten wie `[G]`, und haben Vorrang. Filter von Tabs gelten wie die „Zusätzlichen Nachrichten“ nur für Nachrichten, die sonst im System-Tab landen würden.
+- **Fenster verschieben und Größe ändern:** Bei offenem Chat das Fenster an der **Titelleiste** ziehen, an der **Ecke unten rechts** die Größe ändern. Das Mausrad über einem Fenster scrollt nur dieses Fenster. Position und Größe werden pro Server-Profil gespeichert und passen sich der Fenstergröße und GUI-Skalierung an.
+- **Jeder Kanal-Tab und jeder „Alle“-Tab kann ein Fenster sein:** *Tab bearbeiten → Anzeige: Eigenes Fenster*. Ein Fenster vom Typ **Alle** ist der komplette Chatverlauf in der Original-Reihenfolge, also quasi der Vanilla-Chat zum Nachkontrollieren.
+- **Fenster …** (im Tab-Editor): **Textgröße**, **Hintergrund-Deckkraft**, **Anzeige bei geschlossenem Chat** (wie der Chat ausblenden, immer sichtbar, nur bei offenem Chat oder eine feste Zeit), *Auch im normalen Chat anzeigen*, *Position zurücksetzen*.
+- Beliebig viele Fenster. Links und Befehle in Nachrichten lassen sich in Fenstern genauso anklicken wie im Chat, und die Suche (Strg+F) springt auch zu Nachrichten in Fenstern.
+- Filter bearbeiten oder löschen: *Tab bearbeiten → Zusätzliche Nachrichten*.
+
 ## Server-Profile
 - Jeder Server bekommt beim ersten Betreten automatisch ein **eigenes Profil** (Tabs, Kanäle und alle Einstellungen) – als Kopie des **Standard-Profils**. Das Standard-Profil gilt im Einzelspieler und ist die Vorlage für neue Server.
 - Unter **Server-Profile …** (oben im Menü) siehst du alle bekannten Server: ChatLanes pro Server **an/aus**, Profil bearbeiten, auf Standard zurücksetzen (↺) oder entfernen (✕).
@@ -38,7 +53,7 @@ Die `chatlanes-<version>.jar` in den `mods`-Ordner legen. Benötigt **Fabric Loa
 Im Menü:
 - **Tabs**: hinzufügen, bearbeiten, verschieben (↑/↓), löschen
 - **Anordnen**: Tabs per Drag & Drop sortieren und auf eine **obere** (über dem Chat) und **untere Leiste** (über dem Eingabefeld) verteilen – auch die Msg-Tabs; pro Leiste einstellbar, ob sie bei geschlossenem Chat immer, nur bei Ungelesenem oder gar nicht angezeigt wird
-- **Tab bearbeiten**: Name, Uhrzeit (Standard/An/Aus), Typ (System / Kanal / Alle), Erkennung, Wechsel-Befehl, Sende-Präfix, Blinken, Zähler „(3)“ an/aus, Farbe, **Ton mit Lautstärke** (rund 20 Töne, ▶ zum Probehören), **Zusätzliche Nachrichten** (eigene Regeln, mit denen Nachrichten, die sonst im System-Tab landen, in diesen Kanal kommen – per Kennung, Text, Regex oder **Befehl-Ausgabe**, z. B. die komplette Ausgabe von `/where`, Zeitfenster pro Befehl einstellbar (0,1–60 s), funktioniert auch mit Makro-Mods; optional zusätzlich in System) und ein **Live-Test** („✔ Landet im Tab …“)
+- **Tab bearbeiten**: Name, Uhrzeit (Standard/An/Aus), Typ (System / Kanal / Alle), Erkennung, Wechsel-Befehl, Sende-Präfix, **Anzeige in der Tab-Leiste oder als eigenes Fenster** (siehe oben), Blinken, Zähler „(3)“ an/aus, Farbe, **Ton mit Lautstärke** (rund 20 Töne, ▶ zum Probehören), **Zusätzliche Nachrichten** (eigene Regeln, mit denen Nachrichten, die sonst im System-Tab landen, in diesen Kanal kommen – per Kennung, Text, Regex oder **Befehl-Ausgabe**, z. B. die komplette Ausgabe von `/where`, Zeitfenster pro Befehl einstellbar (0,1–60 s), funktioniert auch mit Makro-Mods; optional zusätzlich in System) und ein **Live-Test** („✔ Landet im Tab …“)
   - *Kennung*: einfach z. B. `[G]` eintragen – Server-Präfixe wie `[Freebuild]` davor werden übersprungen
   - *Enthält Text*: alle Nachrichten mit diesem Text
   - *Regex*: regulärer Ausdruck für Profis

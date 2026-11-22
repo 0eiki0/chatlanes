@@ -138,6 +138,14 @@ public final class ServerProfiles {
 		return config;
 	}
 
+	/**
+	 * Speichert das gerade aktive Profil so, wie es im Spiel gerade ist (z. B. nach dem Verschieben
+	 * eines Chatfensters) – ohne die Tabs neu aufzubauen.
+	 */
+	public static void saveActiveQuietly() {
+		ChatLanes.get().config().save(profileFile(activeKey));
+	}
+
 	/** Speichert ein Profil; ist es das aktive, wird es sofort übernommen. */
 	public static void save(@Nullable String key, ChatLanesConfig config) {
 		config.save(profileFile(key));
