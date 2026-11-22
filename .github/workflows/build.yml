@@ -9,6 +9,10 @@ name: Build
 on:
   push:
     branches: ["**"]
+    # Reine Wiki-Änderungen brauchen keinen Build und kein neues Release
+    paths-ignore:
+      - "wiki/**"
+      - ".github/workflows/wiki.yml"
   pull_request:
   workflow_dispatch:
 

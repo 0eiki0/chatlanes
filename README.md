@@ -4,6 +4,8 @@
 
 [![Build](https://github.com/0eiki0/chatlanes/actions/workflows/build.yml/badge.svg)](https://github.com/0eiki0/chatlanes/actions/workflows/build.yml)
 
+📖 **[Wiki mit Anleitung und Bildern (Deutsch / English)](https://github.com/0eiki0/chatlanes/wiki)**
+
 Teilt den Chat in Tabs auf: **System** (alles Übrige), Kanäle wie **Global** (`[G]`) / **Handel** (`[H]`) und automatisch ein **Msg-Tab pro Spieler** (`@Name`).
 Läuft auch zusammen mit der CubesideMod.
 
