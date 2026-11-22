@@ -132,5 +132,13 @@ public abstract class ChatComponentMixin {
 		GuiGraphicsExtractor graphics, Font font, int ticks, int mouseX, int mouseY, ChatComponent.DisplayMode displayMode, boolean changeCursor, CallbackInfo ci
 	) {
 		TabBar.render(graphics, font, displayMode.foreground, mouseX, mouseY);
+		// Eigene Fenster zuletzt, damit sie über dem Chat (und dessen Hintergrund) liegen
+		de.chatlanes.ChatWindows.get().render(graphics, font, displayMode.foreground, mouseX, mouseY);
+	}
+
+	/** Der Chat baut seine Zeilen neu auf (z. B. nach Sprach- oder Schriftwechsel) → eigene Fenster ebenfalls. */
+	@Inject(method = "refreshTrimmedMessages", at = @At("HEAD"))
+	private void chatlanes$refreshWindows(CallbackInfo ci) {
+		de.chatlanes.ChatWindows.get().onChatRefresh();
 	}
 }

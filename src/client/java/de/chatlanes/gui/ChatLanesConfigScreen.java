@@ -223,10 +223,17 @@ public class ChatLanesConfigScreen extends BaseSettingsScreen {
 
 	/** Kurzbeschreibung eines Tabs für die Liste, z. B. "Kanal · [G]". */
 	private static Component describe(TabConfig tab) {
+		Component base = describeType(tab);
+		return tab.isWindow() ? Component.empty().append(base).append(" · ").append(t("describe.window")) : base;
+	}
+
+	private static Component describeType(TabConfig tab) {
 		return switch (tab.type) {
 			case SYSTEM -> t("describe.system");
 			case ALL -> t("describe.all");
-			case CHANNEL -> tab.pattern.isEmpty()
+			case CHANNEL -> tab.pattern.isEmpty() && !tab.extraRulesOrEmpty().isEmpty()
+				? t("describe.filters", tab.extraRulesOrEmpty().size())
+				: tab.pattern.isEmpty()
 				? t("describe.channel_empty")
 				: t("describe.channel", tab.match == TabConfig.Match.REGEX ? t("describe.regex") : Component.literal(tab.pattern))
 					.append(tab.extraRulesOrEmpty().isEmpty() ? Component.empty() : Component.literal(" +" + tab.extraRulesOrEmpty().size()))

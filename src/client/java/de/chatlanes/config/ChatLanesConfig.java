@@ -217,6 +217,23 @@ public class ChatLanesConfig {
 		/** In welcher Leiste der Tab steht (oben über dem Chat / unten über dem Eingabefeld; fehlt = wie unter Allgemein). */
 		public Position row;
 
+		/** Tab als eigenes, frei verschiebbares Chatfenster anzeigen (statt in der Tab-Leiste). Nur Kanal und Alle. */
+		public boolean window = false;
+		/** Position, Größe und Aussehen des Fensters (fehlt = Standard). */
+		public WindowLayout windowLayout;
+
+		/** Wird dieser Tab als eigenes Fenster angezeigt? (System-Tabs bleiben immer in der Leiste) */
+		public boolean isWindow() {
+			return this.window && this.type != Type.SYSTEM;
+		}
+
+		public WindowLayout windowLayoutOrDefault() {
+			if (this.windowLayout == null) {
+				this.windowLayout = new WindowLayout();
+			}
+			return this.windowLayout;
+		}
+
 		/** Uhrzeit vor Nachrichten dieses Tabs (fehlt = wie unter Allgemein). */
 		public TimestampMode timestamps;
 
@@ -279,7 +296,62 @@ public class ChatLanesConfig {
 				copy.extraRules.add(rule.copy());
 			}
 			copy.volume = this.volume;
+			copy.window = this.window;
+			copy.windowLayout = this.windowLayout == null ? null : this.windowLayout.copy();
 			return copy;
+		}
+	}
+
+	/**
+	 * Ein eigenes Chatfenster: Position und Größe als Anteil der Bildschirmgröße (0–1), damit es
+	 * bei jeder Fenstergröße und GUI-Skalierung an derselben Stelle sitzt.
+	 */
+	public static class WindowLayout {
+		/** Anzeige bei geschlossenem Chat: Sonderwerte für {@link #displaySeconds}. */
+		public static final int ALWAYS = 0;
+		public static final int FOCUSED_ONLY = -1;
+
+		public double x = 0.62;
+		public double y = 0.04;
+		public double width = 0.36;
+		public double height = 0.24;
+		/** Textgröße in Prozent (fehlt = wie die Chat-Textgröße von Minecraft). */
+		public Integer textScale;
+		/** Deckkraft des Hintergrunds in Prozent (fehlt = wie der Chat). */
+		public Integer opacity;
+		/**
+		 * Bei geschlossenem Chat: fehlt = ausblenden wie der Chat (Aussehen), 0 = immer sichtbar,
+		 * -1 = nur bei offenem Chat, sonst nach so vielen Sekunden ausblenden.
+		 */
+		public Integer displaySeconds;
+		/**
+		 * Nachrichten dieses Fensters zusätzlich dort zeigen, wo sie ohne das Fenster landen würden
+		 * (z. B. im Global- oder System-Tab). Aus = sie werden ins Fenster verschoben.
+		 */
+		public boolean alsoInMain = false;
+
+		public WindowLayout copy() {
+			WindowLayout copy = new WindowLayout();
+			copy.x = this.x;
+			copy.y = this.y;
+			copy.width = this.width;
+			copy.height = this.height;
+			copy.textScale = this.textScale;
+			copy.opacity = this.opacity;
+			copy.displaySeconds = this.displaySeconds;
+			copy.alsoInMain = this.alsoInMain;
+			return copy;
+		}
+
+		/** Position/Größe auf sinnvolle Werte begrenzen. */
+		public void clamp() {
+			this.width = Math.max(0.05, Math.min(1.0, Double.isFinite(this.width) ? this.width : 0.36));
+			this.height = Math.max(0.05, Math.min(1.0, Double.isFinite(this.height) ? this.height : 0.24));
+			this.x = Math.max(0.0, Math.min(1.0 - this.width, Double.isFinite(this.x) ? this.x : 0.0));
+			this.y = Math.max(0.0, Math.min(1.0 - this.height, Double.isFinite(this.y) ? this.y : 0.0));
+			if (this.textScale != null) this.textScale = Math.max(25, Math.min(200, this.textScale));
+			if (this.opacity != null) this.opacity = Math.max(0, Math.min(100, this.opacity));
+			if (this.displaySeconds != null && this.displaySeconds < FOCUSED_ONLY) this.displaySeconds = FOCUSED_ONLY;
 		}
 	}
 
@@ -386,6 +458,7 @@ public class ChatLanesConfig {
 			}
 			if (tab.pattern == null) tab.pattern = "";
 			if (tab.sendPrefix == null) tab.sendPrefix = "";
+			if (tab.windowLayout != null) tab.windowLayout.clamp();
 		}
 		return this;
 	}

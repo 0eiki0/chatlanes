@@ -27,12 +27,22 @@ public final class ChatLanes {
 
 	/** Ergebnis der Zuordnung einer Nachricht. channel == null und player == null bedeutet "System". */
 	/** alsoSystem = per Zusatzregel einem Kanal zugeordnet, soll aber auch im System-Tab erscheinen. */
-	private record Classification(@Nullable ChatTab channel, @Nullable String player, boolean everywhere, boolean alsoSystem) {
+	/** extraWindow = Fenster, in dem die Nachricht (per Filter) zusätzlich erscheint. */
+	private record Classification(@Nullable ChatTab channel, @Nullable String player, boolean everywhere, boolean alsoSystem,
+			@Nullable ChatTab extraWindow) {
 		static final Classification SYSTEM = new Classification(null, null, false, false);
 		static final Classification EVERYWHERE = new Classification(null, null, true, false);
 
 		Classification(@Nullable ChatTab channel, @Nullable String player) {
 			this(channel, player, false, false);
+		}
+
+		Classification(@Nullable ChatTab channel, @Nullable String player, boolean everywhere, boolean alsoSystem) {
+			this(channel, player, everywhere, alsoSystem, null);
+		}
+
+		Classification withExtraWindow(ChatTab window) {
+			return new Classification(this.channel, this.player, this.everywhere, this.alsoSystem, window);
 		}
 	}
 
@@ -98,6 +108,7 @@ public final class ChatLanes {
 		if (this.enabled != enabled) {
 			this.enabled = enabled;
 			this.peekReturnTab = null;
+			ChatWindows.get().markDirty();
 			this.refreshChat();
 		}
 	}
@@ -142,7 +153,7 @@ public final class ChatLanes {
 
 		this.cache = new MapMaker().weakKeys().makeMap();
 		this.active = null;
-		for (ChatTab tab : this.tabs()) {
+		for (ChatTab tab : this.barTabs()) {
 			if (tab.name().equals(activeName)) {
 				this.active = tab;
 				break;
@@ -152,6 +163,13 @@ public final class ChatLanes {
 			// Erster Aufruf (Spielstart) oder der aktive Tab existiert nicht mehr → Standard-Tab
 			this.active = this.defaultTabOrFirst();
 		}
+		List<ChatTab> windows = new ArrayList<>();
+		for (ChatTab tab : this.configTabs) {
+			if (tab.isWindow()) {
+				windows.add(tab);
+			}
+		}
+		ChatWindows.get().setTabs(windows);
 		this.refreshChat();
 	}
 
@@ -160,7 +178,7 @@ public final class ChatLanes {
 		String name = this.config.defaultTab;
 		if (name != null && !name.isBlank()) {
 			for (ChatTab tab : this.configTabs) {
-				if (tab.name().equals(name)) {
+				if (tab.name().equals(name) && !tab.isWindow()) {
 					return tab;
 				}
 			}
@@ -495,6 +513,14 @@ public final class ChatLanes {
 	public void jumpTo(SearchHit hit) {
 		Minecraft minecraft = Minecraft.getInstance();
 		Classification c = this.classify(hit.message());
+		if (hit.tab() != null && hit.tab().isWindow() && (this.active == null || !belongsTo(c, this.active))) {
+			// Nachricht steht in einem eigenen Fenster: dort hinscrollen statt den Tab zu wechseln
+			minecraft.gui.setScreen(new net.minecraft.client.gui.screens.ChatScreen("", false));
+			ChatWindows.get().scrollTo(hit.tab(), hit.message());
+			this.highlighted = hit.message();
+			this.highlightUntil = System.currentTimeMillis() + 4000L;
+			return;
+		}
 		if (this.active == null || !belongsTo(c, this.active)) {
 			ChatTab tab = hit.tab();
 			if (tab != null) {
@@ -571,8 +597,19 @@ public final class ChatLanes {
 		return all;
 	}
 
+	/** Tabs in der Tab-Leiste (ohne die, die als eigenes Fenster angezeigt werden). */
+	public List<ChatTab> barTabs() {
+		List<ChatTab> bar = new ArrayList<>();
+		for (ChatTab tab : this.tabs()) {
+			if (!tab.isWindow()) {
+				bar.add(tab);
+			}
+		}
+		return bar;
+	}
+
 	private @Nullable ChatTab firstTab() {
-		List<ChatTab> tabs = this.tabs();
+		List<ChatTab> tabs = this.barTabs();
 		return tabs.isEmpty() ? null : tabs.getFirst();
 	}
 
@@ -716,7 +753,13 @@ public final class ChatLanes {
 	private void refreshChat() {
 		Minecraft minecraft = Minecraft.getInstance();
 		if (minecraft != null && minecraft.gui != null && minecraft.gui.hud != null) {
-			minecraft.gui.hud.getChat().rescaleChat();
+			// Tab-Wechsel ändern nichts an den Fenstern → die müssen nicht neu aufgebaut werden
+			ChatWindows.get().setOwnRefresh(true);
+			try {
+				minecraft.gui.hud.getChat().rescaleChat();
+			} finally {
+				ChatWindows.get().setOwnRefresh(false);
+			}
 		}
 	}
 
@@ -736,11 +779,27 @@ public final class ChatLanes {
 			text = "";
 		}
 
+		// Filter der Fenster (zusätzliche Regeln) gelten für JEDE Nachricht – auch für Kanal- und private Nachrichten –
+		// und haben Vorrang vor allen anderen Tabs.
+		ChatTab filterWindow = null;
+		for (ChatTab tab : this.configTabs) {
+			if (tab.isWindow() && tab.kind() == ChatTab.Kind.CHANNEL && tab.matchesExtra(text)) {
+				filterWindow = tab;
+				break;
+			}
+		}
+		if (filterWindow != null && !filterWindow.windowAlsoInMain()) {
+			// Ins Fenster verschieben
+			Classification moved = new Classification(filterWindow, null);
+			this.cache.put(message, moved);
+			return moved;
+		}
+
 		Classification result = Classification.SYSTEM;
 		for (ChatTab tab : this.configTabs) {
 			Pattern pattern = tab.pattern();
 			if (tab.kind() == ChatTab.Kind.CHANNEL && pattern != null && pattern.matcher(text).find()) {
-				result = new Classification(tab, null);
+				result = new Classification(tab, null, false, tab.windowAlsoInMain());
 				break;
 			}
 		}
@@ -772,8 +831,9 @@ public final class ChatLanes {
 		// Zusätzliche Regeln der Kanäle – nur für Nachrichten, die sonst im System-Tab landen würden.
 		if (result == Classification.SYSTEM) {
 			for (ChatTab tab : this.configTabs) {
-				if (tab.kind() == ChatTab.Kind.CHANNEL && tab.matchesExtra(text)) {
-					result = new Classification(tab, null, false, tab.config().extraAlsoInSystem);
+				// (Filter der Fenster wurden oben schon geprüft)
+				if (tab.kind() == ChatTab.Kind.CHANNEL && !tab.isWindow() && tab.matchesExtra(text)) {
+					result = new Classification(tab, null, false, tab.config().extraAlsoInSystem || tab.windowAlsoInMain());
 					break;
 				}
 			}
@@ -792,19 +852,23 @@ public final class ChatLanes {
 				for (ChatTab tab : this.configTabs) {
 					if (tab.kind() == ChatTab.Kind.CHANNEL && tab.name().equals(tabName)) {
 						this.captured.put(message, tabName);
-						result = new Classification(tab, null, false, tab.config().extraAlsoInSystem);
+						result = new Classification(tab, null, false, tab.config().extraAlsoInSystem || tab.windowAlsoInMain());
 						break;
 					}
 				}
 			}
 		}
 
+		if (filterWindow != null) {
+			// Bleibt, wo sie ist, und erscheint zusätzlich im Fenster
+			result = result.withExtraWindow(filterWindow);
+		}
 		this.cache.put(message, result);
 		return result;
 	}
 
 	private static boolean belongsTo(Classification c, ChatTab tab) {
-		if (c.everywhere()) {
+		if (c.everywhere() || (c.extraWindow() != null && c.extraWindow() == tab)) {
 			return true;
 		}
 		return switch (tab.kind()) {
@@ -813,6 +877,12 @@ public final class ChatLanes {
 			case CHANNEL -> c.channel() == tab;
 			case PRIVATE -> c.player() != null && c.player().equalsIgnoreCase(tab.player());
 		};
+	}
+
+	/** Gehört die Nachricht in dieses eigene Fenster? Hinweise der Mod (Trennlinie, Update-Meldung) bleiben im Chat. */
+	boolean belongsToWindow(GuiMessage message, ChatTab window) {
+		Classification c = this.classify(message);
+		return !c.everywhere() && belongsTo(c, window);
 	}
 
 	/** Soll die Nachricht im aktuell gewählten Tab angezeigt werden? */
@@ -833,6 +903,7 @@ public final class ChatLanes {
 			return;
 		}
 		Classification c = this.classify(message);
+		ChatWindows.get().onNewMessage(message);
 		this.reopenIfNewer(c, ChatHistory.get().isRestoring() ? ChatHistory.get().restoreTime() : System.currentTimeMillis());
 		if (ChatHistory.get().isRestoring()) {
 			return;
@@ -852,7 +923,8 @@ public final class ChatLanes {
 			}
 		}
 		for (ChatTab tab : this.tabs()) {
-			if (tab != this.active && belongsTo(c, tab)) {
+			// Fenster sind immer sichtbar – dort gibt es nichts Ungelesenes
+			if (tab != this.active && !tab.isWindow() && belongsTo(c, tab)) {
 				tab.addUnread();
 				List<GuiMessage> list = this.unseen.computeIfAbsent(tab.name(), k -> new ArrayList<>());
 				list.add(message);
@@ -1023,6 +1095,7 @@ public final class ChatLanes {
 	}
 
 	public void onClear(boolean disconnect) {
+		ChatWindows.get().markDirty();
 		if (disconnect) {
 			ChatHistory.get().onChatCleared();
 			this.resetServerChannel();

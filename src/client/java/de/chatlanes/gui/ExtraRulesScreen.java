@@ -65,12 +65,17 @@ class ExtraRulesScreen extends BaseSettingsScreen {
 		List<Rule> rules = this.tab.extraRulesOrEmpty();
 		int y = TOP;
 
-		this.label(t("extra.info"), this.left, y + 2);
+		this.label(t(this.tab.isWindow() ? "extra.info_window" : "extra.info"), this.left, y + 2);
 		y += 14;
 
-		CycleButton<Boolean> alsoSystem = onOff(this.tab.extraAlsoInSystem)
-			.create(this.left, y, this.contentWidth, 20, t("extra.also_system"), (b, v) -> this.tab.extraAlsoInSystem = v);
-		alsoSystem.setTooltip(Tooltip.create(t("extra.also_system.tooltip")));
+		// Fenster: Filter gelten für alle Nachrichten → "auch im normalen Chat" statt "auch im System-Tab"
+		boolean window = this.tab.isWindow();
+		CycleButton<Boolean> alsoSystem = window
+			? onOff(this.tab.windowLayoutOrDefault().alsoInMain)
+				.create(this.left, y, this.contentWidth, 20, t("filter.also_main"), (b, v) -> this.tab.windowLayoutOrDefault().alsoInMain = v)
+			: onOff(this.tab.extraAlsoInSystem)
+				.create(this.left, y, this.contentWidth, 20, t("extra.also_system"), (b, v) -> this.tab.extraAlsoInSystem = v);
+		alsoSystem.setTooltip(Tooltip.create(t(window ? "filter.also_main.tooltip" : "extra.also_system.tooltip")));
 		this.addRenderableWidget(alsoSystem);
 		y += ROW + 4;
 

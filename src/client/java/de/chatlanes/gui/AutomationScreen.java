@@ -31,7 +31,7 @@ class AutomationScreen extends BaseSettingsScreen {
 		y += 12;
 		List<String> names = new ArrayList<>();
 		for (var tab : this.working.tabs) {
-			if (!names.contains(tab.name)) {
+			if (!tab.isWindow() && !names.contains(tab.name)) {
 				names.add(tab.name);
 			}
 		}
