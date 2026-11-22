@@ -116,7 +116,7 @@ class WindowSettingsScreen extends BaseSettingsScreen {
 			if (y > this.height - 40) {
 				break;
 			}
-			graphics.text(this.font, line, this.left, y, LABEL_COLOR, false);
+			graphics.text(this.font, line, this.left, y, LABEL_COLOR, true);
 			y += 10;
 		}
 	}
