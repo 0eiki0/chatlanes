@@ -88,22 +88,35 @@ class TabEditScreen extends BaseSettingsScreen {
 		}
 		y += ROW;
 
-		EditBox switchCommand = this.textRow(y, t("edit.switch"), this.edited.switchCommand == null ? "" : this.edited.switchCommand,
-			t("edit.switch.hint"), t("edit.switch.tooltip"), v -> this.edited.switchCommand = v);
-		y += ROW;
-
-		this.textRow(y, t("edit.prefix"), this.edited.sendPrefix, t("edit.prefix.hint"), t("prefix.tooltip"), v -> this.edited.sendPrefix = v);
-		y += ROW;
+		boolean window = this.edited.isWindow();
+		if (!window) {
+			// Wechsel-Befehl und Sende-Präfix nebeneinander (in Fenstern wird nicht geschrieben → dort ausgeblendet)
+			EditBox switchCommand = this.textRow(y, t("edit.switch_prefix"), this.edited.switchCommand == null ? "" : this.edited.switchCommand,
+				t("edit.switch.hint"), t("edit.switch.tooltip"), v -> this.edited.switchCommand = v);
+			switchCommand.setWidth(fieldWidth / 2 - 2);
+			EditBox prefix = new EditBox(this.font, this.left + this.labelWidth + fieldWidth / 2 + 2, y + 1, fieldWidth - fieldWidth / 2 - 2, 18,
+				t("edit.prefix"));
+			prefix.setMaxLength(1024);
+			prefix.setValue(this.edited.sendPrefix);
+			prefix.moveCursorToStart(false);
+			prefix.setHint(t("edit.prefix.hint"));
+			prefix.setTooltip(Tooltip.create(t("prefix.tooltip")));
+			prefix.setResponder(v -> this.edited.sendPrefix = v);
+			this.addRenderableWidget(prefix);
+			y += ROW;
+		}
 
 		// Drei Schalter nebeneinander: Blinken | Zähler | Farbe
 		int third = (this.contentWidth - 8) / 3;
 		CycleButton<Boolean> blink = onOff(this.edited.blink)
 			.create(this.left, y, third, 20, t("blink"), (b, v) -> this.edited.blink = v);
 		blink.setTooltip(Tooltip.create(t("blink.tooltip")));
+		blink.active = !window;
 		this.addRenderableWidget(blink);
 		CycleButton<Boolean> counter = onOff(this.edited.showsUnread())
 			.create(this.left + third + 4, y, third, 20, t("counter"), (b, v) -> this.edited.showUnread = v);
 		counter.setTooltip(Tooltip.create(t("counter.tooltip")));
+		counter.active = !window;
 		this.addRenderableWidget(counter);
 		this.addRenderableWidget(CycleButton.<TabColor>builder(c -> Component.translatable(c.translationKey()).withColor(c.argb()), this.edited.color)
 			.withValues(TabColor.values())
@@ -112,6 +125,33 @@ class TabEditScreen extends BaseSettingsScreen {
 
 		this.soundRow(y, this.edited.soundOrNone(), this.edited.volumeOrDefault(), v -> this.edited.sound = v, v -> this.edited.volume = v);
 		y += ROW;
+
+		if (this.edited.type != TabConfig.Type.SYSTEM) {
+			// Anzeige: in der Tab-Leiste oder als eigenes, frei verschiebbares Fenster
+			CycleButton<Boolean> display = CycleButton.<Boolean>builder(v -> t(v ? "display.window" : "display.bar"), this.edited.window)
+				.withValues(false, true)
+				.create(this.left, y, half, 20, t("display"), (b, v) -> {
+					this.edited.window = v;
+					if (v && this.edited.windowLayout == null) {
+						int windows = 0;
+						for (TabConfig other : this.main.working.tabs) {
+							if (other != this.original && other.isWindow()) {
+								windows++;
+							}
+						}
+						this.edited.windowLayout = de.chatlanes.ChatWindows.defaultLayout(windows);
+					}
+					this.rebuildWidgets();
+				});
+			display.setTooltip(Tooltip.create(t("display.tooltip")));
+			this.addRenderableWidget(display);
+			Button windowSettings = Button.builder(t("window.button"),
+					b -> this.minecraft.gui.setScreen(new WindowSettingsScreen(this, this.edited)))
+				.bounds(this.rightHalfX(), y, half, 20).build();
+			windowSettings.active = this.edited.window;
+			this.addRenderableWidget(windowSettings);
+			y += ROW;
+		}
 
 		if (channel) {
 			// Weitere Nachrichten (die sonst im System-Tab landen würden) diesem Kanal zuordnen
@@ -177,6 +217,8 @@ class TabEditScreen extends BaseSettingsScreen {
 			this.original.color = this.edited.color;
 			this.original.extraRules = this.edited.extraRules;
 			this.original.extraAlsoInSystem = this.edited.extraAlsoInSystem;
+			this.original.window = this.edited.window;
+			this.original.windowLayout = this.edited.windowLayout;
 		}
 		this.onClose();
 	}

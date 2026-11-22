@@ -85,7 +85,8 @@ class TabLayoutScreen extends BaseSettingsScreen {
 	private List<Object> itemsIn(Position row) {
 		List<Object> items = new ArrayList<>();
 		for (TabConfig tab : this.working.tabs) {
-			if (this.working.rowOf(tab) == row) {
+			// Tabs, die als eigenes Fenster angezeigt werden, stehen in keiner Leiste
+			if (!tab.isWindow() && this.working.rowOf(tab) == row) {
 				items.add(tab);
 			}
 		}

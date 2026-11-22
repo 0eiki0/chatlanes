@@ -85,6 +85,16 @@ public final class ChatTab {
 		return this.kind == Kind.PRIVATE;
 	}
 
+	/** Wird dieser Tab als eigenes Chatfenster angezeigt (statt in der Tab-Leiste)? */
+	public boolean isWindow() {
+		return this.config != null && this.config.isWindow();
+	}
+
+	/** Sollen Nachrichten dieses Fensters zusätzlich im normalen Chat (wo sie sonst landen würden) erscheinen? */
+	boolean windowAlsoInMain() {
+		return this.isWindow() && this.config.windowLayout != null && this.config.windowLayout.alsoInMain;
+	}
+
 	public @Nullable TabConfig config() {
 		return this.config;
 	}

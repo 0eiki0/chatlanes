@@ -39,6 +39,23 @@ public final class ChatLook {
 		return (float) (in * out);
 	}
 
+	/**
+	 * Sichtbarkeit einer Zeile in einem eigenen Fenster: nach displaySeconds Sekunden in fadeOutSeconds ausblenden
+	 * (0 = hart ausblenden).
+	 */
+	public static float alpha(GuiMessage.Line line, double displaySeconds, double fadeOutSeconds) {
+		Minecraft minecraft = Minecraft.getInstance();
+		double ticks = minecraft.gui.hud.getGuiTicks() + minecraft.getDeltaTracker().getGameTimeDeltaPartialTick(true);
+		double age = Math.max(0.0, (ticks - line.addedTime()) / 20.0);
+		if (age <= displaySeconds) {
+			return (float) smooth(age / FADE_IN_SECONDS);
+		}
+		if (fadeOutSeconds <= 0.0) {
+			return 0.0F;
+		}
+		return (float) smooth(1.0 - (age - displaySeconds) / fadeOutSeconds);
+	}
+
 	private static double smooth(double t) {
 		t = Mth.clamp(t, 0.0, 1.0);
 		return t * t * (3.0 - 2.0 * t);

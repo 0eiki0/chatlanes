@@ -107,6 +107,31 @@ public final class TabBar {
 		}
 	}
 
+	/** Nachricht im normalen Chat unter der Maus (bei offenem Chat), sonst null – für "Filter erstellen". */
+	public static net.minecraft.client.multiplayer.chat.@Nullable GuiMessage messageAt(int screenHeight, double mouseX, double mouseY) {
+		Minecraft minecraft = Minecraft.getInstance();
+		if (!ChatLanes.get().isEnabled() || minecraft.options.chatVisibility().get() == net.minecraft.world.entity.player.ChatVisiblity.HIDDEN) {
+			return null;
+		}
+		ChatBox box = chatBox(minecraft, screenHeight);
+		if (mouseX < 0 || mouseX >= box.right() || mouseY >= box.bottom()) {
+			return null;
+		}
+		var chat = minecraft.gui.hud.getChat();
+		var accessor = (ChatComponentAccessor) chat;
+		List<net.minecraft.client.multiplayer.chat.GuiMessage.Line> lines = accessor.chatlanes$getTrimmedMessages();
+		double local = box.scaledBottom() - mouseY / box.scale();
+		if (local < 0) {
+			return null;
+		}
+		int index = (int) (local / box.lineHeight());
+		int scroll = accessor.chatlanes$getScrollPos();
+		if (index >= chat.getLinesPerPage() || scroll + index >= lines.size()) {
+			return null;
+		}
+		return ChatLanes.get().originalOf(lines.get(scroll + index).parent());
+	}
+
 	private static int rowY(Minecraft minecraft, int screenHeight, ChatLanesConfig.Position position) {
 		if (position == ChatLanesConfig.Position.BOTTOM) {
 			// Zwischen Chat und Eingabefeld (das Eingabefeld beginnt bei height - 14).
@@ -140,7 +165,7 @@ public final class TabBar {
 		// Tabs auf die beiden Leisten verteilen (Reihenfolge wie in der Tab-Liste)
 		List<ChatTab> top = new ArrayList<>();
 		List<ChatTab> bottom = new ArrayList<>();
-		for (ChatTab tab : tabs.tabs()) {
+		for (ChatTab tab : tabs.barTabs()) {
 			ChatLanesConfig.Position row = tab.isPrivate() ? config.pmRowOrDefault() : config.rowOf(tab.config());
 			(row == ChatLanesConfig.Position.BOTTOM ? bottom : top).add(tab);
 		}
